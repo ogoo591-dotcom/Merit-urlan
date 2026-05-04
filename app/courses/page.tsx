@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import { CoursesCarousel } from "@/components/courses-carousel";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";

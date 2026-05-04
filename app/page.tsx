@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { CategoryCard } from "@/components/category-card";
+
+export const runtime = "edge";
 import { FeaturedCourseCard } from "@/components/featured-course-card";
 import { ShopHero } from "@/components/shop-hero";
 import { SiteFooter } from "@/components/site-footer";
