@@ -23,6 +23,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(storageKey);
+      // Сагсыг серверээс биш хөтчөөс уншдаг тул hydration-ий дараа нэг удаа ачаална.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (stored) setItems(JSON.parse(stored) as CartLine[]);
     } catch {
       window.localStorage.removeItem(storageKey);
