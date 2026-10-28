@@ -45,11 +45,11 @@ export function ShopHero({
       >
         <div className="mx-auto grid w-full max-w-[1800px] gap-12 px-6 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-12 lg:py-16">
           <div className="flex flex-col justify-center lg:pr-8">
-            <p className="text-xs uppercase tracking-[0.42em] text-[#9c7d63]">{meta.heroEyebrow}</p>
-            <h1 className="mt-6 whitespace-pre-line font-serif text-6xl leading-[0.84] font-semibold tracking-[-0.06em] text-[#1f1712] sm:text-7xl lg:text-[7.4rem]">
+            <p className="text-[8px] uppercase tracking-[0.42em] text-[#9c7d63]">{meta.heroEyebrow}</p>
+            <h1 className="mt-6 whitespace-pre-line font-serif text-[48px] leading-[0.84] font-semibold tracking-[-0.06em] text-[#1f1712] sm:text-[56px] lg:text-[68px]">
               {meta.heroTitle}
             </h1>
-            <p className="mt-8 max-w-xl font-serif text-2xl leading-relaxed text-[#7f746b] italic lg:text-[2.15rem]">
+            <p className="mt-8 max-w-xl font-serif text-[12px] leading-relaxed text-[#7f746b] italic">
               {meta.heroDescription}
             </p>
           </div>
@@ -93,8 +93,8 @@ export function ShopHero({
         <div className="mx-auto grid w-full max-w-[1800px] gap-8 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:px-12">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="font-serif text-5xl font-semibold text-[#573a2a] lg:text-6xl">{stat.value}</p>
-              <p className="mt-4 text-base uppercase tracking-[0.2em] text-[#9b8572]">{stat.label}</p>
+              <p className="font-serif text-[12px] font-semibold text-[#573a2a]">{stat.value}</p>
+              <p className="mt-4 text-[12px] uppercase tracking-[0.2em] text-[#9b8572]">{stat.label}</p>
             </div>
           ))}
         </div>

@@ -69,7 +69,7 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
           onClick={() => scrollToIndex(currentIndex - 1)}
           disabled={currentIndex === 0}
           aria-label="Өмнөх сургалт"
-          className="absolute left-0 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#2f3742] text-4xl text-white shadow-[0_20px_45px_-28px_rgba(20,20,20,0.5)] transition hover:bg-[#232933] disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
+          className="absolute left-0 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#2f3742] text-[12px] text-white shadow-[0_20px_45px_-28px_rgba(20,20,20,0.5)] transition hover:bg-[#232933] disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         >
           ←
         </button>
@@ -93,13 +93,13 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
           onClick={() => scrollToIndex(currentIndex + 1)}
           disabled={currentIndex === courses.length - 1}
           aria-label="Дараах сургалт"
-          className="absolute right-0 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#2f3742] text-4xl text-white shadow-[0_20px_45px_-28px_rgba(20,20,20,0.5)] transition hover:bg-[#232933] disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
+          className="absolute right-0 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 items-center justify-center rounded-full bg-[#2f3742] text-[12px] text-white shadow-[0_20px_45px_-28px_rgba(20,20,20,0.5)] transition hover:bg-[#232933] disabled:cursor-not-allowed disabled:opacity-40 lg:flex"
         >
           →
         </button>
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-5 text-3xl text-[#676c75]">
+      <div className="mt-4 flex items-center justify-center gap-5 text-[12px] text-[#676c75]">
         <button
           type="button"
           onClick={() => scrollToIndex(currentIndex - 1)}
@@ -109,7 +109,7 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
         >
           ←
         </button>
-        <p className="min-w-20 text-center text-2xl font-medium">
+        <p className="min-w-20 text-center text-[12px] font-medium">
           {currentIndex + 1} / {courses.length}
         </p>
         <button

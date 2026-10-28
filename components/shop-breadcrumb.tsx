@@ -13,7 +13,7 @@ type ShopBreadcrumbProps = {
 export function ShopBreadcrumb({ crumbs }: ShopBreadcrumbProps) {
   return (
     <div className="border-y border-[#e7e8ea] bg-[#f4f5f7]">
-      <div className="mx-auto flex w-full max-w-[1800px] flex-wrap items-center gap-3 px-6 py-5 text-xl lg:px-12 lg:text-[2rem]">
+      <div className="mx-auto flex w-full max-w-[1800px] flex-wrap items-center gap-3 px-6 py-5 text-[12px] lg:px-12">
         {crumbs.map((crumb, index) => (
           <div key={`${crumb.label}-${index}`} className="flex items-center gap-3">
             {crumb.href ? (

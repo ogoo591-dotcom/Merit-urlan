@@ -3,10 +3,12 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { ProductOptionCard } from "@/components/product-option-card";
+import { ProductPurchaseControls } from "@/components/product-purchase-controls";
 import { ShopBreadcrumb } from "@/components/shop-breadcrumb";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getCatalogItem, shopCategoryMeta, type ShopCategoryKey } from "@/lib/site-data";
+import { findCatalogItem } from "@/lib/products";
+import { shopCategoryMeta, type ShopCategoryKey } from "@/lib/site-data";
 
 export const runtime = "edge";
 
@@ -41,7 +43,7 @@ function getSectionCrumb(category: ShopCategoryKey, subcategory: string) {
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
   const { category, slug } = await params;
   if (!isCategoryKey(category)) return {};
-  const item = getCatalogItem(category, slug);
+  const item = await findCatalogItem(category, slug);
   if (!item) return {};
   return {
     title: `${item.name} | Merit Urlan`,
@@ -53,7 +55,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const { category, slug } = await params;
   if (!isCategoryKey(category)) notFound();
 
-  const item = getCatalogItem(category, slug);
+  const item = await findCatalogItem(category, slug);
   if (!item) notFound();
 
   const metaChips = [
@@ -79,14 +81,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
         <section className="mx-auto w-full max-w-[1800px] px-6 py-16 lg:px-12">
           {item.options?.length ? (
-            <div>
+            <div id="product-options">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <p className="flex items-center gap-3 text-2xl font-semibold text-[#6e6e6e] lg:text-3xl">
+                <p className="flex items-center gap-3 text-[12px] font-semibold text-[#6e6e6e]">
                   <span>🎨</span> Сонголтууд ({item.options.length})
                 </p>
-                <button className="w-fit rounded-xl border border-[#9aa5b1] px-6 py-3 text-lg font-medium text-[#4b5563] transition hover:bg-[#f7f7f7]">
+                <a href="#product-options" className="w-fit rounded-xl border border-[#9aa5b1] px-6 py-3 text-[12px] font-medium text-[#4b5563] transition hover:bg-[#f7f7f7]">
                   Бүгдийг харах
-                </button>
+                </a>
               </div>
               <div className="-mx-2 overflow-x-auto px-2 pb-2">
                 <div className="flex gap-4">
@@ -118,14 +120,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </div>
 
             <div className="xl:pt-6">
-              <h1 className="text-5xl font-bold leading-[0.92] tracking-tight text-black lg:text-[5.2rem]">
+              <h1 className="text-[40px] font-bold leading-[0.92] tracking-tight text-black lg:text-[68px]">
                 {item.name}
               </h1>
               <div className="mt-6 flex flex-wrap gap-3">
                 {metaChips.map((chip) => (
                   <div
                     key={chip}
-                    className="rounded-2xl border border-[#dfe3e6] bg-[#f8f9fa] px-5 py-3 text-lg font-medium text-[#6c757d] lg:text-2xl"
+                    className="rounded-2xl border border-[#dfe3e6] bg-[#f8f9fa] px-5 py-3 text-[12px] font-medium text-[#6c757d]"
                   >
                     {chip}
                   </div>
@@ -134,49 +136,21 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
               <div className="mt-10 space-y-8">
                 <div className="flex items-center justify-between rounded-[1.7rem] border border-[#dfe3e6] px-6 py-7">
-                  <span className="text-2xl font-semibold text-[#495057] lg:text-3xl">Үнэ:</span>
-                  <span className="text-4xl font-bold text-[#f59b17] lg:text-5xl">{item.price}</span>
+                  <span className="text-[12px] font-semibold text-[#495057]">Үнэ:</span>
+                  <span className="text-[12px] font-bold text-[#f59b17]">{item.price}</span>
                 </div>
 
-                <div>
-                  <p className="mb-4 text-2xl font-medium text-[#495057] lg:text-3xl">Тоо ширхэг:</p>
-                  <div className="grid gap-4 lg:grid-cols-[0.78fr_1fr_1fr]">
-                    <div className="flex h-20 items-center overflow-hidden rounded-[1.4rem] border border-[#dfe3e6] bg-white lg:h-24">
-                      <button className="flex h-full w-18 items-center justify-center bg-[#f1f3f5] px-6 text-3xl text-[#b2bbc5] lg:text-4xl">
-                        −
-                      </button>
-                      <div className="flex-1 text-center text-2xl font-semibold lg:text-3xl">1</div>
-                      <button className="flex h-full w-18 items-center justify-center px-6 text-3xl text-[#a0a9b3] lg:text-4xl">
-                        +
-                      </button>
-                    </div>
-                    <button className="rounded-[1.4rem] bg-[#f7a40d] px-8 py-5 text-2xl font-bold text-white transition hover:bg-[#e69607] lg:text-3xl">
-                      🧺 Сагслах
-                    </button>
-                    <button className="rounded-[1.4rem] bg-[#1fbe86] px-8 py-5 text-2xl font-semibold text-white transition hover:bg-[#18ac78] lg:text-3xl">
-                      ♡ Хадгалах
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-[1.7rem] border border-[#dfe3e6] px-6 py-7">
-                  <span className="text-2xl font-semibold text-[#495057] lg:text-3xl">Нийт дүн:</span>
-                  <span className="text-4xl font-bold text-[#f59b17] lg:text-5xl">{item.price}</span>
-                </div>
-
-                <button className="w-fit rounded-xl bg-[#2d7be5] px-8 py-4 text-xl font-semibold text-white lg:text-2xl">
-                  f Share
-                </button>
+                <ProductPurchaseControls item={item} />
 
                 <div className="rounded-[2rem] border border-[#ecd8de] bg-[#fffafb] p-8 lg:p-10">
-                  <p className="text-2xl font-semibold text-[#3d4651] lg:text-3xl">Тайлбар</p>
-                  <p className="mt-5 text-lg leading-8 text-[#6c7380] lg:text-2xl lg:leading-10">
+                  <p className="text-[12px] font-semibold text-[#3d4651]">Тайлбар</p>
+                  <p className="mt-5 text-[12px] leading-8 text-[#6c7380] lg:leading-10">
                     {item.description}
                   </p>
 
                   <div className="mt-12">
-                    <p className="text-2xl uppercase tracking-[0.08em] text-[#9f7b84] lg:text-3xl">Онцлог</p>
-                    <div className="mt-8 space-y-5 text-lg text-[#425066] lg:text-2xl">
+                    <p className="text-[12px] uppercase tracking-[0.08em] text-[#9f7b84]">Онцлог</p>
+                    <div className="mt-8 space-y-5 text-[12px] text-[#425066]">
                       {(item.features ?? [
                         "Нэг бүрчлэн шалгаж бэлтгэсэн чанартай бүтээгдэхүүн.",
                         "Захиалгын дараа хүргэлт болон сонголтын баталгаажуулалт хийгдэнэ.",

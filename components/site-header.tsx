@@ -3,11 +3,16 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-import { catalogItems, navigation } from "@/lib/site-data";
+import type { CatalogItem } from "@/lib/site-data";
+import { AddressButton } from "@/components/address-button";
+import { CategoryMenu } from "@/components/category-menu";
+import { useAuthModal } from "@/components/auth/auth-modal-provider";
+import { useCart } from "@/components/cart-provider";
 
-function SearchIcon({ className = "h-8 w-8" }: { className?: string }) {
+function SearchIcon({ className = "h-6 w-6" }: { className?: string }) {
   return (
     <svg
       aria-hidden="true"
@@ -60,7 +65,7 @@ function UserIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-8 w-8"
+      className="h-6 w-6"
       viewBox="0 0 32 32"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -70,26 +75,6 @@ function UserIcon() {
         d="M6 28C6.6 21.8 10.4 18.5 16 18.5C21.6 18.5 25.4 21.8 26 28H6Z"
         stroke="currentColor"
         strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M4.5 7.5L10 13L15.5 7.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
@@ -115,7 +100,7 @@ function StoreIcon() {
   return (
     <svg
       aria-hidden="true"
-      className="h-9 w-9"
+      className="h-6 w-6"
       viewBox="0 0 32 32"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -158,33 +143,63 @@ function highlightMatch(text: string, query: string) {
   return (
     <>
       {before}
-      <span className="text-[#f39a08]">{match}</span>
+      <span className="text-[#6e4f45]">{match}</span>
       {after}
     </>
   );
 }
 
 export function SiteHeader() {
-  const { isSignedIn } = useUser();
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const router = useRouter();
+  const { isSignedIn, user } = useUser();
+  const isAdmin = user?.publicMetadata?.role === "admin";
+  const { openAuth, requireAuth } = useAuthModal();
+  const { items, removeItem } = useCart();
+  const cartCount = items.reduce((total, item) => total + item.quantity, 0);
+  const cartTotal = items.reduce((total, item) => total + item.priceValue * item.quantity, 0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<CatalogItem[]>([]);
+  const headerRef = useRef<HTMLElement>(null);
 
-  const searchResults = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+  // Expose the header height so full-screen sections (the home hero) can fill
+  // exactly the space below it.
+  useEffect(() => {
+    const header = headerRef.current;
 
-    if (!query) {
-      return [];
+    if (!header) {
+      return;
     }
 
-    return catalogItems
-      .filter((item) =>
-        [item.name, item.subcategory, item.description].some((value) =>
-          value.toLowerCase().includes(query),
-        ),
-      )
-      .slice(0, 4);
+    const observer = new ResizeObserver(() => {
+      document.documentElement.style.setProperty("--header-h", `${header.offsetHeight}px`);
+    });
+    observer.observe(header);
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Бичиж дуусахыг 250мс хүлээгээд сангаас хайна.
+  useEffect(() => {
+    const query = searchQuery.trim();
+
+    if (!query) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
+        .then((response) => (response.ok ? response.json() : { items: [] }))
+        .then((data: { items: CatalogItem[] }) => setSearchResults(data.items))
+        .catch(() => {});
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
   }, [searchQuery]);
 
   const closeSearch = () => {
@@ -194,99 +209,157 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="relative z-40 border-b border-[#ddd1c4] bg-[#f3ede5]">
-        <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 px-6 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-12">
+      <header ref={headerRef} className="sticky top-0 z-40 border-b border-[#eadfd5] bg-[#fcf6f0] bg-[radial-gradient(#ead9cc_1px,transparent_1px)] [background-size:28px_28px]">
+        <div className="mx-auto grid w-full max-w-[1600px] grid-cols-[auto_1fr] items-center gap-x-6 gap-y-4 px-6 py-3 lg:grid-cols-[1fr_auto_1fr] lg:px-[60px]">
+          <div className="order-last col-span-2 flex w-full items-center gap-3 lg:order-none lg:col-span-1 lg:max-w-[500px]">
+          <CategoryMenu />
+
+          <div
+            className="relative min-w-0 flex-1"
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                setIsSearchOpen(false);
+              }
+            }}
+          >
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                const query = searchQuery.trim();
+
+                if (query) {
+                  router.push(`/shop?search=${encodeURIComponent(query)}`);
+                  closeSearch();
+                }
+              }}
+              className="flex items-center gap-3 rounded-xl border border-[#e3d6cb] bg-white/80 px-4 py-3 transition focus-within:border-[#6e4f45]"
+            >
+              <SearchIcon className="h-6 w-6 shrink-0 text-[#8a7b73]" />
+              <input
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setIsSearchOpen(true);
+                }}
+                onFocus={() => setIsSearchOpen(true)}
+                placeholder="Хайх"
+                className="min-w-0 flex-1 bg-transparent text-[12px] text-[#2f2420] outline-none placeholder:text-[#8a7b73]"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  aria-label="Хайлтын үг арилгах"
+                  onClick={() => setSearchQuery("")}
+                  className="text-[#8a7b73] transition hover:text-[#6e4f45]"
+                >
+                  <CloseIcon className="h-5 w-5" />
+                </button>
+              ) : null}
+            </form>
+
+            {isSearchOpen && searchQuery.trim() ? (
+              <div className="absolute inset-x-0 top-[calc(100%+0.5rem)] z-50 overflow-hidden rounded-xl border border-[#eadfd5] bg-white shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
+                {searchResults.length > 0 ? (
+                  <>
+                    {searchResults.map((item) => (
+                      <Link
+                        key={`${item.category}-${item.slug}`}
+                        href={`/shop/${item.category}/${item.slug}`}
+                        onClick={closeSearch}
+                        className="flex items-center gap-4 border-b border-[#f1ebe5] px-4 py-3 transition hover:bg-[#fcf6f0]"
+                      >
+                        <Image
+                          src={item.image}
+                          alt=""
+                          width={56}
+                          height={56}
+                          className="h-14 w-14 shrink-0 rounded-lg bg-[#f2f2f2] object-cover"
+                        />
+                        <div className="min-w-0">
+                          <p className="line-clamp-1 text-[11px] font-semibold text-[#2f2420]">
+                            {highlightMatch(item.name, searchQuery)}
+                          </p>
+                          <p className="mt-0.5 text-[10px] font-medium text-[#6e4f45]">{item.price}</p>
+                        </div>
+                      </Link>
+                    ))}
+                    <Link
+                      href={`/shop?search=${encodeURIComponent(searchQuery.trim())}`}
+                      onClick={closeSearch}
+                      className="block px-4 py-3 text-center text-[11px] font-medium text-[#6e4f45] transition hover:bg-[#fcf6f0]"
+                    >
+                      «{searchQuery.trim()}» бүгдийг харах
+                    </Link>
+                  </>
+                ) : (
+                  <p className="px-4 py-6 text-center text-[11px] text-[#8a7b73]">
+                    «{searchQuery.trim()}» олдсонгүй
+                  </p>
+                )}
+              </div>
+            ) : null}
+          </div>
+          </div>
+
           <Link href="/" className="flex shrink-0 items-center gap-3">
             <Image
               src="/Logo.png"
               alt="Merit Urlan Logo"
-              width={96}
-              height={96}
-              className="h-15 w-auto"
+              width={128}
+              height={128}
+              className="h-14 w-14 rounded-full object-cover"
               priority
             />
-            <p className="font-serif text-xl font-semibold uppercase tracking-tight text-[#7b2533] md:text-4xl">
-              Merit Urlan
-            </p>
+            <div className="leading-tight">
+              <p className="text-[12px] font-semibold text-[#2f2420]">Merit урлан</p>
+              <p className="mt-1 text-[9px] font-medium uppercase tracking-[0.2em] text-[#8a7b73]">
+                Бизнес
+              </p>
+            </div>
           </Link>
 
-          <nav className="flex flex-1 flex-wrap items-center justify-center gap-6 text-xs uppercase tracking-[0.34em] text-stone-500 md:gap-10">
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="transition hover:text-[#7b2533]"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="relative flex items-center gap-7 self-end text-[#27313a] lg:self-auto">
-            <button
-              type="button"
-              aria-label="Хайх"
-              onClick={() => {
-                setIsSearchOpen(true);
-                setIsAccountOpen(false);
-              }}
-              className="flex h-11 w-11 items-center justify-center transition hover:text-[#7b2533]"
-            >
-              <SearchIcon />
-            </button>
+          <div className="flex items-center justify-end gap-5 text-[#2f2420]">
+            <AddressButton />
             <button
               type="button"
               aria-label="Сагс"
-              onClick={() => {
-                setIsCartOpen(true);
-                setIsAccountOpen(false);
-              }}
-              className="relative flex h-11 w-11 items-center justify-center transition hover:text-[#7b2533]"
+              onClick={() => setIsCartOpen(true)}
+              className="relative flex h-11 w-11 items-center justify-center transition hover:text-[#6e4f45]"
             >
               <CartIcon />
-              <span className="absolute -right-2 -top-1 flex h-8 min-w-8 items-center justify-center rounded-full bg-[#f39a08] px-2 text-base font-bold leading-none text-white">
-                0
-              </span>
+              {cartCount > 0 ? (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#6e4f45] px-1.5 text-[8px] font-semibold leading-none text-white">
+                  {cartCount}
+                </span>
+              ) : null}
             </button>
 
-            {!isSignedIn ? (
+            {isSignedIn ? (
+              <>
+                {isAdmin ? (
+                  <Link
+                    href="/admin"
+                    className="rounded-full bg-[#2f2420] px-4 py-2 text-[11px] font-semibold text-white transition hover:bg-[#6e4f45]"
+                  >
+                    Админ
+                  </Link>
+                ) : null}
+                <UserButton>
+                  <UserButton.MenuItems>
+                    <UserButton.Link label="Миний захиалгууд" labelIcon={<CartIcon className="h-4 w-4" />} href="/account" />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </>
+            ) : (
               <button
                 type="button"
-                aria-label="Нэвтрэх"
-                onClick={() => setIsAccountOpen((isOpen) => !isOpen)}
-                className={`flex h-11 items-center justify-center gap-2 transition ${
-                  isAccountOpen ? "text-[#f39a08]" : "hover:text-[#7b2533]"
-                }`}
+                onClick={() => openAuth()}
+                className="flex items-center gap-2 rounded-full border-[1.5px] border-[#2f2420] px-5 py-2.5 text-[12px] font-semibold transition hover:border-[#6e4f45] hover:text-[#6e4f45]"
               >
                 <UserIcon />
-                <ChevronDownIcon />
+                Нэвтрэх
               </button>
-            ) : null}
-
-            {isSignedIn ? (
-              <UserButton />
-            ) : null}
-
-            {isAccountOpen ? (
-              <div className="absolute right-0 top-[calc(100%+1.25rem)] z-50 w-[min(28rem,calc(100vw-2rem))] rounded-b-2xl rounded-tr-2xl bg-white py-8 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.45)]">
-                <div className="absolute right-8 top-0 h-8 w-8 -translate-y-1/2 rotate-45 bg-white" />
-                <Link
-                  href="/sign-in"
-                  onClick={() => setIsAccountOpen(false)}
-                  className="relative block px-8 py-4 text-3xl font-medium text-[#3f465f] transition hover:text-[#f39a08]"
-                >
-                  Нэвтрэх
-                </Link>
-                <div className="mx-8 border-t border-[#dfe3e6]" />
-                <Link
-                  href="/sign-up"
-                  onClick={() => setIsAccountOpen(false)}
-                  className="relative block px-8 py-4 text-3xl font-medium text-[#3f465f] transition hover:text-[#f39a08]"
-                >
-                  Бүртгүүлэх
-                </Link>
-              </div>
-            ) : null}
+            )}
           </div>
         </div>
       </header>
@@ -294,122 +367,80 @@ export function SiteHeader() {
       {isCartOpen ? (
         <div className="fixed inset-0 z-50 bg-black/45" onClick={() => setIsCartOpen(false)}>
           <aside
-            className="ml-auto flex h-full w-full max-w-[46rem] flex-col bg-white"
+            className="ml-auto flex h-full w-full max-w-[32rem] flex-col bg-white"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-[#dfe3e6] bg-[#f5f8fa] px-8 py-7 md:px-12">
-              <h2 className="text-4xl font-bold text-[#101820]">Таны сагс</h2>
+            <div className="flex items-center justify-between border-b border-[#eadfd5] bg-[#fcf6f0] px-8 py-6">
+              <h2 className="text-[12px] font-semibold text-[#2f2420]">Таны сагс</h2>
               <button
                 type="button"
                 aria-label="Сагс хаах"
                 onClick={() => setIsCartOpen(false)}
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#7a828a] transition hover:text-[#f39a08]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#8a7b73] transition hover:text-[#6e4f45]"
               >
-                <CloseIcon className="h-7 w-7" />
+                <CloseIcon className="h-6 w-6" />
               </button>
             </div>
 
-            <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-              <CartIcon className="h-28 w-28 text-[#6f7880]" />
-              <h3 className="mt-10 text-4xl font-bold text-[#6f7880]">Таны сагс хоосон байна</h3>
-              <p className="mt-6 max-w-xl text-3xl font-medium leading-relaxed text-[#6f7880]">
-                Дуртай бараагаа нэмээд худалдан авалтаа эхлээрэй
-              </p>
-              <Link
-                href="/shop"
-                onClick={() => setIsCartOpen(false)}
-                className="mt-8 flex w-full max-w-[34rem] items-center justify-center gap-4 rounded bg-[#f7a009] px-8 py-5 text-4xl font-bold text-white transition hover:bg-[#dd8900]"
-              >
-                <StoreIcon />
-                Дэлгүүр хэсэх
-              </Link>
-            </div>
-          </aside>
-        </div>
-      ) : null}
-
-      {isSearchOpen ? (
-        <div className="fixed inset-0 z-50 bg-black/65 px-4 py-10" onClick={closeSearch}>
-          <div
-            className="mx-auto w-full max-w-6xl overflow-hidden rounded-[1.7rem] bg-white shadow-[0_30px_80px_-28px_rgba(0,0,0,0.55)]"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center gap-6 border-b border-[#e6e6e6] p-6">
-              <div className="flex min-w-0 flex-1 items-center gap-5 rounded-[1.35rem] bg-[#f4f4f4] px-6 py-5">
-                <SearchIcon className="h-8 w-8 shrink-0 text-[#6f7880]" />
-                <input
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  autoFocus
-                  placeholder="Хайх..."
-                  className="min-w-0 flex-1 bg-transparent text-3xl font-semibold text-black outline-none placeholder:text-[#9aa1a8]"
-                />
-                {searchQuery ? (
+            {cartCount === 0 ? (
+              <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+                <CartIcon className="h-20 w-20 text-[#8a7b73]" />
+                <h3 className="mt-8 text-[12px] font-semibold text-[#2f2420]">Таны сагс хоосон байна</h3>
+                <p className="mt-3 max-w-sm text-[12px] leading-relaxed text-[#6f625b]">Дуртай бараагаа нэмээд худалдан авалтаа эхлээрэй</p>
+                <Link
+                  href="/shop"
+                  onClick={() => setIsCartOpen(false)}
+                  className="mt-8 flex w-full max-w-sm items-center justify-center gap-3 rounded-[14px] bg-[#6e4f45] px-6 py-4 text-[12px] font-medium text-white transition hover:bg-[#5c4038]"
+                >
+                  <StoreIcon />
+                  Дэлгүүр хэсэх
+                </Link>
+              </div>
+            ) : (
+              <>
+                <ul className="flex-1 overflow-y-auto px-8 py-4">
+                  {items.map((item) => (
+                    <li key={item.slug} className="flex items-center gap-4 border-b border-[#f1ebe5] py-4">
+                      <Image src={item.image} alt="" width={56} height={56} className="h-14 w-14 shrink-0 rounded-lg bg-[#f7f2ed] object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-2 text-[12px] font-medium text-[#2f2420]">{item.name}</p>
+                        <p className="mt-1 text-[11px] text-[#8a7b73]">
+                          {item.quantity} × {item.priceValue.toLocaleString("en-US")}₮
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.slug)}
+                        aria-label={`${item.name}-г хасах`}
+                        className="text-[#b3a69e] transition hover:text-[#b04a4a]"
+                      >
+                        <CloseIcon className="h-4 w-4" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="border-t border-[#eadfd5] px-8 py-6">
+                  <div className="flex items-center justify-between text-[12px]">
+                    <span className="text-[#6f625b]">Нийт дүн</span>
+                    <strong className="text-[#2f2420]">{cartTotal.toLocaleString("en-US")}₮</strong>
+                  </div>
                   <button
                     type="button"
-                    aria-label="Хайлтын үг арилгах"
-                    onClick={() => setSearchQuery("")}
-                    className="text-[#6f7880] transition hover:text-[#f39a08]"
+                    onClick={() => {
+                      setIsCartOpen(false);
+                      requireAuth("/checkout");
+                    }}
+                    className="mt-5 flex w-full items-center justify-center gap-3 rounded-[14px] bg-[#6e4f45] px-6 py-4 text-[12px] font-medium text-white transition hover:bg-[#5c4038]"
                   >
-                    <CloseIcon />
+                    Захиалах
                   </button>
-                ) : null}
-              </div>
-              <button
-                type="button"
-                onClick={closeSearch}
-                className="text-3xl font-bold text-[#f39a08] transition hover:text-[#d48200]"
-              >
-                Болих
-              </button>
-            </div>
-
-            {searchQuery.trim() && searchResults.length > 0 ? (
-              <>
-                <div>
-                  {searchResults.map((item) => (
-                    <Link
-                      key={`${item.category}-${item.slug}`}
-                      href={`/shop/${item.category}/${item.slug}`}
-                      onClick={closeSearch}
-                      className="flex items-center gap-6 border-b border-[#ececec] px-8 py-5 transition hover:bg-[#fafafa]"
-                    >
-                      <Image
-                        src={item.image}
-                        alt=""
-                        width={96}
-                        height={96}
-                        className="h-24 w-24 shrink-0 rounded-xl bg-[#f2f2f2] object-cover"
-                      />
-                      <div className="min-w-0">
-                        <h3 className="line-clamp-2 text-3xl font-bold text-black">
-                          {highlightMatch(item.name, searchQuery)}
-                        </h3>
-                        <p className="mt-2 text-2xl font-bold text-[#f39a08]">{item.price}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-                <div className="p-8">
-                  <Link
-                    href={`/shop?search=${encodeURIComponent(searchQuery.trim())}`}
-                    onClick={closeSearch}
-                    className="flex w-full items-center justify-center gap-4 rounded-[1.35rem] bg-[#f7a009] px-8 py-6 text-3xl font-bold text-white transition hover:bg-[#dd8900]"
-                  >
-                    <SearchIcon className="h-8 w-8" />
-                    «{searchQuery.trim()}» бүгдийг харах
-                  </Link>
+                  {!isSignedIn ? (
+                    <p className="mt-3 text-center text-[11px] text-[#8a7b73]">Захиалахын тулд утас эсвэл имэйлээр нэвтэрнэ</p>
+                  ) : null}
                 </div>
               </>
-            ) : null}
-
-            {searchQuery.trim() && searchResults.length === 0 ? (
-              <div className="flex min-h-72 flex-col items-center justify-center px-8 py-14 text-center">
-                <SearchIcon className="h-24 w-24 text-[#c2c7cc]" />
-                <p className="mt-7 text-3xl font-bold text-[#72777c]">«{searchQuery.trim()}» олдсонгүй</p>
-              </div>
-            ) : null}
-          </div>
+            )}
+          </aside>
         </div>
       ) : null}
     </>

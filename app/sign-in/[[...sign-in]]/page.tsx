@@ -1,18 +1,13 @@
-import { SignIn } from "@clerk/nextjs";
+import { SignInScreen } from "@/components/auth/sign-in-screen";
+import { safeRedirect } from "@/lib/redirect";
 
 export const runtime = "edge";
 
-export default function SignInPage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f1eb] px-6 py-16">
-      <SignIn
-        appearance={{
-          variables: {
-            colorPrimary: "#f39a08",
-            borderRadius: "0.75rem",
-          },
-        }}
-      />
-    </main>
-  );
+type SignInPageProps = {
+  searchParams: Promise<{ redirect_url?: string | string[] }>;
+};
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const { redirect_url } = await searchParams;
+  return <SignInScreen redirectTo={safeRedirect(redirect_url)} />;
 }

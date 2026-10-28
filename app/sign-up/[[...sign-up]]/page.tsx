@@ -1,18 +1,8 @@
-import { SignUp } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export const runtime = "edge";
 
+// Нэг цонхоор нэвтрэх болон бүртгүүлэх хоёулаа хийгддэг.
 export default function SignUpPage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f8f1eb] px-6 py-16">
-      <SignUp
-        appearance={{
-          variables: {
-            colorPrimary: "#f39a08",
-            borderRadius: "0.75rem",
-          },
-        }}
-      />
-    </main>
-  );
+  redirect("/sign-in");
 }

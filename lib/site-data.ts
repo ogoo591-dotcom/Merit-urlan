@@ -74,9 +74,10 @@ export type ShopCategoryMeta = {
 };
 
 export const navigation = [
-  { href: "/shop", label: "Дэлгүүр" },
-  { href: "/courses", label: "Сургалт" },
-  { href: "/", label: "Сэтгүүл" },
+  { href: "/", label: "Нүүр" },
+  { href: "/#about", label: "Бидний тухай" },
+  { href: "/#services", label: "Бүтээгдэхүүн / Үйлчилгээ" },
+  { href: "/#gallery", label: "Зургийн цомог" },
 ] as const;
 
 export const featuredProducts: Product[] = [
@@ -399,5 +400,21 @@ export function getCatalogItems(category: ShopCategoryKey) {
 }
 
 export function getCatalogItem(category: ShopCategoryKey, slug: string) {
-  return catalogItems.find((item) => item.category === category && item.slug === slug);
+  const item = catalogItems.find((entry) => entry.category === category && entry.slug === slug);
+  if (item) return item;
+
+  const parent = catalogItems.find((entry) => entry.category === category && entry.options?.some((option) => option.slug === slug));
+  const option = parent?.options?.find((entry) => entry.slug === slug);
+  if (!parent || !option) return undefined;
+
+  return {
+    ...parent,
+    slug: option.slug,
+    name: `${parent.name} — ${option.name}`,
+    price: option.price,
+    priceValue: Number(option.price.replace(/[^0-9]/g, "")),
+    stock: option.stock,
+    image: option.image,
+    options: undefined,
+  };
 }

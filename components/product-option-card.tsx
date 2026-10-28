@@ -28,7 +28,7 @@ export function ProductOptionCard({
       }`}
     >
       {selected ? (
-        <div className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-[#1fc28b] text-xl font-bold text-white">
+        <div className="absolute -right-2 -top-2 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-[#1fc28b] text-[12px] font-bold text-white">
           ✓
         </div>
       ) : null}
@@ -40,9 +40,9 @@ export function ProductOptionCard({
         className="h-24 w-full rounded-xl bg-[#f7f7f7] object-contain p-2"
       />
       <div className="mt-3 text-center">
-        <p className="truncate text-sm text-[#7f8b97]">{name}</p>
-        <p className="mt-2 text-xl font-semibold text-[#ff5a36]">{price}</p>
-        <p className="mt-1 text-lg text-[#28a745]">{stock} ш</p>
+        <p className="truncate text-[10px] text-[#7f8b97]">{name}</p>
+        <p className="mt-2 text-[12px] font-semibold text-[#ff5a36]">{price}</p>
+        <p className="mt-1 text-[12px] text-[#28a745]">{stock} ш</p>
       </div>
     </Link>
   );

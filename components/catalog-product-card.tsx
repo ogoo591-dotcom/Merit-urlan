@@ -16,7 +16,7 @@ export function CatalogProductCard({ item, href }: CatalogProductCardProps) {
     >
       <div className="relative overflow-hidden rounded-[1rem] bg-[#faf7f6]">
         {item.badge ? (
-          <div className="absolute left-3 top-3 z-10 rounded-lg bg-[#20c997] px-4 py-2 text-lg font-bold text-white">
+          <div className="absolute left-3 top-3 z-10 rounded-lg bg-[#20c997] px-4 py-2 text-[12px] font-bold text-white">
             {item.badge}
           </div>
         ) : null}
@@ -30,12 +30,12 @@ export function CatalogProductCard({ item, href }: CatalogProductCardProps) {
       </div>
 
       <div className="mt-5 space-y-4">
-        <h3 className="line-clamp-2 text-[2rem] font-bold leading-tight text-[#ff9800]">{item.name}</h3>
-        <div className="flex flex-wrap gap-3 text-base text-[#6c757d]">
+        <h3 className="line-clamp-2 text-[12px] font-bold leading-tight text-[#ff9800]">{item.name}</h3>
+        <div className="flex flex-wrap gap-3 text-[12px] text-[#6c757d]">
           <span className="rounded-lg border border-[#dfe3e6] bg-[#f8f9fa] px-3 py-2">Үлдэгдэл {item.stock}</span>
           <span className="rounded-lg border border-[#dfe3e6] bg-[#f8f9fa] px-3 py-2">Бренд {item.brand}</span>
         </div>
-        <p className="text-[2.2rem] font-bold text-[#111]">{item.price}</p>
+        <p className="text-[12px] font-bold text-[#111]">{item.price}</p>
       </div>
     </Link>
   );
