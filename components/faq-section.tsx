@@ -1,30 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 const faqs = [
   {
-    question: "Ямар бүтээгдэхүүн, үйлчилгээ санал болгодог вэ?",
-    answer:
-      "Гараар нэхсэн чихмэл тоглоом, бэлэг дурсгалын бүтээл, нэхмэлийн утас, товч зэрэг туслах материал болон алхамчилсан онлайн видео сургалт санал болгодог.",
-  },
-  {
-    question: "Танай бизнестэй хэрхэн холбоо барих вэ?",
-    answer:
-      "99129445 дугаарт залгах эсвэл Facebook, Instagram хуудас болон Messenger-ээр бидэнд бичээрэй.",
-  },
-  {
-    question: "Үнийн санал хэрхэн авах вэ?",
-    answer:
-      "Бэлэн бүтээгдэхүүний үнэ дэлгүүр хэсэгт харагдана. Захиалгат бүтээлийн үнэ загвар, хэмжээнээс хамаарах тул Messenger-ээр бидэнд бичиж тохирно уу.",
-  },
-  {
     question: "Захиалга хэрхэн хийх вэ?",
     answer:
-      "Дэлгүүрээс хүссэн бараагаа сагсанд нэмээд захиалаарай. Захиалгат бүтээл хийлгэх бол өнгө, хэмжээ, загвараа бидэнд илгээгээрэй.",
+      "Дэлгүүрээс хүссэн бараагаа сагсанд нэмээд \"Захиалах\" товч дарна. Утасны дугаар эсвэл имэйлээр нэвтэрч, хүргэлтийн хаягаа оруулан төлбөрөө төлснөөр захиалга баталгаажна.",
+  },
+  {
+    question: "Өөрийн хүссэн загвар, өнгөөр захиалж болох уу?",
+    answer:
+      "Болно. Өнгө, хэмжээ, загвар эсвэл тоглоом дээр нэр хатгуулах хүсэлтээ Messenger-ээр зурагтай нь илгээгээрэй. Захиалгат бүтээлийн үнэ, хугацааг загварын нарийн төвөгтэй байдлаас хамааран тохирно.",
+  },
+  {
+    question: "Хүргэлт хэрхэн хийгддэг вэ?",
+    answer:
+      "Улаанбаатар хотод болон орон нутагт хүргэлт гарах боломжтой. Хүргэлтийн хаягаа захиалгын үед оруулах ба хүргэлтийн нөхцөл, хугацааг захиалга баталгаажуулах үед танд мэдэгдэнэ. Бэлэн бараа 24–48 цагийн дотор, бэлэн бус захиалга 3–7 хоногийн дотор хийгдэн хүргэгдэнэ.",
+  },
+  {
+    question: "Нэхэж сурч эхлэхэд юу хэрэгтэй вэ?",
+    answer:
+      "Дэгээ, утас, чихмэл, нүд зэрэг туслах материалыг манай дэлгүүрээс авч болно. Алхамчилсан заавар, видео сургалт манайд байдаг тул анх удаа нэхэж буй хүн ч эхнээс нь сурах боломжтой.",
+  },
+  {
+    question: "Нэхмэл тоглоомыг хэрхэн арчлах вэ?",
+    answer:
+      "Бүлээн усанд зөөлөн угаалгын бодисоор гараар зөөлөн угааж, мушгилгүй шахаж усыг нь гаргаад хэлбэрийг нь засаж хэвтээгээр хатаана. Угаалгын машин, хатаагч ашиглахгүй байхыг зөвлөж байна.",
   },
 ] as const;
+
+// Эхний хэдэн асуулт харагдаж, бусад нь "Бүх асуултыг харах" дарахад гарч ирнэ.
+const visibleCount = 4;
 
 function QuestionIcon() {
   return (
@@ -40,7 +48,7 @@ function PlusIcon({ open }: { open: boolean }) {
   return (
     <svg
       aria-hidden="true"
-      className={`h-5 w-5 transition-transform ${open ? "rotate-45" : ""}`}
+      className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-45" : ""}`}
       viewBox="0 0 20 20"
       fill="none"
     >
@@ -49,8 +57,98 @@ function PlusIcon({ open }: { open: boolean }) {
   );
 }
 
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+      viewBox="0 0 20 20"
+      fill="none"
+    >
+      <path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// Өндрийг grid-template-rows (0fr → 1fr)-ээр зөөлөн нээж хаана.
+function Collapse({ open, id, children }: { open: boolean; id?: string; children: React.ReactNode }) {
+  return (
+    <div
+      id={id}
+      inert={!open}
+      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+        open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      }`}
+    >
+      <div className="overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
+function FaqItem({
+  index,
+  question,
+  answer,
+  open,
+  onToggle,
+}: {
+  index: number;
+  question: string;
+  answer: string;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const panelId = useId();
+
+  return (
+    <li
+      className={`rounded-2xl border transition-colors duration-300 ${
+        open
+          ? "border-[#ecd3d9] bg-white shadow-[0_18px_40px_-30px_rgba(162,68,86,0.45)]"
+          : "border-transparent hover:bg-white/50"
+      }`}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="flex w-full items-center gap-5 px-5 py-5 text-left"
+      >
+        <span className={`text-[11px] font-semibold tabular-nums ${open ? "text-[#a24456]" : "text-[#a3958d]"}`}>
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="flex-1 text-[12px] font-semibold text-[#2f2420]">{question}</span>
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition duration-300 ${
+            open ? "border-[#a24456] bg-[#a24456] text-white" : "border-[#ead9d4] bg-[#fdf7f1] text-[#2f2420]"
+          }`}
+        >
+          <PlusIcon open={open} />
+        </span>
+      </button>
+      <Collapse open={open} id={panelId}>
+        <p className="max-w-[820px] pb-6 pl-[3.6rem] pr-16 text-[12px] leading-[1.9] text-[#7a6b63]">{answer}</p>
+      </Collapse>
+    </li>
+  );
+}
+
 export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [showAll, setShowAll] = useState(false);
+  const hiddenCount = faqs.length - visibleCount;
+
+  const renderItem = (index: number) => (
+    <FaqItem
+      key={faqs[index].question}
+      index={index}
+      question={faqs[index].question}
+      answer={faqs[index].answer}
+      open={openIndex === index}
+      onToggle={() => setOpenIndex(openIndex === index ? null : index)}
+    />
+  );
 
   return (
     <section id="faq" className="screen-section bg-[#f7ebe8] px-6 py-10 lg:px-[160px]">
@@ -63,13 +161,13 @@ export function FaqSection() {
             асуулт, хариулт
           </h2>
           <p className="mt-8 text-[12px] leading-[1.9] text-[#7a6b63]">
-            Үйлчлүүлэгчдийн хамгийн их асуудаг асуултуудад товч, ойлгомжтой хариуллаа.
+            Захиалга, хүргэлт, арчилгаа болон сургалттай холбоотой хамгийн их асуудаг асуултуудад хариуллаа.
           </p>
           <Link
             href="https://m.me/meriturlan"
             target="_blank"
             rel="noreferrer"
-            className="mt-10 inline-flex items-center gap-4 rounded-2xl border border-[#efe0d6] bg-[#fdf7f1] p-5 pr-7 transition hover:border-[#6e4f45]"
+            className="mt-10 inline-flex items-center gap-4 rounded-2xl border border-[#efe0d6] bg-[#fdf7f1] p-5 pr-7 transition hover:border-[#a24456]"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#ecd3dd] text-[#2f2420]">
               <QuestionIcon />
@@ -82,43 +180,33 @@ export function FaqSection() {
           </Link>
         </div>
 
-        <ul className="border-t border-[#ead9d4]">
-          {faqs.map((faq, index) => {
-            const isOpen = openIndex === index;
+        <div>
+          <ul className="space-y-2">{faqs.slice(0, visibleCount).map((_, index) => renderItem(index))}</ul>
 
-            return (
-              <li key={faq.question} className="border-b border-[#ead9d4]">
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center gap-6 py-6 text-left"
-                >
-                  <span className="text-[12px] font-medium text-[#7a6b63]">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="flex-1 text-[12px] font-semibold text-[#2f2420]">
-                    {faq.question}
-                  </span>
-                  <span
-                    className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border transition ${
-                      isOpen
-                        ? "border-[#3d302c] bg-[#3d302c] text-white"
-                        : "border-[#efe0d6] bg-[#fdf7f1] text-[#2f2420]"
-                    }`}
-                  >
-                    <PlusIcon open={isOpen} />
-                  </span>
-                </button>
-                {isOpen ? (
-                  <p className="-mt-2 max-w-[820px] pb-6 pl-[3.25rem] text-[12px] leading-[1.9] text-[#7a6b63]">
-                    {faq.answer}
-                  </p>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+          {hiddenCount > 0 ? (
+            <>
+              <Collapse open={showAll}>
+                <ul className="space-y-2 pt-2">
+                  {faqs.slice(visibleCount).map((_, offset) => renderItem(visibleCount + offset))}
+                </ul>
+              </Collapse>
+
+              <button
+                type="button"
+                onClick={() => {
+                  // Хураахад нуугдах асуулт нээлттэй байвал хаана.
+                  if (showAll && openIndex !== null && openIndex >= visibleCount) setOpenIndex(null);
+                  setShowAll((value) => !value);
+                }}
+                aria-expanded={showAll}
+                className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-[#ead9d4] bg-[#fdf7f1] px-6 py-3 text-[12px] font-semibold text-[#2f2420] transition hover:border-[#a24456] hover:text-[#a24456]"
+              >
+                {showAll ? "Хураах" : `Бүх асуултыг харах (+${hiddenCount})`}
+                <ChevronIcon open={showAll} />
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
     </section>
   );

@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { AuthModalProvider } from "@/components/auth/auth-modal-provider";
 import { CartProvider } from "@/components/cart-provider";
 import { DeliveryAddressProvider } from "@/components/delivery-address-provider";
+import { SavedProvider } from "@/components/saved-provider";
 import "./globals.css";
 
 export const runtime = "edge";
@@ -23,7 +24,9 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <AuthModalProvider>
           <DeliveryAddressProvider>
-            <CartProvider>{children}</CartProvider>
+            <CartProvider>
+              <SavedProvider>{children}</SavedProvider>
+            </CartProvider>
           </DeliveryAddressProvider>
         </AuthModalProvider>
       </body>

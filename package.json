@@ -7,11 +7,13 @@
     "build": "next build",
     "pages:build": "npx @cloudflare/next-on-pages",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "compress": "node scripts/compress.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.2.7",
     "@supabase/supabase-js": "^2.118.0",
+    "lucide-react": "^1.64.0",
     "next": "^15.5.28",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

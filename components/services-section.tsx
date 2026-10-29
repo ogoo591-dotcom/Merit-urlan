@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import { CroppedPhoto } from "@/components/cropped-photo";
+import galleryImages from "@/lib/gallery-images.json";
 
 function BookIcon() {
   return (
@@ -83,7 +84,9 @@ const services = [
     cta: "Заавар үзэх",
     href: "/courses",
     icon: BookIcon,
-    focus: "14% 58%",
+    // Бичлэг, схемийн зураг бэлэн болтол хоосон харагдана.
+    image: null,
+    placeholder: "Схем, зааврын зураг удахгүй нэмэгдэнэ",
     card: "bg-[#fdf6ee] border-[#f3e6d8]",
   },
   {
@@ -92,16 +95,20 @@ const services = [
     cta: "Сургалт сонгох",
     href: "/courses",
     icon: GraduationCapIcon,
-    focus: "48% 40%",
+    image: null,
+    placeholder: "Видео сургалт удахгүй нэмэгдэнэ",
     card: "bg-[#f5e1e5] border-[#efd3d9]",
   },
   {
     title: "Чихмэл тоглоом",
     description: "Гараар урласан хөөрхөн бүтээлүүд",
     cta: "Дэлгүүр үзэх",
-    href: "/shop/finished",
+    // Шууд барааны жагсаалт руу гүйлгэж очно.
+    href: "/shop/finished#products",
     icon: BagIcon,
-    focus: "70% 58%",
+    // raw-images доторх файлын нэрээр (npm run compress-ийн дараа ч зөв зургаа олно).
+    image: galleryImages.find((entry) => entry.source === "21.jpg")?.src ?? null,
+    placeholder: "Зураг удахгүй нэмэгдэнэ",
     card: "bg-[#ebe3f4] border-[#e0d6ee]",
   },
 ] as const;
@@ -159,16 +166,29 @@ export function ServicesSection() {
                   className={`flex flex-col rounded-[28px] border p-4 shadow-[0_20px_40px_-34px_rgba(70,45,35,0.5)] ${service.card}`}
                 >
                   <div className="relative">
-                    <CroppedPhoto
-                      alt={service.title}
-                      focus={service.focus}
-                      zoom={2.4}
-                      sizes="(max-width: 768px) 90vw, 30vw"
-                      className="aspect-[16/10] rounded-[20px]"
-                    />
-                    <span className="absolute left-5 top-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 text-[#2f2420]">
-                      <Icon />
-                    </span>
+                    {service.image ? (
+                      <div className="relative aspect-[16/10] overflow-hidden rounded-[20px] bg-[#f3ebe2]">
+                        <Image
+                          src={service.image}
+                          alt={service.title}
+                          fill
+                          sizes="(max-width: 768px) 90vw, 30vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex aspect-[16/10] flex-col items-center justify-center gap-3 rounded-[20px] border-2 border-dashed border-[#2f2420]/12 bg-white/45 px-6 text-center text-[#a3958d]">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/80 text-[#7a6b63]">
+                          <Icon />
+                        </span>
+                        <span className="text-[11px] font-medium">{service.placeholder}</span>
+                      </div>
+                    )}
+                    {service.image ? (
+                      <span className="absolute left-5 top-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 text-[#2f2420]">
+                        <Icon />
+                      </span>
+                    ) : null}
                     <span className="absolute right-5 top-5 rounded-full bg-[#2f2420]/75 px-3 py-1.5 text-[9px] font-semibold text-white">
                       {String(index + 1).padStart(2, "0")}
                     </span>

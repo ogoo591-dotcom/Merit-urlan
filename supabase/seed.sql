@@ -1,6 +1,6 @@
 -- Одоо сайтад байгаа бараануудыг санд оруулна (schema.sql-ийн дараа нэг удаа).
 insert into public.products
-  (slug, name, category, subcategory, price, stock, brand, image, description, badge, features, group_slug, option_label, sort_order)
+  (slug, name, category, subcategory, price, stock, brand, image, description, badge, features, group_slug, option_label, sort_order),
 values
   ('buttons-sky', '12мм бор товч ( 10 ширхэг ) — Тэнгэрийн цэнхэр', 'supplies', 'Товч', 2500, 7, '-', '/buttons-sky.svg', 'Нэхмэл амьтан, хүүхдийн хувцас, жижиг гоёлын ажилд тохирох 12мм хэмжээтэй бор товч.', '6 сонголт', array['Шууд ашиглахад бэлэн, цэвэр савлагаатай.', 'Гар урлал, хүүхдийн хувцас, amigurumi детальд тохиромжтой.', 'Нэг удаагийн худалдан авалт, нэмэлт subscription байхгүй.', 'Messenger болон Instagram-аар захиалгын дэмжлэг үзүүлнэ.']::text[], '12mm-bor-tovch-10', 'Тэнгэрийн цэнхэр', 0),
   ('12mm-bor-tovch-10', '12мм бор товч ( 10 ширхэг ) — Бор', 'supplies', 'Товч', 2500, 7, '-', '/buttons-brown.svg', 'Нэхмэл амьтан, хүүхдийн хувцас, жижиг гоёлын ажилд тохирох 12мм хэмжээтэй бор товч.', '6 сонголт', array['Шууд ашиглахад бэлэн, цэвэр савлагаатай.', 'Гар урлал, хүүхдийн хувцас, amigurumi детальд тохиромжтой.', 'Нэг удаагийн худалдан авалт, нэмэлт subscription байхгүй.', 'Messenger болон Instagram-аар захиалгын дэмжлэг үзүүлнэ.']::text[], '12mm-bor-tovch-10', 'Бор', 1),
@@ -15,7 +15,14 @@ values
   ('pipe-cleaner-yellow-100', 'yellow ( 100ш )', 'supplies', 'Синель утас', 2900, 6, '-', '/chenille-yellow.svg', 'Хурц шар өнгийн гар урлалын утас.', null, '{}'::text[], null, null, 10),
   ('pipe-cleaner-orange-100', 'orange ( 100ш )', 'supplies', 'Синель утас', 2900, 3, '-', '/chenille-orange.svg', 'Намрын өнгө, цэцэг, жижиг чимэглэл хийхэд зориулсан улбар шар материал.', null, '{}'::text[], null, null, 11),
   ('pipe-cleaner-green-100', 'green ( 100ш )', 'supplies', 'Синель утас', 2900, 8, '-', '/chenille-green.svg', 'Навч, иш, ногоон деталь хийхэд тохирсон синель утас.', null, '{}'::text[], null, null, 12),
-  ('rabbit-doll-pink', 'Нандинсувд дэгээ зүүнийн тоглоом', 'finished', 'Тоглоом', 50000, 999, '-', '/finished-rabbit.svg', 'Гараар сүлжсэн зөөлөн туулай, жижиг цүнхтэй хамт бэлэглэхэд бэлэн.', null, array['Гараар бүрэн сүлжсэн, нэг бүрчлэн шалгасан.', 'Хүүхдийн өрөө, бэлэг, дурсгалын зориулалтаар тохиромжтой.', 'Захиалгын дараа нэмэлт зураг, хүргэлтийн мэдээлэл илгээнэ.', 'Хэмжээ, өнгөний захиалгат өөрчлөлт хийх боломжтой.']::text[], null, null, 13),
-  ('bear-gift-set', 'Бяцхан баавгайн бэлгийн багц', 'finished', 'Бэлгийн багц', 68000, 12, '-', '/finished-bear.svg', 'Зөөлөн баавгай, жижиг хөнжил, бэлгийн ууттай иж бүрдэл.', null, '{}'::text[], null, null, 14),
-  ('strawberry-mini-bag', 'Гүзээлзгэнэ mini bag', 'finished', 'Цүнх', 42000, 15, '-', '/finished-bag.svg', 'Гүзээлзгэнийн өнгөтэй, өдөр тутмын жижиг хэрэглэл хийх сүлжмэл цүнх.', null, '{}'::text[], null, null, 15)
+  ('snoopy-dog', 'Snoopy нохой', 'finished', 'Тоглоом', 55000, 1, '-', '/products/snoopy-dog.webp', 'Улаан хүзүүвчтэй, гараар нэхсэн цагаан Snoopy нохой. Хүүхдэд бэлэглэхэд тохиромжтой.', null, '{}'::text[], null, null, 14),
+  ('little-bunny-sarnai', 'Little Bunny — Сарнай', 'finished', 'Тоглоом', 45000, 1, '-', '/products/little-bunny-sarnai.webp', 'Улаан даашинзтай, нэр хатгамалтай саарал туулай. Даашинзан дээрх нэрийг захиалгаар өөрчилж болно.', null, '{}'::text[], null, null, 15),
+  ('big-bunny', 'Big Bunny', 'finished', 'Тоглоом', 55000, 1, '-', '/products/big-bunny.webp', 'Ягаан туузтай, том хэмжээтэй цагаан туулай.', null, '{}'::text[], null, null, 16),
+  ('baby-set', 'Нярайн бэлгийн багц', 'finished', 'Бэлгийн багц', 85000, 1, '-', '/products/baby-set.webp', 'Нярай хүүхдэд зориулсан гараар нэхсэн тоглоом, хувцасны иж бүрдэл.', null, '{}'::text[], null, null, 17),
+  ('ukher', 'Үхэр', 'finished', 'Тоглоом', 50000, 1, '-', '/products/ukher.webp', 'Шар судалтай өмдтэй, хөөрхөн үхэр тоглоом.', null, '{}'::text[], null, null, 18),
+  ('piggy-cow', 'Piggy & Cow', 'finished', 'Тоглоом', 90000, 1, '-', '/products/piggy-cow.webp', 'Гахай, үхэр хоёр тоглоомын хос. Найз нөхөд, ах дүүд бэлэглэхэд тохиромжтой.', null, '{}'::text[], null, null, 19),
+  ('charlie-brown', 'Charlie Brown', 'finished', 'Тоглоом', 55000, 1, '-', '/products/charlie-brown.webp', 'Шар цамцтай Charlie Brown дүр.', null, '{}'::text[], null, null, 20),
+  ('little-bunny-white', 'Little Bunny — Цагаан', 'finished', 'Тоглоом', 45000, 1, '-', '/products/little-bunny-white.webp', 'Өнгөлөг даашинзтай цагаан туулай.', null, '{}'::text[], null, null, 21),
+  ('khavtaga-morin-tovch', 'Хавтага — Морьтон', 'finished', 'Хавтага', 35000, 1, '-', '/products/khavtaga-morin-tovch.webp', 'Морьтон хүний хатгамалтай, шар торгон хавтага.', null, '{}'::text[], null, null, 22),
+  ('khavtaga-mori', 'Хавтага — Морь', 'finished', 'Хавтага', 35000, 1, '-', '/products/khavtaga-mori.webp', 'Морины хатгамалтай, шар торгон хавтага.', null, '{}'::text[], null, null, 23)
 on conflict (slug) do nothing;

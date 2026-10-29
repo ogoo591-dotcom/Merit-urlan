@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import galleryImages from "@/lib/gallery-images.json";
+
+// Нүүр зураг: zurag-14.webp (raw-images/14.jpg). Дугаар шилжсэн ч эх файлын нэрээр олно.
+const heroImage = galleryImages.find((image) => image.source === "14.jpg") ?? { src: "/Hero.jpg", width: 5, height: 4 };
+
 const highlights = [
   { label: "Алхамчилсан заавар", dot: "bg-[#f0c4cf]" },
   { label: "Видео сургалт", dot: "bg-[#d4cdf0]" },
@@ -156,16 +161,20 @@ export function HomeHero() {
           </ul>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[680px] lg:mx-0">
+        <div className="relative mx-auto w-full max-w-[600px] lg:mx-0">
           <div className="rounded-[44px] border border-[#f1dcd8] bg-white/60 p-4 shadow-[0_30px_70px_-40px_rgba(70,45,35,0.45)]">
-            <div className="relative aspect-[5/4] overflow-hidden rounded-[34px] bg-[#f3ebe2]">
+            {/* Хүрээ зургийн өөрийн харьцаатай тул зураг тасрахгүй бүтнээрээ харагдана. */}
+            <div
+              className="relative overflow-hidden rounded-[34px] bg-[#f3ebe2]"
+              style={{ aspectRatio: `${heroImage.width} / ${heroImage.height}` }}
+            >
               <Image
-                src="/Hero.jpg"
+                src={heroImage.src}
                 alt="Merit Urlan-ы гараар урласан тоглоомууд"
                 fill
                 priority
                 sizes="(max-width: 1024px) 90vw, 680px"
-                className="object-cover object-center"
+                className="object-contain"
               />
             </div>
           </div>

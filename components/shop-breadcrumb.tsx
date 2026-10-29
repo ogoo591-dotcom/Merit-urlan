@@ -21,8 +21,8 @@ export function ShopBreadcrumb({ crumbs }: ShopBreadcrumbProps) {
                 href={crumb.href}
                 className={
                   crumb.active
-                    ? "font-medium text-[#ff9800]"
-                    : "text-[#ff9800] transition hover:text-[#e18700]"
+                    ? "font-medium text-[#a24456]"
+                    : "text-[#a24456] transition hover:text-[#8a3748]"
                 }
               >
                 {index === 0 ? (

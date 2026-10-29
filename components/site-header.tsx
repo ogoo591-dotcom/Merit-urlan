@@ -3,14 +3,18 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Heart, Library, Menu, ShieldCheck, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 
 import type { CatalogItem } from "@/lib/site-data";
 import { AddressButton } from "@/components/address-button";
-import { CategoryMenu } from "@/components/category-menu";
+import { AllMenuDrawer } from "@/components/all-menu-drawer";
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
 import { useCart } from "@/components/cart-provider";
+import { useSaved } from "@/components/saved-provider";
+import { navSections } from "@/lib/navigation";
 
 function SearchIcon({ className = "h-6 w-6" }: { className?: string }) {
   return (
@@ -61,26 +65,6 @@ function CartIcon({ className = "h-8 w-8" }: { className?: string }) {
   );
 }
 
-function UserIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-6 w-6"
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle cx="16" cy="9.5" r="5.5" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M6 28C6.6 21.8 10.4 18.5 16 18.5C21.6 18.5 25.4 21.8 26 28H6Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function CloseIcon({ className = "h-8 w-8" }: { className?: string }) {
   return (
     <svg
@@ -123,6 +107,27 @@ function StoreIcon() {
   );
 }
 
+// Дээд мөрийн баруун талын дүрс + доорх жижиг текст.
+const headerActionClass =
+  "relative flex min-w-[52px] flex-col items-center gap-1 text-[#2f2420] transition hover:text-[#a24456]";
+
+function ActionLabel({ children }: { children: ReactNode }) {
+  return <span className="hidden text-[10px] font-medium leading-none sm:block">{children}</span>;
+}
+
+function CountBadge({ count }: { count: number }) {
+  return (
+    <span className="absolute -top-1.5 right-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#a24456] px-1 text-[9px] font-semibold leading-none text-white">
+      {count}
+    </span>
+  );
+}
+
+function isActivePath(pathname: string, href: string) {
+  const path = href.split(/[?#]/)[0];
+  return path !== "/" && (pathname === path || pathname.startsWith(`${path}/`));
+}
+
 function highlightMatch(text: string, query: string) {
   const trimmedQuery = query.trim();
 
@@ -151,10 +156,13 @@ function highlightMatch(text: string, query: string) {
 
 export function SiteHeader() {
   const router = useRouter();
+  const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isSignedIn, user } = useUser();
   const isAdmin = user?.publicMetadata?.role === "admin";
   const { openAuth, requireAuth } = useAuthModal();
   const { items, removeItem } = useCart();
+  const savedCount = useSaved().items.length;
   const cartCount = items.reduce((total, item) => total + item.quantity, 0);
   const cartTotal = items.reduce((total, item) => total + item.priceValue * item.quantity, 0);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -209,11 +217,34 @@ export function SiteHeader() {
 
   return (
     <>
-      <header ref={headerRef} className="sticky top-0 z-40 border-b border-[#eadfd5] bg-[#fcf6f0] bg-[radial-gradient(#ead9cc_1px,transparent_1px)] [background-size:28px_28px]">
-        <div className="mx-auto grid w-full max-w-[1600px] grid-cols-[auto_1fr] items-center gap-x-6 gap-y-4 px-6 py-3 lg:grid-cols-[1fr_auto_1fr] lg:px-[60px]">
-          <div className="order-last col-span-2 flex w-full items-center gap-3 lg:order-none lg:col-span-1 lg:max-w-[500px]">
-          <CategoryMenu />
+      <header ref={headerRef} className="sticky top-0 z-40 border-b border-[#eadfd5] bg-[#fcf6f0]">
+        {/* Дээд мөр: лого | хайлт | хаяг + үйлдлүүд */}
+        <div className="mx-auto grid w-full max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6 lg:gap-x-10 lg:px-[60px]">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Бүх ангилал"
+              aria-expanded={isMenuOpen}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-[#2f2420] transition hover:bg-white md:hidden"
+            >
+              <Menu aria-hidden className="h-6 w-6" strokeWidth={1.8} />
+            </button>
+            <Link href="/" className="flex shrink-0 items-center gap-3">
+              <Image
+                src="/Logo.png"
+                alt="Merit Urlan Logo"
+                width={128}
+                height={128}
+                className="h-11 w-11 rounded-full object-cover sm:h-12 sm:w-12"
+                priority
+              />
+              <span className="hidden text-[14px] font-semibold text-[#2f2420] sm:block">Merit урлан</span>
+            </Link>
+          </div>
 
+          <div className="order-last col-span-3 lg:order-none lg:col-span-1">
+            <div className="mx-auto w-full max-w-[760px]">
           <div
             className="relative min-w-0 flex-1"
             onBlur={(event) => {
@@ -232,7 +263,7 @@ export function SiteHeader() {
                   closeSearch();
                 }
               }}
-              className="flex items-center gap-3 rounded-xl border border-[#e3d6cb] bg-white/80 px-4 py-3 transition focus-within:border-[#6e4f45]"
+              className="flex items-center gap-3 rounded-full border border-[#e3d6cb] bg-white px-5 py-3 transition focus-within:border-[#a24456] focus-within:shadow-[0_0_0_3px_rgba(162,68,86,0.12)]"
             >
               <SearchIcon className="h-6 w-6 shrink-0 text-[#8a7b73]" />
               <input
@@ -242,7 +273,8 @@ export function SiteHeader() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                placeholder="Хайх"
+                placeholder="Тоглоом, утас, материал хайх…"
+                aria-label="Хайх"
                 className="min-w-0 flex-1 bg-transparent text-[12px] text-[#2f2420] outline-none placeholder:text-[#8a7b73]"
               />
               {searchQuery ? (
@@ -299,70 +331,81 @@ export function SiteHeader() {
               </div>
             ) : null}
           </div>
+            </div>
           </div>
 
-          <Link href="/" className="flex shrink-0 items-center gap-3">
-            <Image
-              src="/Logo.png"
-              alt="Merit Urlan Logo"
-              width={128}
-              height={128}
-              className="h-14 w-14 rounded-full object-cover"
-              priority
-            />
-            <div className="leading-tight">
-              <p className="text-[12px] font-semibold text-[#2f2420]">Merit урлан</p>
-              <p className="mt-1 text-[9px] font-medium uppercase tracking-[0.2em] text-[#8a7b73]">
-                Бизнес
-              </p>
+          <div className="flex items-center justify-end gap-2 sm:gap-4">
+            <div className="hidden xl:block">
+              <AddressButton />
             </div>
-          </Link>
-
-          <div className="flex items-center justify-end gap-5 text-[#2f2420]">
-            <AddressButton />
-            <button
-              type="button"
-              aria-label="Сагс"
-              onClick={() => setIsCartOpen(true)}
-              className="relative flex h-11 w-11 items-center justify-center transition hover:text-[#6e4f45]"
-            >
-              <CartIcon />
-              {cartCount > 0 ? (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#6e4f45] px-1.5 text-[8px] font-semibold leading-none text-white">
-                  {cartCount}
-                </span>
-              ) : null}
-            </button>
 
             {isSignedIn ? (
-              <>
-                {isAdmin ? (
-                  <Link
-                    href="/admin"
-                    className="rounded-full bg-[#2f2420] px-4 py-2 text-[11px] font-semibold text-white transition hover:bg-[#6e4f45]"
-                  >
-                    Админ
-                  </Link>
-                ) : null}
+              <div className={headerActionClass}>
                 <UserButton>
                   <UserButton.MenuItems>
-                    <UserButton.Link label="Миний захиалгууд" labelIcon={<CartIcon className="h-4 w-4" />} href="/account" />
+                    <UserButton.Link label="Миний захиалгууд" labelIcon={<ShoppingBag className="h-4 w-4" />} href="/account" />
+                    {isAdmin ? (
+                      <UserButton.Link label="Админ самбар" labelIcon={<ShieldCheck className="h-4 w-4" />} href="/admin" />
+                    ) : null}
                   </UserButton.MenuItems>
                 </UserButton>
-              </>
+                <ActionLabel>Профайл</ActionLabel>
+              </div>
             ) : (
-              <button
-                type="button"
-                onClick={() => openAuth()}
-                className="flex items-center gap-2 rounded-full border-[1.5px] border-[#2f2420] px-5 py-2.5 text-[12px] font-semibold transition hover:border-[#6e4f45] hover:text-[#6e4f45]"
-              >
-                <UserIcon />
-                Нэвтрэх
+              <button type="button" onClick={() => openAuth()} className={headerActionClass}>
+                <User aria-hidden className="h-6 w-6" strokeWidth={1.7} />
+                <ActionLabel>Нэвтрэх</ActionLabel>
               </button>
             )}
+
+            <Link href="/saved" className={`${headerActionClass} max-md:hidden`}>
+              <Heart aria-hidden className="h-6 w-6" strokeWidth={1.7} />
+              {savedCount > 0 ? <CountBadge count={savedCount} /> : null}
+              <ActionLabel>Хадгалсан</ActionLabel>
+            </Link>
+
+            <Link href="/library" className={`${headerActionClass} max-md:hidden`}>
+              <Library aria-hidden className="h-6 w-6" strokeWidth={1.7} />
+              <ActionLabel>Миний сан</ActionLabel>
+            </Link>
+
+            <button type="button" aria-label={`Сагс, ${cartCount} бараа`} onClick={() => setIsCartOpen(true)} className={headerActionClass}>
+              <ShoppingCart aria-hidden className="h-6 w-6" strokeWidth={1.7} />
+              {cartCount > 0 ? <CountBadge count={cartCount} /> : null}
+              <ActionLabel>Сагс</ActionLabel>
+            </button>
           </div>
         </div>
+
+        {/* Хоёрдугаар мөр: "☰ Бүгд" + үндсэн хэсгүүд. Утсан дээр нуугдаж, дээд мөрийн ☰ товч үлдэнэ. */}
+        <div className="hidden border-t border-[#eadfd5] bg-[#f3eeea] md:block">
+          <nav aria-label="Үндсэн цэс" className="mx-auto flex w-full max-w-[1600px] items-center gap-1 px-6 py-2 lg:px-[60px]">
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen(true)}
+              aria-expanded={isMenuOpen}
+              className="mr-3 flex items-center gap-2 rounded-lg bg-[#a24456] px-4 py-2 text-[12px] font-semibold text-white transition hover:bg-[#8a3748]"
+            >
+              <Menu aria-hidden className="h-4 w-4" strokeWidth={2} />
+              Бүгд
+            </button>
+            {navSections.map((section) => (
+              <Link
+                key={section.id}
+                href={section.href}
+                aria-current={isActivePath(pathname, section.href) ? "page" : undefined}
+                className={`rounded-lg px-3.5 py-2 text-[12px] font-medium transition hover:bg-white hover:text-[#a24456] ${
+                  isActivePath(pathname, section.href) ? "bg-white text-[#a24456]" : "text-[#4a3b35]"
+                }`}
+              >
+                {section.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </header>
+
+      {isMenuOpen ? <AllMenuDrawer onClose={() => setIsMenuOpen(false)} /> : null}
 
       {isCartOpen ? (
         <div className="fixed inset-0 z-50 bg-black/45" onClick={() => setIsCartOpen(false)}>

@@ -1,4 +1,9 @@
-import { CroppedPhoto } from "@/components/cropped-photo";
+import Image from "next/image";
+
+import galleryImages from "@/lib/gallery-images.json";
+
+// zurag-11.webp (raw-images/10.jpg). Дугаар шилжсэн ч эх файлын нэрээр олно.
+const aboutImage = galleryImages.find((image) => image.source === "10.jpg")?.src ?? "/Hero.jpg";
 
 const eyebrowClass = "text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7a6b63]";
 
@@ -38,13 +43,17 @@ export function AboutSection() {
 
         <div className="mt-8 grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <div className="relative self-start pb-10">
-            <CroppedPhoto
-              alt="Merit Urlan-ы гараар урласан бугын тоглоом"
-              focus="48% 45%"
-              zoom={1.8}
-              sizes="(max-width: 1024px) 90vw, 720px"
-              className="aspect-[4/5] rounded-[36px] lg:aspect-auto lg:h-[calc(100svh-var(--header-h,130px)-280px)]"
-            />
+            <div className="relative aspect-square overflow-hidden rounded-[36px] bg-[#2f2420] lg:aspect-auto lg:h-[calc(100svh-var(--header-h,130px)-280px)]">
+              {/* Зургийг бүтнээр нь харуулж, үлдсэн зайг бүдгэрүүлсэн хувилбараар дүүргэнэ. */}
+              <Image src={aboutImage} alt="" aria-hidden fill sizes="10vw" className="scale-110 object-cover opacity-70 blur-2xl" />
+              <Image
+                src={aboutImage}
+                alt="Merit Urlan-ы гараар урласан Piggy & Cow тоглоом"
+                fill
+                sizes="(max-width: 1024px) 90vw, 720px"
+                className="object-contain"
+              />
+            </div>
             <span className="absolute bottom-16 left-6 rounded-full bg-[#2f2420]/75 px-5 py-2.5 text-[11px] text-white backdrop-blur">
               Merit урлан · Улаанбаатар
             </span>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { ProductOptionCard } from "@/components/product-option-card";
 import { ProductPurchaseControls } from "@/components/product-purchase-controls";
+import { SaveButton } from "@/components/save-button";
 import { ShopBreadcrumb } from "@/components/shop-breadcrumb";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -109,7 +110,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           ) : null}
 
           <div className="mt-10 grid gap-12 xl:grid-cols-[0.9fr_1.1fr]">
-            <div className="overflow-hidden rounded-[2.5rem] bg-[#fcfaf8] ring-1 ring-[#ece4dd]">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-[#fcfaf8] ring-1 ring-[#ece4dd]">
+              <SaveButton
+                item={{ slug: item.slug, category, name: item.name, price: item.price, image: item.image }}
+                className="absolute right-6 top-6 z-10 h-12 w-12"
+              />
               <Image
                 src={item.image}
                 alt={item.name}
@@ -137,7 +142,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <div className="mt-10 space-y-8">
                 <div className="flex items-center justify-between rounded-[1.7rem] border border-[#dfe3e6] px-6 py-7">
                   <span className="text-[12px] font-semibold text-[#495057]">Үнэ:</span>
-                  <span className="text-[12px] font-bold text-[#f59b17]">{item.price}</span>
+                  <span className="text-[12px] font-bold text-[#a24456]">{item.price}</span>
                 </div>
 
                 <ProductPurchaseControls item={item} />
