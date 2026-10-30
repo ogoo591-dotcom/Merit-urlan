@@ -39,8 +39,8 @@ export type NavSection = {
   links: NavLink[];
 };
 
-const finished = (sub: string) => `/shop/finished?sub=${encodeURIComponent(sub)}#products`;
-const supplies = (sub: string) => `/shop/supplies?sub=${encodeURIComponent(sub)}#products`;
+const finished = (category: string) => `/products?category=${encodeURIComponent(category)}`;
+const supplies = (category: string) => `/materials?category=${encodeURIComponent(category)}`;
 
 export const navSections: NavSection[] = [
   {
@@ -50,17 +50,17 @@ export const navSections: NavSection[] = [
     icon: Info,
     description: "Merit урлангийн түүх ба бидний тухай",
     links: [
-      { label: "Бидний түүх", href: "/about", icon: BookOpen },
-      { label: "Зургийн цомог", href: "/#gallery", icon: Images },
-      { label: "Яагаад Merit урлан", href: "/#why", icon: Award },
-      { label: "Түгээмэл асуулт", href: "/#faq", icon: CircleHelp },
-      { label: "Холбоо барих", href: "#contact", icon: Phone },
+      { label: "Бидний түүх", href: "/about#story", icon: BookOpen },
+      { label: "Зургийн цомог", href: "/about#gallery", icon: Images },
+      { label: "Яагаад Merit урлан", href: "/about#why", icon: Award },
+      { label: "Түгээмэл асуулт", href: "/about#faq", icon: CircleHelp },
+      { label: "Холбоо барих", href: "/about#contact", icon: Phone },
     ],
   },
   {
     id: "products",
     label: "Бүтээгдэхүүн",
-    href: "/shop/finished",
+    href: "/products",
     icon: Gift,
     description: "Гараар урласан бэлэн бүтээгдэхүүн",
     links: [
@@ -73,7 +73,7 @@ export const navSections: NavSection[] = [
   {
     id: "supplies",
     label: "Материал",
-    href: "/shop/supplies",
+    href: "/materials",
     icon: Spool,
     description: "Утас, товч, зүү болон туслах материал",
     links: [
@@ -81,7 +81,7 @@ export const navSections: NavSection[] = [
       { label: "Синель утас", href: supplies("Синель утас"), icon: Flower2 },
       { label: "Товч", href: supplies("Товч"), icon: Palette },
       { label: "Зүү", href: supplies("Зүү"), icon: Scissors },
-      { label: "Шинэ ирсэн", href: "/shop/supplies#products", icon: Sparkles },
+      { label: "Шинэ ирсэн", href: "/materials", icon: Sparkles },
     ],
   },
   {

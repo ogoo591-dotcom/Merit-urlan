@@ -1,145 +1,137 @@
 "use client";
 
+import { X } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 
-import { saveProduct, type ProductFormState } from "@/app/admin/products/actions";
-import type { ProductRow } from "@/lib/products";
+import { saveProductAction, type FormState } from "@/app/admin/products/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
+import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton } from "@/components/admin/ui";
+import type { ProductType, StoreProduct } from "@/lib/mock/products";
 
-const inputClass =
-  "mt-2 w-full rounded-xl border border-[#eadfd5] bg-white px-3.5 py-2.5 text-[12px] text-[#2f2420] outline-none transition focus:border-[#6e4f45]";
-const labelClass = "block text-[12px] font-medium text-[#4a3b35]";
-const hintClass = "mt-1 block text-[10px] font-normal text-[#8a7b73]";
-
-export function ProductForm({ product }: { product?: ProductRow }) {
-  const [state, action, pending] = useActionState<ProductFormState, FormData>(saveProduct, {});
-  const [preview, setPreview] = useState(product?.image ?? "");
+export function ProductForm({
+  product,
+  defaultType,
+  categories,
+}: {
+  product?: StoreProduct;
+  defaultType: ProductType;
+  categories: string[];
+}) {
+  const [state, action] = useActionState<FormState, FormData>(saveProductAction, {});
+  const [type, setType] = useState<ProductType>(product?.type ?? defaultType);
+  const [availability, setAvailability] = useState(product?.availability ?? "ready");
+  const [images, setImages] = useState(product?.images ?? []);
 
   return (
     <form action={action} className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-      {product ? <input type="hidden" name="existing_slug" value={product.slug} /> : null}
-      <input type="hidden" name="current_image" value={product?.image ?? ""} />
+      {product ? <input type="hidden" name="originalId" value={product.id} /> : null}
 
-      <div className="space-y-5 rounded-[20px] border border-[#eadfd5] bg-white p-6">
+      <div className={`${cardClass} space-y-5`}>
+        {state.error ? <Notice tone="error">{state.error}</Notice> : null}
         <label className={labelClass}>
-          Барааны нэр
+          Нэр
           <input name="name" required defaultValue={product?.name} className={inputClass} />
         </label>
-
-        <label className={labelClass}>
-          Код (slug)
-          <input
-            name="slug"
-            required={!product}
-            disabled={Boolean(product)}
-            defaultValue={product?.slug}
-            placeholder="bor-tovch-12mm"
-            className={`${inputClass} disabled:bg-[#f7f3ef] disabled:text-[#8a7b73]`}
-          />
-          <span className={hintClass}>Хаягт харагдана (/shop/…/код). Латин жижиг үсэг, тоо, зураас. Дараа нь солигдохгүй.</span>
-        </label>
-
-        <div className="grid gap-5 sm:grid-cols-2">
+        {!product ? (
           <label className={labelClass}>
-            Ангилал
-            <select name="category" defaultValue={product?.category ?? "finished"} className={inputClass}>
-              <option value="finished">Бэлэн бүтээгдэхүүн</option>
-              <option value="supplies">Материал</option>
-            </select>
+            ID (хаягт харагдана)
+            <input name="id" placeholder="snoopy-dog" className={inputClass} />
+            <span className={hintClass}>Латин жижиг үсэг, тоо, зураас. Хоосон орхивол автоматаар үүснэ. Дараа нь солигдохгүй.</span>
           </label>
-          <label className={labelClass}>
-            Дэд ангилал
-            <input name="subcategory" defaultValue={product?.subcategory} placeholder="Товч, Синель утас, Тоглоом…" className={inputClass} />
-          </label>
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-3">
-          <label className={labelClass}>
-            Үнэ (₮)
-            <input name="price" type="number" min={0} required defaultValue={product?.price} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            Үлдэгдэл (ш)
-            <input name="stock" type="number" min={0} required defaultValue={product?.stock ?? 0} className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            Брэнд
-            <input name="brand" defaultValue={product?.brand === "-" ? "" : product?.brand} className={inputClass} />
-          </label>
-        </div>
-
+        ) : (
+          <p className="text-[11px] text-[#9c8c84]">ID: {product.id}</p>
+        )}
         <label className={labelClass}>
           Тайлбар
           <textarea name="description" rows={4} defaultValue={product?.description} className={inputClass} />
         </label>
-
-        <label className={labelClass}>
-          Онцлогууд
-          <textarea name="features" rows={4} defaultValue={product?.features.join("\n")} className={inputClass} />
-          <span className={hintClass}>Мөр бүрт нэг онцлог.</span>
-        </label>
-
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <label className={labelClass}>
-            Хувилбарын бүлэг
-            <input name="group_slug" defaultValue={product?.group_slug ?? ""} placeholder="buttons-12mm" className={inputClass} />
-            <span className={hintClass}>Нэг барааны өөр өнгөнүүдэд ижил бүлгийн нэр өгвөл хамт харагдана.</span>
+            Төрөл
+            <select name="type" value={type} onChange={(event) => setType(event.target.value as ProductType)} className={inputClass}>
+              <option value="product">Бүтээгдэхүүн</option>
+              <option value="material">Материал</option>
+            </select>
           </label>
           <label className={labelClass}>
-            Хувилбарын нэр
-            <input name="option_label" defaultValue={product?.option_label ?? ""} placeholder="Бор, Mint…" className={inputClass} />
+            Ангилал
+            <input name="category" required list="product-categories" defaultValue={product?.category} className={inputClass} />
+            <datalist id="product-categories">
+              {categories.map((category) => (
+                <option key={category} value={category} />
+              ))}
+            </datalist>
           </label>
+          <label className={labelClass}>
+            Үнэ (₮)
+            <input name="price" type="number" min={0} step={100} required defaultValue={product?.price} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            Үлдэгдэл
+            <input name="stock" type="number" min={0} step={1} required defaultValue={product?.stock ?? 0} className={inputClass} />
+          </label>
+          <label className={labelClass}>
+            Бэлэн байдал
+            <select
+              name="availability"
+              value={availability}
+              onChange={(event) => setAvailability(event.target.value as typeof availability)}
+              className={inputClass}
+            >
+              <option value="ready">Бэлэн</option>
+              <option value="made_to_order">Захиалгаар хийнэ</option>
+            </select>
+          </label>
+          {availability === "made_to_order" ? (
+            <label className={labelClass}>
+              Бэлэн болох хоног
+              <input name="leadDays" type="number" min={1} required defaultValue={product?.leadDays ?? 7} className={inputClass} />
+            </label>
+          ) : null}
+          {type === "material" ? (
+            <label className={labelClass}>
+              Гарал үүсэл
+              <select name="origin" defaultValue={product?.origin ?? ""} className={inputClass}>
+                <option value="">—</option>
+                <option value="Хятад">Хятад</option>
+                <option value="Турк">Турк</option>
+              </select>
+            </label>
+          ) : null}
         </div>
       </div>
 
-      <div className="space-y-5">
-        <div className="rounded-[20px] border border-[#eadfd5] bg-white p-6">
-          <p className={labelClass}>Зураг</p>
-          <div className="relative mt-3 aspect-square overflow-hidden rounded-xl bg-[#f7f2ed]">
-            {preview ? (
-              <Image src={preview} alt="" fill unoptimized className="object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-[11px] text-[#8a7b73]">Зураг сонгоогүй</div>
-            )}
-          </div>
-          <input
-            name="image"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file) setPreview(URL.createObjectURL(file));
-            }}
-            className="mt-3 w-full text-[11px] file:mr-3 file:rounded-lg file:border-0 file:bg-[#f3ebe4] file:px-3 file:py-2 file:text-[11px]"
-          />
-          <span className={hintClass}>JPG, PNG, WEBP · 5MB хүртэл</span>
-        </div>
-
-        <div className="space-y-4 rounded-[20px] border border-[#eadfd5] bg-white p-6">
-          <label className="flex items-center gap-3 text-[12px]">
-            <input name="is_active" type="checkbox" defaultChecked={product?.is_active ?? true} className="h-4 w-4 accent-[#6e4f45]" />
-            Сайтад харуулах
-          </label>
-          <label className={labelClass}>
-            Тэмдэглэгээ (badge)
-            <input name="badge" defaultValue={product?.badge ?? ""} placeholder="Шинэ, Хямдрал…" className={inputClass} />
-          </label>
-          <label className={labelClass}>
-            Эрэмбэ
-            <input name="sort_order" type="number" min={0} defaultValue={product?.sort_order ?? 0} className={inputClass} />
-            <span className={hintClass}>Бага тоо түрүүлж харагдана.</span>
+      <div className="space-y-6">
+        <div className={cardClass}>
+          <p className={labelClass}>Зургууд</p>
+          {images.length ? (
+            <ul className="mt-3 grid grid-cols-3 gap-3">
+              {images.map((src) => (
+                <li key={src} className="relative aspect-square overflow-hidden rounded-xl border border-[#eadfd5] bg-[#faf7f6]">
+                  <input type="hidden" name="keepImages" value={src} />
+                  <Image src={src} alt="" fill sizes="120px" className="object-contain" />
+                  <button
+                    type="button"
+                    onClick={() => setImages((list) => list.filter((item) => item !== src))}
+                    aria-label="Зураг хасах"
+                    className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-[#a33a3a]"
+                  >
+                    <X aria-hidden className="h-3.5 w-3.5" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <label className={`${labelClass} mt-4`}>
+            Зураг нэмэх
+            <input name="images" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-[#f7e9ec] file:px-3 file:py-1.5 file:text-[#a24456]`} />
+            <span className={hintClass}>JPG, PNG, WEBP · 5MB хүртэл. (Mock: .mock-db/uploads-д хадгална, дараа нь Supabase Storage.)</span>
           </label>
         </div>
-
-        {state.error ? <p className="rounded-xl bg-[#fbeaea] px-4 py-3 text-[12px] text-[#b04a4a]">{state.error}</p> : null}
-
-        <button
-          type="submit"
-          disabled={pending}
-          className="w-full rounded-[14px] bg-[#6e4f45] px-6 py-3.5 text-[13px] font-medium text-white transition hover:bg-[#5c4038] disabled:opacity-60"
-        >
-          {pending ? "Хадгалж байна…" : product ? "Өөрчлөлт хадгалах" : "Бараа нэмэх"}
-        </button>
+        <SubmitButton className={`${primaryButton} w-full py-3`} pendingText="Хадгалж байна…">
+          {product ? "Өөрчлөлт хадгалах" : "Нэмэх"}
+        </SubmitButton>
       </div>
     </form>
   );

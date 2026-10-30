@@ -1,54 +1,53 @@
-export type OrderStatus = "new" | "confirmed" | "delivered" | "cancelled";
-export type EnrollmentStatus = "new" | "contacted" | "enrolled" | "cancelled";
+// Захиалгын төрөл, статусууд (client, server хоёуланд).
 
-export type OrderRow = {
+export const orderStatuses = [
+  { key: "received", label: "Хүлээн авсан" },
+  { key: "in_progress", label: "Хийгдэж байна" },
+  { key: "ready", label: "Бэлэн" },
+  { key: "shipping", label: "Хүргэлтэнд гарсан" },
+  { key: "delivered", label: "Хүргэгдсэн" },
+] as const;
+
+export type OrderStatus = (typeof orderStatuses)[number]["key"];
+
+export const orderStatusLabel = (status: OrderStatus) => orderStatuses.find((item) => item.key === status)?.label ?? status;
+
+export const orderStatusTone: Record<OrderStatus, string> = {
+  received: "bg-[#fdf0dc] text-[#9a6412]",
+  in_progress: "bg-[#e6eefb] text-[#2f5ea8]",
+  ready: "bg-[#efe6fb] text-[#6b3fa8]",
+  shipping: "bg-[#e3f4f4] text-[#1f6f72]",
+  delivered: "bg-[#e3f2e6] text-[#2e7a43]",
+};
+
+export type OrderLine = {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  quantity: number;
+  madeToOrder: boolean;
+  leadDays?: number;
+};
+
+export type Order = {
   id: number;
-  user_id: string;
-  customer_name: string;
-  phone: string;
-  email: string | null;
-  address: string;
-  note: string | null;
-  items: Array<{ slug: string; name: string; price: number; quantity: number }>;
+  userId: string;
+  customer: { name: string; phone: string };
+  address: { district: string; khoroo: string; detail: string };
+  note: string;
+  items: OrderLine[];
   total: number;
   status: OrderStatus;
-  created_at: string;
+  history: Array<{ status: OrderStatus; at: string }>;
+  payment: { provider: "qpay"; transactionId: string };
+  createdAt: string;
+  // Захиалгаар хийх бараа байвал тооцсон, эсвэл админы сонгосон бэлэн болох огноо.
+  readyBy?: string;
 };
 
-export type EnrollmentRow = {
-  id: number;
-  user_id: string;
-  course_title: string;
-  customer_name: string;
-  phone: string;
-  email: string | null;
-  status: EnrollmentStatus;
-  created_at: string;
-};
+export type CartInput = Array<{ id: string; quantity: number }>;
 
-export const orderStatusLabels: Record<OrderStatus, string> = {
-  new: "Шинэ",
-  confirmed: "Баталгаажсан",
-  delivered: "Хүргэгдсэн",
-  cancelled: "Цуцалсан",
-};
-
-export const enrollmentStatusLabels: Record<EnrollmentStatus, string> = {
-  new: "Шинэ",
-  contacted: "Холбогдсон",
-  enrolled: "Элссэн",
-  cancelled: "Цуцалсан",
-};
-
-export const statusTone: Record<string, string> = {
-  new: "bg-[#fdf0dc] text-[#9a6412]",
-  confirmed: "bg-[#e6eefb] text-[#2f5ea8]",
-  contacted: "bg-[#e6eefb] text-[#2f5ea8]",
-  delivered: "bg-[#e3f2e6] text-[#2e7a43]",
-  enrolled: "bg-[#e3f2e6] text-[#2e7a43]",
-  cancelled: "bg-[#f3e6e6] text-[#a04848]",
-};
-
-export function formatDate(value: string) {
-  return new Date(value).toLocaleString("mn-MN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ulaanbaatar" });
+export function formatOrderAddress(address: Order["address"]) {
+  return [address.district, address.khoroo && `${address.khoroo}-р хороо`, address.detail].filter(Boolean).join(", ");
 }

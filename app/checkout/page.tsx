@@ -4,8 +4,6 @@ import { CheckoutForm } from "@/components/checkout-form";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-export const runtime = "edge";
-
 export default async function CheckoutPage() {
   const user = await currentUser();
   const phone = user?.primaryPhoneNumber?.phoneNumber.replace(/^\+976/, "") ?? "";
@@ -20,7 +18,6 @@ export default async function CheckoutPage() {
             defaults={{
               name: user?.fullName ?? "",
               phone,
-              email: user?.primaryEmailAddress?.emailAddress ?? "",
             }}
           />
         </div>

@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { AboutSection } from "@/components/about-section";
 import { FaqSection } from "@/components/faq-section";
 import { GallerySection } from "@/components/gallery-section";

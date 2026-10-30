@@ -3,17 +3,20 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Library, Menu, ShieldCheck, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import { Bell, Heart, Library, Menu, ShieldCheck, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
-import type { CatalogItem } from "@/lib/site-data";
 import { AddressButton } from "@/components/address-button";
 import { AllMenuDrawer } from "@/components/all-menu-drawer";
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
 import { useCart } from "@/components/cart-provider";
 import { useSaved } from "@/components/saved-provider";
+import { storeMeta } from "@/components/store/store-paths";
+import { getViewerStatus, searchCatalog } from "@/app/actions";
+import { formatPrice } from "@/lib/format";
+import type { StoreProduct } from "@/lib/mock/products";
 import { navSections } from "@/lib/navigation";
 
 function SearchIcon({ className = "h-6 w-6" }: { className?: string }) {
@@ -123,6 +126,11 @@ function CountBadge({ count }: { count: number }) {
   );
 }
 
+// Enter дарахад эхний илэрцийн төрлийн (бүтээгдэхүүн / материал) жагсаалт руу хайлттайгаар очно.
+function searchPageHref(query: string, results: StoreProduct[]) {
+  return `${storeMeta[results[0]?.type ?? "product"].base}?q=${encodeURIComponent(query)}`;
+}
+
 function isActivePath(pathname: string, href: string) {
   const path = href.split(/[?#]/)[0];
   return path !== "/" && (pathname === path || pathname.startsWith(`${path}/`));
@@ -158,8 +166,11 @@ export function SiteHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isSignedIn, user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "admin";
+  const { isSignedIn } = useUser();
+  // Админ эсэх (publicMetadata эсвэл ADMIN_EMAILS) болон уншаагүй мэдэгдлийн тоог серверээс авна.
+  const [viewer, setViewer] = useState({ isAdmin: false, unread: 0 });
+  const isAdmin = isSignedIn ? viewer.isAdmin : false;
+  const unread = isSignedIn ? viewer.unread : 0;
   const { openAuth, requireAuth } = useAuthModal();
   const { items, removeItem } = useCart();
   const savedCount = useSaved().items.length;
@@ -168,7 +179,7 @@ export function SiteHeader() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<CatalogItem[]>([]);
+  const [searchResults, setSearchResults] = useState<StoreProduct[]>([]);
   const headerRef = useRef<HTMLElement>(null);
 
   // Expose the header height so full-screen sections (the home hero) can fill
@@ -188,7 +199,27 @@ export function SiteHeader() {
     return () => observer.disconnect();
   }, []);
 
-  // Бичиж дуусахыг 250мс хүлээгээд сангаас хайна.
+  // Хуудас солигдох, цонх руу буцаж ирэх бүрд болон минут тутам мэдэгдлийн тоог шинэчилнэ.
+  useEffect(() => {
+    if (!isSignedIn) return;
+    let alive = true;
+    const refresh = () =>
+      getViewerStatus()
+        .then((status) => {
+          if (alive) setViewer(status);
+        })
+        .catch(() => {});
+    refresh();
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [isSignedIn, pathname]);
+
+  // Бичиж дуусахыг 250мс хүлээгээд хайна.
   useEffect(() => {
     const query = searchQuery.trim();
 
@@ -198,10 +229,9 @@ export function SiteHeader() {
 
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
-        .then((response) => (response.ok ? response.json() : { items: [] }))
-        .then((data: { items: CatalogItem[] }) => setSearchResults(data.items))
-        .catch(() => {});
+      searchCatalog(query).then((items) => {
+        if (!controller.signal.aborted) setSearchResults(items);
+      });
     }, 250);
 
     return () => {
@@ -259,7 +289,7 @@ export function SiteHeader() {
                 const query = searchQuery.trim();
 
                 if (query) {
-                  router.push(`/shop?search=${encodeURIComponent(query)}`);
+                  router.push(searchPageHref(query, searchResults));
                   closeSearch();
                 }
               }}
@@ -295,13 +325,13 @@ export function SiteHeader() {
                   <>
                     {searchResults.map((item) => (
                       <Link
-                        key={`${item.category}-${item.slug}`}
-                        href={`/shop/${item.category}/${item.slug}`}
+                        key={item.id}
+                        href={`${storeMeta[item.type].base}/${item.id}`}
                         onClick={closeSearch}
                         className="flex items-center gap-4 border-b border-[#f1ebe5] px-4 py-3 transition hover:bg-[#fcf6f0]"
                       >
                         <Image
-                          src={item.image}
+                          src={item.images[0]}
                           alt=""
                           width={56}
                           height={56}
@@ -311,12 +341,12 @@ export function SiteHeader() {
                           <p className="line-clamp-1 text-[11px] font-semibold text-[#2f2420]">
                             {highlightMatch(item.name, searchQuery)}
                           </p>
-                          <p className="mt-0.5 text-[10px] font-medium text-[#6e4f45]">{item.price}</p>
+                          <p className="mt-0.5 text-[10px] font-medium text-[#6e4f45]">{formatPrice(item.price)}</p>
                         </div>
                       </Link>
                     ))}
                     <Link
-                      href={`/shop?search=${encodeURIComponent(searchQuery.trim())}`}
+                      href={searchPageHref(searchQuery.trim(), searchResults)}
                       onClick={closeSearch}
                       className="block px-4 py-3 text-center text-[11px] font-medium text-[#6e4f45] transition hover:bg-[#fcf6f0]"
                     >
@@ -343,12 +373,18 @@ export function SiteHeader() {
               <div className={headerActionClass}>
                 <UserButton>
                   <UserButton.MenuItems>
-                    <UserButton.Link label="Миний захиалгууд" labelIcon={<ShoppingBag className="h-4 w-4" />} href="/account" />
+                    <UserButton.Link label="Миний захиалгууд" labelIcon={<ShoppingBag className="h-4 w-4" />} href="/account/orders" />
+                    <UserButton.Link label="Мэдэгдэл" labelIcon={<Bell className="h-4 w-4" />} href={isAdmin ? "/admin/notifications" : "/account/notifications"} />
                     {isAdmin ? (
                       <UserButton.Link label="Админ самбар" labelIcon={<ShieldCheck className="h-4 w-4" />} href="/admin" />
                     ) : null}
                   </UserButton.MenuItems>
                 </UserButton>
+                {unread > 0 ? (
+                  <span aria-label={`${unread} уншаагүй мэдэгдэл`}>
+                    <CountBadge count={unread} />
+                  </span>
+                ) : null}
                 <ActionLabel>Профайл</ActionLabel>
               </div>
             ) : (
@@ -431,7 +467,7 @@ export function SiteHeader() {
                 <h3 className="mt-8 text-[12px] font-semibold text-[#2f2420]">Таны сагс хоосон байна</h3>
                 <p className="mt-3 max-w-sm text-[12px] leading-relaxed text-[#6f625b]">Дуртай бараагаа нэмээд худалдан авалтаа эхлээрэй</p>
                 <Link
-                  href="/shop"
+                  href="/products"
                   onClick={() => setIsCartOpen(false)}
                   className="mt-8 flex w-full max-w-sm items-center justify-center gap-3 rounded-[14px] bg-[#6e4f45] px-6 py-4 text-[12px] font-medium text-white transition hover:bg-[#5c4038]"
                 >

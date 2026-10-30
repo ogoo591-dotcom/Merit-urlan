@@ -11,8 +11,6 @@ import { SiteHeader } from "@/components/site-header";
 import { findCatalogItem } from "@/lib/products";
 import { shopCategoryMeta, type ShopCategoryKey } from "@/lib/site-data";
 
-export const runtime = "edge";
-
 type ProductDetailPageProps = {
   params: Promise<{ category: string; slug: string }>;
 };

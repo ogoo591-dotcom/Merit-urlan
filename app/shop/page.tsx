@@ -11,8 +11,6 @@ type ShopPageProps = {
   searchParams?: Promise<{ search?: string }>;
 };
 
-export const runtime = "edge";
-
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams;
   const searchQuery = params?.search?.trim() ?? "";

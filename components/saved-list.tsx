@@ -7,6 +7,9 @@ import Link from "next/link";
 import { SaveButton } from "@/components/save-button";
 import { useSaved } from "@/components/saved-provider";
 
+// Хуучин (/shop/...) хадгалсан бараа redirect-ээр шинэ хуудас руу шилжинэ.
+const storeCategories = ["products", "materials"];
+
 export function SavedList() {
   const { items } = useSaved();
 
@@ -21,10 +24,10 @@ export function SavedList() {
           Барааны зураг дээрх зүрхийг дарж хадгалаад, дараа нь эндээс хурдан олоорой.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/shop/finished" className="rounded-xl bg-[#a24456] px-6 py-3.5 text-[12px] font-semibold text-white transition hover:bg-[#8a3748]">
+          <Link href="/products" className="rounded-xl bg-[#a24456] px-6 py-3.5 text-[12px] font-semibold text-white transition hover:bg-[#8a3748]">
             Бүтээгдэхүүн үзэх
           </Link>
-          <Link href="/shop/supplies" className="rounded-xl border border-[#e3d6cb] px-6 py-3.5 text-[12px] font-semibold text-[#2f2420] transition hover:border-[#a24456] hover:text-[#a24456]">
+          <Link href="/materials" className="rounded-xl border border-[#e3d6cb] px-6 py-3.5 text-[12px] font-semibold text-[#2f2420] transition hover:border-[#a24456] hover:text-[#a24456]">
             Материал үзэх
           </Link>
         </div>
@@ -37,7 +40,7 @@ export function SavedList() {
       {items.map((item) => (
         <li key={item.slug} className="relative">
           <Link
-            href={`/shop/${item.category}/${item.slug}`}
+            href={storeCategories.includes(item.category) ? `/${item.category}/${item.slug}` : `/shop/${item.category}/${item.slug}`}
             className="block rounded-[1.35rem] border-2 border-[#ecd3d9] bg-white p-5 transition hover:border-[#a24456]"
           >
             <Image

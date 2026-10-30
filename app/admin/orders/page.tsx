@@ -1,89 +1,80 @@
 import Link from "next/link";
 
-import { setOrderStatus } from "@/app/admin/orders/actions";
-import { StatusSelect } from "@/components/admin/status-select";
-import { getAdminSupabase } from "@/lib/auth";
-import { formatDate, orderStatusLabels, statusTone, type OrderRow, type OrderStatus } from "@/lib/orders";
+import { PageHeader, StatusPill } from "@/components/admin/ui";
+import { requireAdmin } from "@/lib/auth";
+import { getAllOrders } from "@/lib/data/orders";
+import { formatDateTime, formatPrice } from "@/lib/format";
+import { orderStatusLabel, orderStatuses, orderStatusTone, type OrderStatus } from "@/lib/orders";
 
-export const runtime = "edge";
-
-type AdminOrdersPageProps = {
-  searchParams: Promise<{ status?: string }>;
-};
-
-export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
-  const { status } = await searchParams;
-  const supabase = await getAdminSupabase();
-
-  let query = supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(200);
-  if (status && status in orderStatusLabels) query = query.eq("status", status);
-  const { data } = await query;
-  const orders = (data ?? []) as OrderRow[];
+export default async function AdminOrdersPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  await requireAdmin();
+  const { status: statusParam } = await searchParams;
+  const status = orderStatuses.find((item) => item.key === statusParam)?.key as OrderStatus | undefined;
+  const all = await getAllOrders();
+  const orders = status ? all.filter((order) => order.status === status) : all;
 
   return (
     <div>
-      <h1 className="text-[24px] font-semibold">Захиалга</h1>
-      <p className="mt-1 text-[12px] text-[#8a7b73]">Цуцалсан захиалгын бараа үлдэгдэлд автоматаар буцаж нэмэгдэнэ.</p>
+      <PageHeader title="Захиалгууд" description="Захиалга дээр дарж дэлгэрэнгүйг харах, статус солих" />
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/admin/orders" className={`rounded-full px-4 py-2 text-[12px] ${!status ? "bg-[#2f2420] text-white" : "bg-white ring-1 ring-[#eadfd5]"}`}>
-          Бүгд
-        </Link>
-        {(Object.keys(orderStatusLabels) as OrderStatus[]).map((key) => (
-          <Link
-            key={key}
-            href={`/admin/orders?status=${key}`}
-            className={`rounded-full px-4 py-2 text-[12px] ${status === key ? "bg-[#2f2420] text-white" : "bg-white ring-1 ring-[#eadfd5]"}`}
-          >
-            {orderStatusLabels[key]}
-          </Link>
-        ))}
-      </div>
+      <nav aria-label="Статусаар шүүх" className="mt-6 flex flex-wrap gap-2 text-[12px]">
+        {[{ key: undefined, label: "Бүгд" }, ...orderStatuses].map((item) => {
+          const count = item.key ? all.filter((order) => order.status === item.key).length : all.length;
+          const active = item.key === status;
+          return (
+            <Link
+              key={item.label}
+              href={item.key ? `/admin/orders?status=${item.key}` : "/admin/orders"}
+              aria-current={active ? "page" : undefined}
+              className={`rounded-full px-4 py-2 ${active ? "bg-[#a24456] text-white" : "bg-white ring-1 ring-[#eadfd5] hover:ring-[#a24456]"}`}
+            >
+              {item.label} ({count})
+            </Link>
+          );
+        })}
+      </nav>
 
-      <div className="mt-4 space-y-4">
-        {orders.map((order) => (
-          <article key={order.id} className="rounded-[20px] border border-[#eadfd5] bg-white p-6">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3">
-                  <p className="text-[14px] font-semibold">#{order.id}</p>
-                  <span className={`rounded-full px-2.5 py-1 text-[10px] ${statusTone[order.status]}`}>{orderStatusLabels[order.status]}</span>
-                </div>
-                <p className="mt-1 text-[11px] text-[#8a7b73]">{formatDate(order.created_at)}</p>
-              </div>
-              <form action={setOrderStatus}>
-                <input type="hidden" name="id" value={order.id} />
-                <StatusSelect name="status" defaultValue={order.status} options={orderStatusLabels} />
-              </form>
-            </div>
-
-            <div className="mt-4 grid gap-6 text-[12px] md:grid-cols-2">
-              <div className="space-y-1 text-[#4a3b35]">
-                <p className="font-medium text-[#2f2420]">{order.customer_name}</p>
-                <p>
-                  <a href={`tel:${order.phone}`} className="underline">{order.phone}</a>
-                  {order.email ? <> · {order.email}</> : null}
-                </p>
-                <p className="whitespace-pre-line">{order.address}</p>
-                {order.note ? <p className="text-[#8a7b73]">Тайлбар: {order.note}</p> : null}
-              </div>
-              <div>
-                <ul className="space-y-1">
-                  {order.items.map((item) => (
-                    <li key={item.slug} className="flex justify-between gap-4">
-                      <span>{item.name} × {item.quantity}</span>
-                      <span>{(item.price * item.quantity).toLocaleString("en-US")}₮</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-3 border-t border-[#f1ebe5] pt-2 text-right font-semibold">{order.total.toLocaleString("en-US")}₮</p>
-              </div>
-            </div>
-          </article>
-        ))}
-        {orders.length === 0 ? (
-          <p className="rounded-[20px] border border-[#eadfd5] bg-white p-10 text-center text-[12px] text-[#8a7b73]">Захиалга алга</p>
-        ) : null}
+      <div className="mt-6 overflow-x-auto rounded-[20px] border border-[#eadfd5] bg-white">
+        <table className="w-full min-w-[720px] text-left text-[12px]">
+          <thead className="border-b border-[#f1ebe5] text-[11px] text-[#9c8c84]">
+            <tr>
+              <th className="px-5 py-3 font-medium">№</th>
+              <th className="px-5 py-3 font-medium">Огноо</th>
+              <th className="px-5 py-3 font-medium">Захиалагч</th>
+              <th className="px-5 py-3 font-medium">Бараа</th>
+              <th className="px-5 py-3 font-medium">Статус</th>
+              <th className="px-5 py-3 text-right font-medium">Дүн</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#f1ebe5]">
+            {orders.map((order) => (
+              <tr key={order.id} className="hover:bg-[#faf6f3]">
+                <td className="px-5 py-3">
+                  <Link href={`/admin/orders/${order.id}`} className="font-semibold text-[#a24456] hover:underline">
+                    #{order.id}
+                  </Link>
+                </td>
+                <td className="px-5 py-3 text-[#7a6b63]">{formatDateTime(order.createdAt)}</td>
+                <td className="px-5 py-3">
+                  {order.customer.name}
+                  <span className="block text-[11px] text-[#9c8c84]">{order.customer.phone}</span>
+                </td>
+                <td className="px-5 py-3 text-[#7a6b63]">{order.items.reduce((sum, line) => sum + line.quantity, 0)} ширхэг</td>
+                <td className="px-5 py-3">
+                  <StatusPill className={orderStatusTone[order.status]}>{orderStatusLabel(order.status)}</StatusPill>
+                </td>
+                <td className="px-5 py-3 text-right font-semibold">{formatPrice(order.total)}</td>
+              </tr>
+            ))}
+            {!orders.length ? (
+              <tr>
+                <td colSpan={6} className="px-5 py-10 text-center text-[#9c8c84]">
+                  Захиалга алга
+                </td>
+              </tr>
+            ) : null}
+          </tbody>
+        </table>
       </div>
     </div>
   );

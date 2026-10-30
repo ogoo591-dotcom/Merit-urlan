@@ -104,7 +104,7 @@ const services = [
     description: "Гараар урласан хөөрхөн бүтээлүүд",
     cta: "Дэлгүүр үзэх",
     // Шууд барааны жагсаалт руу гүйлгэж очно.
-    href: "/shop/finished#products",
+    href: "/products",
     icon: BagIcon,
     // raw-images доторх файлын нэрээр (npm run compress-ийн дараа ч зөв зургаа олно).
     image: galleryImages.find((entry) => entry.source === "21.jpg")?.src ?? null,

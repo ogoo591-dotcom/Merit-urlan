@@ -4,8 +4,6 @@ import { SavedList } from "@/components/saved-list";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-export const runtime = "edge";
-
 export const metadata: Metadata = { title: "Хадгалсан | Merit Urlan" };
 
 export default function SavedPage() {

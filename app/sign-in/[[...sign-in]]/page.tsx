@@ -1,8 +1,6 @@
 import { SignInScreen } from "@/components/auth/sign-in-screen";
 import { safeRedirect } from "@/lib/redirect";
 
-export const runtime = "edge";
-
 type SignInPageProps = {
   searchParams: Promise<{ redirect_url?: string | string[] }>;
 };

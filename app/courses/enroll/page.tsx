@@ -6,8 +6,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { featuredCourses } from "@/lib/site-data";
 
-export const runtime = "edge";
-
 type EnrollPageProps = {
   searchParams: Promise<{ course?: string }>;
 };

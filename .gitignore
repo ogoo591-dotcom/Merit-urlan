@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Gallery-ийн эх зургууд (npm run compress)
 raw-images/
+
+# Mock өгөгдлийн сан, upload хийсэн файлууд (локал хөгжүүлэлт)
+.mock-db/

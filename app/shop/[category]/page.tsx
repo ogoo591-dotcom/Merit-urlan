@@ -15,8 +15,6 @@ type CategoryPageProps = {
   searchParams: Promise<{ sub?: string }>;
 };
 
-export const runtime = "edge";
-
 function isCategoryKey(value: string): value is ShopCategoryKey {
   return value === "supplies" || value === "finished";
 }

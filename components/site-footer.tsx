@@ -6,7 +6,7 @@ const quickLinks = [
   { href: "/#about", label: "Бидний тухай" },
   { href: "/#services", label: "Бүтээгдэхүүн / Үйлчилгээ" },
   { href: "/#gallery", label: "Зургийн цомог" },
-  { href: "/shop", label: "Дэлгүүр" },
+  { href: "/products", label: "Дэлгүүр" },
   { href: "/#faq", label: "Түгээмэл асуулт" },
 ] as const;
 
@@ -82,9 +82,10 @@ function ContactItem({ icon, label, children }: { icon: React.ReactNode; label: 
   );
 }
 
-export function SiteFooter() {
+// /about хуудас өөрийн "Холбоо барих" (#contact) хэсэгтэй тул footer-ийн id-г өөрчилж болно.
+export function SiteFooter({ id = "contact" }: { id?: string }) {
   return (
-    <footer id="contact" className="bg-[#3d302c] text-[#b8aaa2]">
+    <footer id={id} className="bg-[#3d302c] text-[#b8aaa2]">
       <div className="mx-auto w-full max-w-[1600px] px-6 pb-8 pt-16 lg:px-[144px] lg:pt-20">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.5fr_0.9fr_1.1fr_0.9fr] lg:gap-16">
           <div>

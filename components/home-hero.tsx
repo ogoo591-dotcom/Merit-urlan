@@ -136,7 +136,7 @@ export function HomeHero() {
 
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href="/shop"
+              href="/products"
               className="inline-flex items-center gap-3 rounded-[14px] bg-[#6e4f45] px-7 py-4 text-[12px] font-semibold text-white shadow-[0_14px_30px_-14px_rgba(70,45,35,0.7)] transition hover:bg-[#5c4038]"
             >
               Бүтээлээ эхлүүлье

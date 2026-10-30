@@ -1,137 +1,120 @@
+import { Pencil, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { toggleActive, updateStock } from "@/app/admin/products/actions";
-import { getAdminSupabase } from "@/lib/auth";
-import { formatPrice, type ProductRow } from "@/lib/products";
+import { updateStockAction } from "@/app/admin/products/actions";
+import { SubmitButton } from "@/components/admin/submit-button";
+import { Notice, PageHeader, StatusPill, primaryButton } from "@/components/admin/ui";
+import { requireAdmin } from "@/lib/auth";
+import { getProducts, type ProductType } from "@/lib/data/products";
+import { formatPrice } from "@/lib/format";
 
-export const runtime = "edge";
-
-type AdminProductsPageProps = {
-  searchParams: Promise<{ q?: string; filter?: string; saved?: string }>;
-};
-
-const categoryLabels = { supplies: "Материал", finished: "Бэлэн бүтээгдэхүүн" } as const;
-
-export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
-  const { q = "", filter, saved } = await searchParams;
-  const supabase = await getAdminSupabase();
-
-  let query = supabase.from("products").select("*").order("category").order("sort_order");
-  if (filter === "low") query = query.lte("stock", 5);
-  if (filter === "hidden") query = query.eq("is_active", false);
-  const { data, error } = await query;
-  const term = q.trim().toLowerCase();
-  const products = ((data ?? []) as ProductRow[]).filter(
-    (product) => !term || product.name.toLowerCase().includes(term) || product.slug.includes(term),
-  );
-  const totalUnits = products.reduce((sum, product) => sum + product.stock, 0);
-
-  const filters = [
-    { key: undefined, label: "Бүгд" },
-    { key: "low", label: "Үлдэгдэл бага" },
-    { key: "hidden", label: "Нуусан" },
-  ];
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string; saved?: string; deleted?: string; q?: string }>;
+}) {
+  await requireAdmin();
+  const params = await searchParams;
+  const type: ProductType = params.type === "material" ? "material" : "product";
+  const products = await getProducts({ type, query: params.q?.trim() || undefined });
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[24px] font-semibold">Бараа бүтээгдэхүүн</h1>
-          <p className="mt-1 text-[12px] text-[#8a7b73]">
-            {products.length} бараа · нийт {totalUnits.toLocaleString("en-US")} ширхэг үлдэгдэл
-          </p>
-        </div>
-        <Link href="/admin/products/new" className="rounded-[14px] bg-[#6e4f45] px-5 py-3 text-[12px] font-medium text-white hover:bg-[#5c4038]">
-          + Шинэ бараа нэмэх
-        </Link>
+      <PageHeader
+        title="Бүтээгдэхүүн / Материал"
+        description="Бараа нэмэх, засах, үлдэгдэл өөрчлөх"
+        action={
+          <Link href={`/admin/products/new?type=${type}`} className={primaryButton}>
+            <Plus aria-hidden className="h-4 w-4" /> Шинэ {type === "product" ? "бүтээгдэхүүн" : "материал"}
+          </Link>
+        }
+      />
+      <div className="mt-4 space-y-2">
+        {params.saved ? <Notice>Хадгаллаа.</Notice> : null}
+        {params.deleted ? <Notice>Устгалаа.</Notice> : null}
       </div>
 
-      {saved ? <p className="mt-4 rounded-xl bg-[#e3f2e6] px-4 py-3 text-[12px] text-[#2e7a43]">Амжилттай хадгаллаа.</p> : null}
-      {error ? <p className="mt-4 rounded-xl bg-[#fbeaea] px-4 py-3 text-[12px] text-[#b04a4a]">{error.message}</p> : null}
-
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        {filters.map((item) => (
-          <Link
-            key={item.label}
-            href={item.key ? `/admin/products?filter=${item.key}` : "/admin/products"}
-            className={`rounded-full px-4 py-2 text-[12px] ${filter === item.key ? "bg-[#2f2420] text-white" : "bg-white text-[#4a3b35] ring-1 ring-[#eadfd5]"}`}
-          >
-            {item.label}
-          </Link>
-        ))}
-        <form className="ml-auto">
-          {filter ? <input type="hidden" name="filter" value={filter} /> : null}
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Нэр, кодоор хайх…"
-            className="w-56 rounded-full border border-[#eadfd5] bg-white px-4 py-2 text-[12px] outline-none focus:border-[#6e4f45]"
-          />
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex gap-2 text-[12px]">
+          {(["product", "material"] as const).map((value) => (
+            <Link
+              key={value}
+              href={`/admin/products?type=${value}`}
+              className={`rounded-full px-4 py-2 ${type === value ? "bg-[#a24456] text-white" : "bg-white ring-1 ring-[#eadfd5]"}`}
+            >
+              {value === "product" ? "Бүтээгдэхүүн" : "Материал"}
+            </Link>
+          ))}
+        </div>
+        <form className="flex gap-2">
+          <input type="hidden" name="type" value={type} />
+          <input name="q" defaultValue={params.q} placeholder="Нэрээр хайх" className="rounded-xl border border-[#eadfd5] bg-white px-3.5 py-2 text-[12px] outline-none focus:border-[#a24456]" />
         </form>
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-[20px] border border-[#eadfd5] bg-white">
-        <table className="w-full min-w-[820px] text-left text-[12px]">
-          <thead className="border-b border-[#eadfd5] text-[11px] text-[#8a7b73]">
+      <div className="mt-6 overflow-x-auto rounded-[20px] border border-[#eadfd5] bg-white">
+        <table className="w-full min-w-[760px] text-left text-[12px]">
+          <thead className="border-b border-[#f1ebe5] text-[11px] text-[#9c8c84]">
             <tr>
               <th className="px-5 py-3 font-medium">Бараа</th>
               <th className="px-5 py-3 font-medium">Ангилал</th>
               <th className="px-5 py-3 font-medium">Үнэ</th>
+              <th className="px-5 py-3 font-medium">Бэлэн байдал</th>
               <th className="px-5 py-3 font-medium">Үлдэгдэл</th>
-              <th className="px-5 py-3 font-medium">Төлөв</th>
               <th className="px-5 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-[#f1ebe5]">
             {products.map((product) => (
-              <tr key={product.slug} className={product.is_active ? "" : "opacity-55"}>
+              <tr key={product.id}>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
-                    <Image src={product.image} alt="" width={44} height={44} className="h-11 w-11 rounded-lg bg-[#f7f2ed] object-cover" />
-                    <div className="min-w-0">
-                      <p className="line-clamp-1 font-medium">{product.name}</p>
-                      <p className="text-[10px] text-[#8a7b73]">{product.slug}</p>
-                    </div>
+                    <Image src={product.images[0] ?? "/Logo.png"} alt="" width={40} height={40} className="h-10 w-10 rounded-lg bg-[#faf7f6] object-contain" />
+                    <span className="font-medium">{product.name}</span>
                   </div>
                 </td>
-                <td className="px-5 py-3 text-[#4a3b35]">
-                  {categoryLabels[product.category]}
-                  <span className="block text-[10px] text-[#8a7b73]">{product.subcategory}</span>
+                <td className="px-5 py-3 text-[#7a6b63]">
+                  {product.category}
+                  {product.origin ? ` · ${product.origin}` : ""}
                 </td>
                 <td className="px-5 py-3">{formatPrice(product.price)}</td>
                 <td className="px-5 py-3">
-                  <form action={updateStock} className="flex items-center gap-2">
-                    <input type="hidden" name="slug" value={product.slug} />
+                  {product.availability === "made_to_order" ? (
+                    <StatusPill className="bg-[#fdf1d6] text-[#8a5a00]">Захиалгаар · {product.leadDays} хоног</StatusPill>
+                  ) : (
+                    <StatusPill className="bg-[#e3f4e8] text-[#1f7a3d]">Бэлэн</StatusPill>
+                  )}
+                </td>
+                <td className="px-5 py-3">
+                  <form action={updateStockAction} className="flex items-center gap-2">
+                    <input type="hidden" name="id" value={product.id} />
+                    <label className="sr-only" htmlFor={`stock-${product.id}`}>Үлдэгдэл</label>
                     <input
+                      id={`stock-${product.id}`}
                       name="stock"
                       type="number"
                       min={0}
                       defaultValue={product.stock}
-                      className={`w-20 rounded-lg border px-2 py-1.5 text-[12px] ${product.stock <= 5 ? "border-[#e9c08a] bg-[#fdf6e7]" : "border-[#eadfd5]"}`}
+                      className={`w-20 rounded-lg border px-2.5 py-1.5 text-[12px] outline-none focus:border-[#a24456] ${
+                        product.stock === 0 ? "border-[#e8b4b4] bg-[#fdf3f3]" : product.stock <= 2 ? "border-[#f0d9a8] bg-[#fdf9ef]" : "border-[#eadfd5]"
+                      }`}
                     />
-                    <button className="rounded-lg bg-[#f3ebe4] px-2.5 py-1.5 text-[11px] hover:bg-[#eadfd5]">Хадгалах</button>
-                  </form>
-                </td>
-                <td className="px-5 py-3">
-                  <form action={toggleActive}>
-                    <input type="hidden" name="slug" value={product.slug} />
-                    <input type="hidden" name="is_active" value={String(!product.is_active)} />
-                    <button className={`rounded-full px-3 py-1 text-[11px] ${product.is_active ? "bg-[#e3f2e6] text-[#2e7a43]" : "bg-[#efe9e4] text-[#7a6b63]"}`}>
-                      {product.is_active ? "Харагдаж байна" : "Нуусан"}
-                    </button>
+                    <SubmitButton className="rounded-lg border border-[#eadfd5] px-2.5 py-1.5 text-[11px] hover:border-[#a24456]">Хадгалах</SubmitButton>
                   </form>
                 </td>
                 <td className="px-5 py-3 text-right">
-                  <Link href={`/admin/products/${product.slug}`} className="text-[12px] font-medium text-[#6e4f45] underline">
-                    Засах
+                  <Link href={`/admin/products/${product.id}`} className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#a24456]">
+                    <Pencil aria-hidden className="h-3.5 w-3.5" /> Засах
                   </Link>
                 </td>
               </tr>
             ))}
-            {products.length === 0 ? (
+            {!products.length ? (
               <tr>
-                <td colSpan={6} className="px-5 py-10 text-center text-[#8a7b73]">Бараа олдсонгүй</td>
+                <td colSpan={6} className="px-5 py-10 text-center text-[#9c8c84]">
+                  Бараа алга
+                </td>
               </tr>
             ) : null}
           </tbody>

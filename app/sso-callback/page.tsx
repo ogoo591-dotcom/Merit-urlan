@@ -1,7 +1,5 @@
 import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
 
-export const runtime = "edge";
-
 // Google/Facebook-ээс буцаж ирэхэд Clerk нэвтрэлтийг дуусгана.
 export default function SsoCallbackPage() {
   return (

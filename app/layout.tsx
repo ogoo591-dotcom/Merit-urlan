@@ -6,8 +6,6 @@ import { DeliveryAddressProvider } from "@/components/delivery-address-provider"
 import { SavedProvider } from "@/components/saved-provider";
 import "./globals.css";
 
-export const runtime = "edge";
-
 export const metadata: Metadata = {
   title: "Merit Urlan",
   description: "Soft editorial crochet ecommerce and courses from Merit Urlan.",

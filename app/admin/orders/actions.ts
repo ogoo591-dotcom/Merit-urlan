@@ -2,28 +2,25 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getAdminSupabase } from "@/lib/auth";
-import { enrollmentStatusLabels, orderStatusLabels } from "@/lib/orders";
+import { requireAdmin } from "@/lib/auth";
+import { setOrderReadyDate, updateOrderStatus } from "@/lib/data/orders";
+import { orderStatuses, type OrderStatus } from "@/lib/orders";
 
-export async function setOrderStatus(formData: FormData) {
-  const supabase = await getAdminSupabase();
-  const status = String(formData.get("status"));
-  if (!(status in orderStatusLabels)) return;
-
-  const { error } = await supabase.rpc("set_order_status", {
-    p_order_id: Number(formData.get("id")),
-    p_status: status,
-  });
-  if (error) console.error("set_order_status failed", error);
-
+export async function changeOrderStatus(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  const status = String(formData.get("status")) as OrderStatus;
+  if (!Number.isInteger(id) || !orderStatuses.some((item) => item.key === status)) return;
+  await updateOrderStatus(id, status);
   revalidatePath("/admin", "layout");
 }
 
-export async function setEnrollmentStatus(formData: FormData) {
-  const supabase = await getAdminSupabase();
-  const status = String(formData.get("status"));
-  if (!(status in enrollmentStatusLabels)) return;
-
-  await supabase.from("course_enrollments").update({ status }).eq("id", Number(formData.get("id")));
+export async function changeReadyDate(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  const date = String(formData.get("readyBy") ?? "");
+  if (!Number.isInteger(id) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+  // Сонгосон өдрийн Улаанбаатарын цагаар 12:00.
+  await setOrderReadyDate(id, new Date(`${date}T12:00:00+08:00`).toISOString());
   revalidatePath("/admin", "layout");
 }
