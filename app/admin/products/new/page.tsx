@@ -8,7 +8,11 @@ import { getProducts } from "@/lib/data/products";
 export default async function NewProductPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   await requireAdmin();
   const type = (await searchParams).type === "material" ? "material" : "product";
-  const categories = [...new Set((await getProducts({})).map((item) => item.category))];
+  const all = await getProducts({});
+  const unique = (values: Array<string | undefined>) => [...new Set(values.filter((value): value is string => Boolean(value)))];
+  const categories = unique(all.map((item) => item.category));
+  const subcategories = unique(all.map((item) => item.subcategory));
+  const brands = unique(all.map((item) => item.brand));
 
   return (
     <div>
@@ -16,7 +20,7 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
       <div className="mt-3">
         <PageHeader title={type === "product" ? "Шинэ бүтээгдэхүүн" : "Шинэ материал"} />
       </div>
-      <ProductForm defaultType={type} categories={categories} />
+      <ProductForm defaultType={type} categories={categories} subcategories={subcategories} brands={brands} />
     </div>
   );
 }

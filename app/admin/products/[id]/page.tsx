@@ -12,7 +12,11 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   await requireAdmin();
   const product = await getProduct((await params).id);
   if (!product) notFound();
-  const categories = [...new Set((await getProducts({})).map((item) => item.category))];
+  const all = await getProducts({});
+  const unique = (values: Array<string | undefined>) => [...new Set(values.filter((value): value is string => Boolean(value)))];
+  const categories = unique(all.map((item) => item.category));
+  const subcategories = unique(all.map((item) => item.subcategory));
+  const brands = unique(all.map((item) => item.brand));
 
   return (
     <div>
@@ -33,7 +37,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           }
         />
       </div>
-      <ProductForm product={product} defaultType={product.type} categories={categories} />
+      <ProductForm product={product} defaultType={product.type} categories={categories} subcategories={subcategories} brands={brands} />
     </div>
   );
 }

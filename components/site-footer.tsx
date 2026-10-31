@@ -82,10 +82,10 @@ function ContactItem({ icon, label, children }: { icon: React.ReactNode; label: 
   );
 }
 
-// /about хуудас өөрийн "Холбоо барих" (#contact) хэсэгтэй тул footer-ийн id-г өөрчилж болно.
-export function SiteFooter({ id = "contact" }: { id?: string }) {
+// Хуудас бүрийн доор байдаг тул цэсний "Холбоо барих" (#contact) аль ч хуудаснаас энд хүрнэ.
+export function SiteFooter() {
   return (
-    <footer id={id} className="bg-[#3d302c] text-[#b8aaa2]">
+    <footer id="contact" className="bg-[#3d302c] text-[#b8aaa2]">
       <div className="mx-auto w-full max-w-[1600px] px-6 pb-8 pt-16 lg:px-[144px] lg:pt-20">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.5fr_0.9fr_1.1fr_0.9fr] lg:gap-16">
           <div>

@@ -7,16 +7,20 @@ import { useActionState, useState } from "react";
 import { saveProductAction, type FormState } from "@/app/admin/products/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton } from "@/components/admin/ui";
-import type { ProductType, StoreProduct } from "@/lib/mock/products";
+import { productColors, type ColorKey, type ProductType, type StoreProduct } from "@/lib/mock/products";
 
 export function ProductForm({
   product,
   defaultType,
   categories,
+  subcategories,
+  brands,
 }: {
   product?: StoreProduct;
   defaultType: ProductType;
   categories: string[];
+  subcategories: string[];
+  brands: string[];
 }) {
   const [state, action] = useActionState<FormState, FormData>(saveProductAction, {});
   const [type, setType] = useState<ProductType>(product?.type ?? defaultType);
@@ -64,6 +68,24 @@ export function ProductForm({
             </datalist>
           </label>
           <label className={labelClass}>
+            Дэд ангилал
+            <input name="subcategory" list="product-subcategories" defaultValue={product?.subcategory} className={inputClass} />
+            <datalist id="product-subcategories">
+              {subcategories.map((value) => (
+                <option key={value} value={value} />
+              ))}
+            </datalist>
+          </label>
+          <label className={labelClass}>
+            Брэнд
+            <input name="brand" list="product-brands" defaultValue={product?.brand} className={inputClass} />
+            <datalist id="product-brands">
+              {brands.map((value) => (
+                <option key={value} value={value} />
+              ))}
+            </datalist>
+          </label>
+          <label className={labelClass}>
             Үнэ (₮)
             <input name="price" type="number" min={0} step={100} required defaultValue={product?.price} className={inputClass} />
           </label>
@@ -100,6 +122,22 @@ export function ProductForm({
             </label>
           ) : null}
         </div>
+
+        <fieldset>
+          <legend className={labelClass}>Өнгө (шүүлтүүрт харагдана)</legend>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(Object.keys(productColors) as ColorKey[]).map((key) => (
+              <label
+                key={key}
+                className="flex cursor-pointer items-center gap-2 rounded-full border border-[#eadfd5] px-3 py-1.5 text-[11px] text-[#4a3b35] has-[:checked]:border-[#a24456] has-[:checked]:bg-[#f7e9ec]"
+              >
+                <input type="checkbox" name="colors" value={key} defaultChecked={product?.colors?.includes(key)} className="sr-only" />
+                <span aria-hidden className="h-3.5 w-3.5 rounded-full ring-1 ring-[#2f2420]/15" style={{ background: productColors[key].hex }} />
+                {productColors[key].label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
       </div>
 
       <div className="space-y-6">

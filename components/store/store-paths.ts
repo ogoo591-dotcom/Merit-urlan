@@ -9,6 +9,6 @@ export const storeMeta: Record<ProductType, { base: string; title: string; descr
   material: {
     base: "/materials",
     title: "Материал",
-    description: "Хятад, Туркээс оруулж ирсэн утас, товч, зүү болон туслах материал",
+    description: "Хятад, Туркээс оруулж ирсэн нэхмэлийн утас болон туслах материал",
   },
 };

@@ -26,18 +26,40 @@ function HeadphonesIcon() {
   );
 }
 
+function PaletteIcon() {
+  return (
+    <svg aria-hidden="true" className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.8-1.7h2.2c2.1 0 3.7-1.6 3.7-3.7 0-4-3.8-7.1-8.5-7.1Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <circle cx="7.8" cy="11" r="1.1" fill="currentColor" />
+      <circle cx="10.5" cy="7.3" r="1.1" fill="currentColor" />
+      <circle cx="15" cy="7.8" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
 const reasons = [
   {
-    title: "Гараар урласан чанар",
+    title: "100% гар урлал",
     description: "Бүтээл бүрийг нэг бүрчлэн гараар, нарийн анхааралтай нэхэж бэлтгэдэг.",
-    tag: "100% гар урлал",
+    tag: "Гараар урласан",
     icon: GemIcon,
   },
   {
-    title: "Аюулгүй материал",
+    title: "Чанартай, аюулгүй материал",
     description: "Хүүхдэд ээлтэй, зөөлөн, удаан эдэлгээтэй утас, дүүргэгч ашигладаг.",
     tag: "Хүүхдэд ээлтэй",
     icon: ShieldIcon,
+  },
+  {
+    title: "Захиалгат бүтээл",
+    description: "Өнгө, хэмжээ, загварыг таны хүсэлтээр тусгайлан урлаж өгнө.",
+    tag: "Таны хүссэнээр",
+    icon: PaletteIcon,
   },
   {
     title: "Тусламж, зөвлөгөө",
@@ -64,7 +86,7 @@ export function WhySection() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {reasons.map((reason, index) => {
             const Icon = reason.icon;
 

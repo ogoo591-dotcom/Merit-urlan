@@ -7,22 +7,10 @@ const aboutImage = galleryImages.find((image) => image.source === "10.jpg")?.src
 
 const eyebrowClass = "text-[10px] font-semibold uppercase tracking-[0.2em] text-[#7a6b63]";
 
-const strengths = [
-  {
-    title: "100% гар урлал",
-    description: "Бүтээл бүрийг нэг бүрчлэн гараар, анхааралтай нэхэж бэлтгэдэг.",
-  },
-  {
-    title: "Чанартай, аюулгүй материал",
-    description: "Хүүхдэд ээлтэй, зөөлөн, удаан эдэлгээтэй утас, материал ашигладаг.",
-  },
-  {
-    title: "Захиалгат бүтээл",
-    description: "Өнгө, хэмжээ, загварыг таны хүсэлтээр тусгайлан урлаж өгнө.",
-  },
-] as const;
+// /about хуудсанд мөн адил харагдуулж, тэнд гарчгийг h1 болгоно.
+export function AboutSection({ headingLevel = "h2" }: { headingLevel?: "h1" | "h2" }) {
+  const Heading = headingLevel;
 
-export function AboutSection() {
   return (
     <section
       id="about"
@@ -34,7 +22,7 @@ export function AboutSection() {
         <div className="flex flex-col gap-6 border-b border-[#e9ddd2] pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className={eyebrowClass}>Бизнесийн танилцуулга</p>
-            <h2 className="mt-5 font-serif text-[40px] leading-tight lg:text-[48px]">Бидний тухай</h2>
+            <Heading className="mt-5 font-serif text-[40px] leading-tight lg:text-[48px]">Бидний тухай</Heading>
           </div>
           <p className="max-w-[580px] text-[12px] leading-[1.8] text-[#7a6b63] lg:pb-3">
             Гараар, хайраар, сэтгэлээ шингээн урласан бүтээл бүр өөрийн гэсэн түүхтэй.
@@ -91,26 +79,15 @@ export function AboutSection() {
               </blockquote>
             </div>
 
-            <div className="mt-6">
-              <p className={eyebrowClass}>Бидний давуу тал</p>
-              <ul className="mt-3 border-t border-[#e9ddd2]">
-                {strengths.map((item, index) => (
-                  <li
-                    key={item.title}
-                    className="grid grid-cols-[3rem_1fr] gap-4 border-b border-[#e9ddd2] py-3"
-                  >
-                    <span className="font-serif text-[12px] text-[#c9a99b]">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <p className="text-[12px] font-semibold text-[#2f2420]">{item.title}</p>
-                      <p className="mt-1.5 text-[12px] leading-relaxed text-[#7a6b63]">
-                        {item.description}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <div className="mt-4 rounded-3xl border border-[#ecdcdc] bg-[#f6eaea] p-6 lg:p-8">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6e4f45]">
+                Бидний алсын хараа
+              </p>
+              <blockquote className="mt-3 text-[12px] font-medium leading-[1.85] text-[#3a2b25]">
+                “Гараар урлах урлагийг Монголд түгээн дэлгэрүүлж, хүн бүр өөрийн гараар бүтээх
+                баяр баясгаланг мэдрэх боломжийг бүрдүүлсэн, Монгол гар урлалыг дэлхийд таниулсан
+                тэргүүлэх брэнд байна.”
+              </blockquote>
             </div>
           </div>
         </div>

@@ -6,7 +6,7 @@ import path from "node:path";
 import galleryImages from "@/lib/gallery-images.json";
 import { mockCourses, type MockCourse } from "@/lib/mock/courses";
 import { mockPatterns, type MockPattern } from "@/lib/mock/patterns";
-import { mockProducts, type StoreProduct } from "@/lib/mock/products";
+import { mockCatalogVersion, mockProducts, type StoreProduct } from "@/lib/mock/products";
 import type { Order } from "@/lib/orders";
 
 // Сервер талын mock өгөгдлийн сан: .mock-db/db.json файл. Админ, захиалагч бүгд нэг өгөгдлийг харна.
@@ -43,6 +43,7 @@ export type Db = {
   courses: DbCourse[];
   patterns: DbPattern[];
   purchases: DbPurchase[];
+  catalogVersion?: number;
 };
 
 export const mockDbDir = path.join(process.cwd(), ".mock-db");
@@ -58,13 +59,21 @@ function seed(): Db {
     courses: mockCourses.map(({ coverSource, ...course }) => ({ ...course, coverImage: coverFor(coverSource) })),
     patterns: mockPatterns.map(({ coverSource, ...pattern }) => ({ ...pattern, coverImage: coverFor(coverSource) })),
     purchases: [],
+    catalogVersion: mockCatalogVersion,
   });
 }
 
 // Файл байхгүй бол анхны өгөгдлийг буцаана (бичихгүй) — анхны бичих үйлдэл файлыг үүсгэнэ.
 async function load(): Promise<Db> {
   try {
-    return { ...seed(), ...(JSON.parse(await readFile(dbFile, "utf8")) as Partial<Db>) };
+    const stored = JSON.parse(await readFile(dbFile, "utf8")) as Partial<Db>;
+    const db = { ...seed(), ...stored };
+    // Mock барааны жагсаалт шинэчлэгдсэн бол хуучныг нь солино (захиалга, мэдэгдэл хэвээр).
+    if (stored.catalogVersion !== mockCatalogVersion) {
+      db.products = structuredClone(mockProducts);
+      db.catalogVersion = mockCatalogVersion;
+    }
+    return db;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return seed();
     throw error;

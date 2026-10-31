@@ -11,7 +11,7 @@ import { SaveButton } from "@/components/save-button";
 import { AvailabilityBadge } from "@/components/store/availability-badge";
 import { storeMeta } from "@/components/store/store-paths";
 import { formatPrice } from "@/lib/format";
-import type { StoreProduct } from "@/lib/mock/products";
+import { productColors, type StoreProduct } from "@/lib/mock/products";
 
 export function ProductDetailView({ product }: { product: StoreProduct }) {
   const meta = storeMeta[product.type];
@@ -37,7 +37,9 @@ export function ProductDetailView({ product }: { product: StoreProduct }) {
   };
 
   const details = [
-    { label: "Ангилал", value: product.category },
+    { label: "Ангилал", value: product.subcategory ? `${product.category} · ${product.subcategory}` : product.category },
+    ...(product.brand ? [{ label: "Брэнд", value: product.brand }] : []),
+    ...(product.colors?.length ? [{ label: "Өнгө", value: product.colors.map((key) => productColors[key].label).join(", ") }] : []),
     ...(product.origin ? [{ label: "Гарал үүсэл", value: product.origin }] : []),
     { label: "Үлдэгдэл", value: soldOut ? "Дууссан" : `${product.stock} ширхэг` },
     {

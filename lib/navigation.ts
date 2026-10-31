@@ -40,7 +40,8 @@ export type NavSection = {
 };
 
 const finished = (category: string) => `/products?category=${encodeURIComponent(category)}`;
-const supplies = (category: string) => `/materials?category=${encodeURIComponent(category)}`;
+const supplies = (category: string, sub?: string) =>
+  `/materials?category=${encodeURIComponent(category)}${sub ? `&sub=${encodeURIComponent(sub)}` : ""}`;
 
 export const navSections: NavSection[] = [
   {
@@ -51,10 +52,10 @@ export const navSections: NavSection[] = [
     description: "Merit урлангийн түүх ба бидний тухай",
     links: [
       { label: "Бидний түүх", href: "/about#story", icon: BookOpen },
-      { label: "Зургийн цомог", href: "/about#gallery", icon: Images },
+      { label: "Зургийн цомог", href: "/#gallery", icon: Images },
       { label: "Яагаад Merit урлан", href: "/about#why", icon: Award },
-      { label: "Түгээмэл асуулт", href: "/about#faq", icon: CircleHelp },
-      { label: "Холбоо барих", href: "/about#contact", icon: Phone },
+      { label: "Түгээмэл асуулт", href: "/#faq", icon: CircleHelp },
+      { label: "Холбоо барих", href: "#contact", icon: Phone },
     ],
   },
   {
@@ -75,13 +76,13 @@ export const navSections: NavSection[] = [
     label: "Материал",
     href: "/materials",
     icon: Spool,
-    description: "Утас, товч, зүү болон туслах материал",
+    description: "Нэхмэлийн утас болон туслах материал",
     links: [
-      { label: "Утас", href: supplies("Утас"), icon: Spool },
-      { label: "Синель утас", href: supplies("Синель утас"), icon: Flower2 },
-      { label: "Товч", href: supplies("Товч"), icon: Palette },
-      { label: "Зүү", href: supplies("Зүү"), icon: Scissors },
-      { label: "Шинэ ирсэн", href: "/materials", icon: Sparkles },
+      { label: "Нэхмэлийн утас", href: supplies("Нэхмэлийн утас"), icon: Spool },
+      { label: "Туслах материал", href: supplies("Туслах материал"), icon: Scissors },
+      { label: "Үслэг утас", href: supplies("Нэхмэлийн утас", "Үслэг утас"), icon: Flower2 },
+      { label: "Дэгээ зүү", href: supplies("Туслах материал", "Дэгээ зүү"), icon: Palette },
+      { label: "Yarn art", href: "/materials?brand=Yarn%20art", icon: Sparkles },
     ],
   },
   {

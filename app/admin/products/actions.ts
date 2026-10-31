@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { deleteProduct, getProduct, saveProduct, setProductStock } from "@/lib/data/products";
 import { saveImageUpload } from "@/lib/data/uploads";
-import type { Availability, Origin, ProductType, StoreProduct } from "@/lib/mock/products";
+import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/lib/mock/products";
 
 export type FormState = { error?: string };
 
@@ -30,6 +30,9 @@ export async function saveProductAction(_state: FormState, formData: FormData): 
   const leadDays = Math.floor(Number(formData.get("leadDays")));
   const origin = text(formData, "origin") as Origin | "";
   const category = text(formData, "category", 60);
+  const subcategory = text(formData, "subcategory", 60);
+  const brand = text(formData, "brand", 60);
+  const colors = [...new Set(formData.getAll("colors").map(String))].filter((key): key is ColorKey => key in productColors);
 
   if (!name || !category) return { error: "Нэр, ангиллаа бөглөнө үү." };
   if (!["product", "material"].includes(type)) return { error: "Төрөл буруу байна." };
@@ -62,6 +65,9 @@ export async function saveProductAction(_state: FormState, formData: FormData): 
     stock,
     availability,
     ...(availability === "made_to_order" ? { leadDays } : {}),
+    ...(subcategory ? { subcategory } : {}),
+    ...(brand ? { brand } : {}),
+    ...(colors.length ? { colors } : {}),
     ...(type === "material" && origin ? { origin } : {}),
   };
 

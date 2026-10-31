@@ -190,7 +190,7 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
         {active ? (
           <div
             ref={panelRef}
-            className="flex h-full w-full flex-col overflow-y-auto bg-[#faf6f3] sm:w-[min(560px,calc(100vw-320px))] sm:border-l sm:border-[#f1ebe5]"
+            className="flex h-full w-full flex-col overflow-y-auto bg-[#faf6f3] sm:w-[min(440px,calc(100vw-320px))] sm:border-l sm:border-[#f1ebe5]"
           >
             <div className="border-b border-[#f1ebe5] px-6 pb-5 pt-5 sm:pt-7">
               <button
@@ -216,7 +216,7 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
               </div>
             </div>
 
-            <ul className="grid grid-cols-2 gap-3 p-6 lg:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-3 p-6">
               {active.links.map(({ label, href, icon: Icon, external }) => (
                 <li key={label}>
                   <Link
