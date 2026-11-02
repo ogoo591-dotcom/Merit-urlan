@@ -20,8 +20,11 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    // Админаас оруулсан барааны зургууд Supabase Storage-д хадгалагдана.
-    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+    // Админаас оруулсан зургууд Cloudinary-д (өмнө нь Supabase Storage-д) хадгалагдана.
+    remotePatterns: [
+      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/*/image/upload/**" },
+    ],
   },
 };
 

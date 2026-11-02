@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/auth";
 import { deletePattern, getPatternForAdmin, savePattern } from "@/lib/data/patterns";
-import { saveImageUpload, savePatternPdf } from "@/lib/data/uploads";
+import { saveImageUpload, savePatternFile } from "@/lib/data/uploads";
 import type { PatternLevel, PatternType } from "@/lib/mock/patterns";
 
 export type FormState = { error?: string };
@@ -27,7 +27,6 @@ export async function savePatternAction(_state: FormState, formData: FormData): 
   const type = text(formData, "type") as PatternType;
   const level = text(formData, "level") as PatternLevel;
   const price = Math.round(Number(formData.get("price")));
-  const pages = Math.floor(Number(formData.get("pages")));
 
   if (!name) return { error: "Схемийн нэрийг оруулна уу." };
   if (!["toy", "clothes", "home", "accessory"].includes(type)) return { error: "Төрөл буруу байна." };
@@ -45,22 +44,17 @@ export async function savePatternAction(_state: FormState, formData: FormData): 
     });
 
   let coverImage = existing?.coverImage ?? "";
-  let previews = formData.getAll("keepPreviews").map(String);
-  let pdfPath = existing?.pdfPath ?? "";
+  let filePath = existing?.filePath ?? "";
   try {
     const cover = formData.get("cover");
-    if (cover instanceof File && cover.size > 0) coverImage = await saveImageUpload(cover);
-    for (const file of formData.getAll("previews")) {
-      if (file instanceof File && file.size > 0) previews.push(await saveImageUpload(file));
-    }
-    const pdf = formData.get("pdf");
-    if (pdf instanceof File && pdf.size > 0) pdfPath = await savePatternPdf(id, pdf);
+    if (cover instanceof File && cover.size > 0) coverImage = await saveImageUpload(cover, "patterns");
+    const file = formData.get("file");
+    if (file instanceof File && file.size > 0) filePath = await savePatternFile(id, file);
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Файл хадгалахад алдаа гарлаа." };
   }
-  previews = previews.slice(0, 4);
   if (!coverImage) return { error: "Нүүр зураг оруулна уу." };
-  if (!pdfPath) return { error: "Схемийн PDF файлыг оруулна уу." };
+  if (!filePath) return { error: "Бүтэн схемийн файлыг оруулна уу." };
 
   try {
     await savePattern(
@@ -70,15 +64,14 @@ export async function savePatternAction(_state: FormState, formData: FormData): 
         description: text(formData, "description", 2000),
         price,
         coverImage,
-        previews,
         type,
         level,
         materials,
         size: text(formData, "size", 80),
         sourceLanguage: text(formData, "sourceLanguage", 40) || "Англи",
-        pages: Number.isInteger(pages) && pages > 0 ? pages : 1,
+        ...(text(formData, "credit", 80) ? { credit: text(formData, "credit", 80) } : {}),
         createdAt: existing?.createdAt ?? new Date().toISOString().slice(0, 10),
-        pdfPath,
+        filePath,
       },
       originalId,
     );

@@ -1,11 +1,12 @@
 import "server-only";
 
+import { buildListing, type ListingFilters } from "@/lib/data/listing";
 import { getProduct } from "@/lib/data/products";
 import { readDb, updateDb, type DbPattern } from "@/lib/mock/db";
 import type { PatternLevel, PatternType } from "@/lib/mock/patterns";
 
-// Схем зааврын өгөгдөл. Client руу дамжих зүйлд pdfPath байхгүй;
-// PDF-ийг зөвхөн /api/patterns/[id]/download эрх шалгасны дараа lib/data/pattern-files.ts уншина.
+// Схем зааврын өгөгдөл. Client руу дамжих зүйлд filePath байхгүй;
+// Бүтэн схемийг зөвхөн /api/patterns/[id]/download эрх шалгасны дараа lib/data/pattern-files.ts уншина.
 
 export type { PatternLevel, PatternType } from "@/lib/mock/patterns";
 
@@ -16,15 +17,17 @@ export type PatternSummary = {
   name: string;
   description: string;
   price: number;
+  isFree: boolean;
+  // Нийтэд нээлттэй бүтээлийн зураг. Бүтэн схем биш.
   cover: { src: string };
-  previews: string[];
+  fileKind: "image" | "pdf";
+  credit?: string;
   type: PatternType;
   typeLabel: string;
   level: PatternLevel;
   levelLabel: string;
   size: string;
   sourceLanguage: string;
-  pages: number;
   createdAt: string;
 };
 
@@ -49,15 +52,16 @@ function toSummary(pattern: DbPattern): PatternSummary {
     name: pattern.name,
     description: pattern.description,
     price: pattern.price,
+    isFree: pattern.price === 0,
     cover: { src: pattern.coverImage },
-    previews: pattern.previews,
+    fileKind: pattern.filePath.toLowerCase().endsWith(".pdf") ? "pdf" : "image",
+    credit: pattern.credit,
     type: pattern.type,
     typeLabel: patternTypeLabels[pattern.type],
     level: pattern.level,
     levelLabel: patternLevelLabels[pattern.level],
     size: pattern.size,
     sourceLanguage: pattern.sourceLanguage,
-    pages: pattern.pages,
     createdAt: pattern.createdAt,
   };
 }
@@ -65,6 +69,20 @@ function toSummary(pattern: DbPattern): PatternSummary {
 export async function getPatterns(filter: { type?: string; sort?: string } = {}): Promise<PatternSummary[]> {
   const items = (await readDb()).patterns.filter((pattern) => !filter.type || pattern.type === filter.type).map(toSummary);
   return filter.sort === "new" ? items.sort((a, b) => b.createdAt.localeCompare(a.createdAt)) : items;
+}
+
+const accessLabels: Record<string, string> = { free: "Үнэгүй", paid: "Төлбөртэй" };
+
+// Схемийн жагсаалтын хуудас: үнэгүй/төлбөртэй нь ангилал, түвшин нь шүүлтүүр.
+export async function getPatternCatalog(filters: ListingFilters) {
+  return buildListing((await readDb()).patterns.map(toSummary), filters, {
+    categoriesOf: (pattern) => [pattern.isFree ? "free" : "paid"],
+    categoryLabel: (access) => accessLabels[access] ?? access,
+    levelLabels: patternLevelLabels,
+    textOf: (pattern) => `${pattern.name} ${pattern.description} ${pattern.typeLabel} ${pattern.levelLabel}`,
+    nameOf: (pattern) => pattern.name,
+    createdAtOf: (pattern) => pattern.createdAt,
+  });
 }
 
 export async function getPattern(id: string): Promise<PatternDetail | null> {
@@ -80,7 +98,7 @@ export async function getPattern(id: string): Promise<PatternDetail | null> {
 }
 
 export function formatPatternPrice(value: number) {
-  return `${value.toLocaleString("en-US")}₮`;
+  return value === 0 ? "Үнэгүй" : `${value.toLocaleString("en-US")}₮`;
 }
 
 // ---- Админ ----

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 
+import { FeedbackDialog } from "@/components/feedback-dialog";
+
 const faqs = [
   {
     question: "Захиалга хэрхэн хийх вэ?",
@@ -32,7 +34,7 @@ const faqs = [
 ] as const;
 
 // Эхний хэдэн асуулт харагдаж, бусад нь "Бүх асуултыг харах" дарахад гарч ирнэ.
-const visibleCount = 4;
+const visibleCount = 3;
 
 function QuestionIcon() {
   return (
@@ -135,7 +137,7 @@ function FaqItem({
 }
 
 export function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [showAll, setShowAll] = useState(false);
   const hiddenCount = faqs.length - visibleCount;
 
@@ -163,21 +165,24 @@ export function FaqSection() {
           <p className="mt-8 text-[12px] leading-[1.9] text-[#7a6b63]">
             Захиалга, хүргэлт, арчилгаа болон сургалттай холбоотой хамгийн их асуудаг асуултуудад хариуллаа.
           </p>
-          <Link
-            href="https://m.me/meriturlan"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-10 inline-flex items-center gap-4 rounded-2xl border border-[#efe0d6] bg-[#fdf7f1] p-5 pr-7 transition hover:border-[#a24456]"
-          >
-            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#ecd3dd] text-[#2f2420]">
-              <QuestionIcon />
-            </span>
-            <span className="text-[12px] leading-relaxed text-[#7a6b63]">
-              Өөр асуулт байна уу?
-              <br />
-              <span className="font-semibold text-[#2f2420]">Messenger-ээр бичээрэй</span>
-            </span>
-          </Link>
+          <div className="mt-10 grid grid-cols-2 gap-3">
+            <Link
+              href="https://m.me/meriturlan"
+              target="_blank"
+              rel="noreferrer"
+              className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-[#efe0d6] bg-[#fdf7f1] p-3 transition hover:border-[#a24456]"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#ecd3dd] text-[#2f2420]">
+                <QuestionIcon />
+              </span>
+              <span className="min-w-0 text-[11px] leading-snug text-[#7a6b63]">
+                Асуулт байна уу?
+                <br />
+                <span className="font-semibold text-[#2f2420]">Messenger-ээр</span>
+              </span>
+            </Link>
+            <FeedbackDialog />
+          </div>
         </div>
 
         <div>

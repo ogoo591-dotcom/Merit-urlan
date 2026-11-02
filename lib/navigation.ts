@@ -1,7 +1,6 @@
 // Header-ийн хоёрдугаар мөр болон "☰ Бүгд" drawer-ийн цэс. Ангилал нэмэх, засах бол зөвхөн энд өөрчилнө.
 import {
   Award,
-  Baby,
   BookOpen,
   CircleHelp,
   Feather,
@@ -21,7 +20,6 @@ import {
   PlayCircle,
   Rabbit,
   Scissors,
-  Shirt,
   Sparkles,
   Spool,
   Star,
@@ -103,11 +101,11 @@ export const navSections: NavSection[] = [
     label: "Схем заавар",
     href: "/patterns",
     icon: BookOpen,
-    description: "Орчуулсан схем, PDF заавар",
+    description: "Үнэгүй болон төлбөртэй схемүүд",
     links: [
       { label: "Бүх схем", href: "/patterns", icon: LayoutGrid },
-      { label: "Тоглоом", href: "/patterns?type=toy", icon: Baby },
-      { label: "Хувцас", href: "/patterns?type=clothes", icon: Shirt },
+      { label: "Үнэгүй схем", href: "/patterns?access=free", icon: Gift },
+      { label: "Төлбөртэй схем", href: "/patterns?access=paid", icon: Award },
       { label: "Шинэ", href: "/patterns?sort=new", icon: Feather },
     ],
   },

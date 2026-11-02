@@ -1,12 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
-import { BadgeCheck, CheckCircle2, Clock, Layers, Lock, PlayCircle, Signal } from "lucide-react";
+import { BadgeCheck, Check, CheckCircle2, Clock, Layers, Lock, PlayCircle, Signal } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { purchaseCourse } from "@/app/courses/actions";
-import { PurchaseButton } from "@/components/purchase-button";
+import { CourseCartActions, CourseGallery, ShareButton } from "@/components/courses/course-buy";
 import { CourseProgressBar } from "@/components/courses/course-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -27,23 +25,44 @@ export default async function CourseDetailPage({ params }: Props) {
   const { userId } = await auth();
   const owned = await hasAccess(userId, course.id);
   const firstFree = course.lessons.find((lesson) => lesson.isFree);
+  const perks = [
+    `${course.lessonCount} видео хичээл, нийт ${course.totalDuration}`,
+    "Эхнээс нь дуустал алхам алхмаар заасан",
+    ...(course.level === "beginner" ? ["Анхан шатныхан ч хамрагдах боломжтой"] : []),
+    "Материалын талаарх мэдээллийг хичээл бүрт өгнө",
+    "Хүссэн үедээ, хэдэн ч удаа үзэх эрхтэй",
+    "Асуух зүйлээ Messenger-ээр асууж болно",
+  ];
 
   return (
     <>
       <SiteHeader />
       <main className="bg-[#fcf6f0]">
-        <section className="mx-auto grid w-full max-w-[1400px] items-center gap-10 px-6 py-12 lg:grid-cols-[1fr_1.1fr] lg:px-[60px]">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-[#faf7f6]">
-            <Image src={course.cover.src} alt={course.title} fill priority sizes="(max-width: 1024px) 90vw, 640px" className="object-cover" />
-          </div>
+        <section className="mx-auto grid w-full max-w-[1400px] gap-10 px-6 py-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:px-[60px]">
+          <CourseGallery title={course.title} images={course.images} />
+
           <div>
             <Link href="/courses" className="text-[11px] text-[#9c8c84] hover:text-[#a24456]">← Бүх сургалт</Link>
-            <h1 className="mt-3 font-serif text-[40px] leading-tight text-[#2f2420] lg:text-[52px]">{course.title}</h1>
-            <p className="mt-4 text-[13px] leading-[1.9] text-[#7a6b63]">{course.description}</p>
-            <ul className="mt-6 flex flex-wrap gap-2 text-[11px] text-[#4a3b35]">
+            <div className="mt-3 flex items-start justify-between gap-4">
+              <h1 className="font-serif text-[34px] leading-tight text-[#2f2420] lg:text-[44px]">{course.title}</h1>
+              <ShareButton title={course.title} />
+            </div>
+            <ul className="mt-4 flex flex-wrap gap-2 text-[11px] text-[#4a3b35]">
               <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-[#eadfd5]"><Signal aria-hidden className="h-3.5 w-3.5" />{course.levelLabel}</li>
               <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-[#eadfd5]"><Layers aria-hidden className="h-3.5 w-3.5" />{course.lessonCount} хичээл</li>
               <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-[#eadfd5]"><Clock aria-hidden className="h-3.5 w-3.5" />{course.totalDuration}</li>
+            </ul>
+
+            {!owned ? <p className="mt-6 text-[30px] font-bold text-[#a24456]">{formatCoursePrice(course.price)}</p> : null}
+
+            <p className="mt-5 text-[13px] leading-[1.9] text-[#7a6b63]">{course.description}</p>
+            <ul className="mt-5 space-y-2.5">
+              {perks.map((perk) => (
+                <li key={perk} className="flex items-start gap-3 text-[12px] leading-relaxed text-[#4a3b35]">
+                  <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-[#a24456]" strokeWidth={2.5} />
+                  {perk}
+                </li>
+              ))}
             </ul>
 
             {owned ? (
@@ -57,19 +76,19 @@ export default async function CourseDetailPage({ params }: Props) {
                 </Link>
               </div>
             ) : (
-              <div className="mt-8">
-                <p className="text-[28px] font-bold text-[#a24456]">{formatCoursePrice(course.price)}</p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {firstFree ? (
-                    <Link
-                      href={`/courses/${course.id}/learn?lesson=${firstFree.id}`}
-                      className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-[#3d302c] px-6 py-4 text-[13px] font-semibold text-[#3d302c] transition hover:bg-[#3d302c] hover:text-white"
-                    >
-                      <PlayCircle aria-hidden className="h-5 w-5" /> 1-р хичээл үнэгүй үзэх
-                    </Link>
-                  ) : null}
-                  <PurchaseButton action={purchaseCourse} itemId={course.id} price={course.price} label="Сургалт авах" />
-                </div>
+              <div className="mt-8 space-y-4">
+                <CourseCartActions course={{ id: course.id, title: course.title, price: course.price, image: course.cover.src }} />
+                {firstFree ? (
+                  <Link
+                    href={`/courses/${course.id}/learn?lesson=${firstFree.id}`}
+                    className="inline-flex items-center gap-2 text-[12px] font-semibold text-[#a24456] underline-offset-4 hover:underline"
+                  >
+                    <PlayCircle aria-hidden className="h-4 w-4" /> 1-р хичээлийг үнэгүй үзэх
+                  </Link>
+                ) : null}
+                <p className="text-[11px] leading-relaxed text-[#9c8c84]">
+                  QPay-ээр төлсний дараа бүх хичээл шууд нээгдэж, “Миний сан” хэсэгт хадгалагдана.
+                </p>
               </div>
             )}
           </div>

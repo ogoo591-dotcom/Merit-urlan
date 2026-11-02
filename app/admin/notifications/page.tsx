@@ -17,7 +17,7 @@ export default async function AdminNotificationsPage({ searchParams }: { searchP
     <div>
       <PageHeader
         title="Мэдэгдэл"
-        description="Шинэ захиалга, худалдан авалт бүрт энд мэдэгдэл ирнэ."
+        description="Шинэ захиалга, худалдан авалт, санал хүсэлт бүрт энд мэдэгдэл ирнэ."
         action={
           unread ? (
             <form action={markAllAdminNotificationsRead}>

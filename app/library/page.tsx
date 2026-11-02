@@ -109,15 +109,15 @@ export default async function LibraryPage() {
                     {pattern.name}
                   </Link>
                   <p className="mt-1 text-[11px] text-[#9c8c84]">
-                    PDF · {pattern.pages} хуудас · Монгол орчуулга
+                    {pattern.typeLabel} · {pattern.levelLabel}
                   </p>
                 </div>
                 {/* Татах линкийг сервер эрх шалгаад олгоно (/api/patterns/[id]/download). */}
                 <a
-                  href={`/api/patterns/${pattern.id}/download`}
+                  href={`/api/patterns/${pattern.id}/download?download=1`}
                   className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#a24456] px-4 py-2.5 text-[12px] font-semibold text-white transition hover:bg-[#8a3748]"
                 >
-                  <Download aria-hidden className="h-4 w-4" /> PDF татах
+                  <Download aria-hidden className="h-4 w-4" /> Татах
                 </a>
               </li>
             ))}

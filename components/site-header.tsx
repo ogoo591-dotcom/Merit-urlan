@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bell, Heart, Library, Menu, ShieldCheck, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { AddressButton } from "@/components/address-button";
 import { AllMenuDrawer } from "@/components/all-menu-drawer";
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
+import { CartPopover } from "@/components/cart/cart-popover";
 import { useCart } from "@/components/cart-provider";
 import { useSaved } from "@/components/saved-provider";
 import { storeMeta } from "@/components/store/store-paths";
@@ -39,35 +40,6 @@ function SearchIcon({ className = "h-6 w-6" }: { className?: string }) {
   );
 }
 
-function CartIcon({ className = "h-8 w-8" }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M6.5 7.5H10L12.8 20.5H25"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11.2 11.5H27L24.7 18.5H12.7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="14.5" cy="25" r="2" stroke="currentColor" strokeWidth="2" />
-      <circle cx="23.5" cy="25" r="2" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-}
-
 function CloseIcon({ className = "h-8 w-8" }: { className?: string }) {
   return (
     <svg
@@ -79,33 +51,6 @@ function CloseIcon({ className = "h-8 w-8" }: { className?: string }) {
     >
       <path d="M8 8L24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <path d="M24 8L8 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function StoreIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-6 w-6"
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M5 13L7.5 7H24.5L27 13"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M7 14V27H25V14"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path d="M12 27V20H20V27" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M5 13H27" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -171,12 +116,12 @@ export function SiteHeader() {
   const [viewer, setViewer] = useState({ isAdmin: false, unread: 0 });
   const isAdmin = isSignedIn ? viewer.isAdmin : false;
   const unread = isSignedIn ? viewer.unread : 0;
-  const { openAuth, requireAuth } = useAuthModal();
-  const { items, removeItem } = useCart();
+  const { openAuth } = useAuthModal();
+  const { items } = useCart();
   const savedCount = useSaved().items.length;
   const cartCount = items.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = items.reduce((total, item) => total + item.priceValue * item.quantity, 0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<StoreProduct[]>([]);
@@ -405,11 +350,20 @@ export function SiteHeader() {
               <ActionLabel>Миний сан</ActionLabel>
             </Link>
 
-            <button type="button" aria-label={`Сагс, ${cartCount} бараа`} onClick={() => setIsCartOpen(true)} className={headerActionClass}>
-              <ShoppingCart aria-hidden className="h-6 w-6" strokeWidth={1.7} />
-              {cartCount > 0 ? <CountBadge count={cartCount} /> : null}
-              <ActionLabel>Сагс</ActionLabel>
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                aria-label={`Сагс, ${cartCount} бараа`}
+                aria-expanded={isCartOpen}
+                onClick={() => setIsCartOpen((open) => !open)}
+                className={headerActionClass}
+              >
+                <ShoppingCart aria-hidden className="h-6 w-6" strokeWidth={1.7} />
+                {cartCount > 0 ? <CountBadge count={cartCount} /> : null}
+                <ActionLabel>Сагс</ActionLabel>
+              </button>
+              {isCartOpen ? <CartPopover onClose={closeCart} /> : null}
+            </div>
           </div>
         </div>
 
@@ -443,85 +397,6 @@ export function SiteHeader() {
 
       {isMenuOpen ? <AllMenuDrawer onClose={() => setIsMenuOpen(false)} /> : null}
 
-      {isCartOpen ? (
-        <div className="fixed inset-0 z-50 bg-black/45" onClick={() => setIsCartOpen(false)}>
-          <aside
-            className="ml-auto flex h-full w-full max-w-[32rem] flex-col bg-white"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-[#eadfd5] bg-[#fcf6f0] px-8 py-6">
-              <h2 className="text-[12px] font-semibold text-[#2f2420]">Таны сагс</h2>
-              <button
-                type="button"
-                aria-label="Сагс хаах"
-                onClick={() => setIsCartOpen(false)}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#8a7b73] transition hover:text-[#6e4f45]"
-              >
-                <CloseIcon className="h-6 w-6" />
-              </button>
-            </div>
-
-            {cartCount === 0 ? (
-              <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-                <CartIcon className="h-20 w-20 text-[#8a7b73]" />
-                <h3 className="mt-8 text-[12px] font-semibold text-[#2f2420]">Таны сагс хоосон байна</h3>
-                <p className="mt-3 max-w-sm text-[12px] leading-relaxed text-[#6f625b]">Дуртай бараагаа нэмээд худалдан авалтаа эхлээрэй</p>
-                <Link
-                  href="/products"
-                  onClick={() => setIsCartOpen(false)}
-                  className="mt-8 flex w-full max-w-sm items-center justify-center gap-3 rounded-[14px] bg-[#6e4f45] px-6 py-4 text-[12px] font-medium text-white transition hover:bg-[#5c4038]"
-                >
-                  <StoreIcon />
-                  Дэлгүүр хэсэх
-                </Link>
-              </div>
-            ) : (
-              <>
-                <ul className="flex-1 overflow-y-auto px-8 py-4">
-                  {items.map((item) => (
-                    <li key={item.slug} className="flex items-center gap-4 border-b border-[#f1ebe5] py-4">
-                      <Image src={item.image} alt="" width={56} height={56} className="h-14 w-14 shrink-0 rounded-lg bg-[#f7f2ed] object-cover" />
-                      <div className="min-w-0 flex-1">
-                        <p className="line-clamp-2 text-[12px] font-medium text-[#2f2420]">{item.name}</p>
-                        <p className="mt-1 text-[11px] text-[#8a7b73]">
-                          {item.quantity} × {item.priceValue.toLocaleString("en-US")}₮
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.slug)}
-                        aria-label={`${item.name}-г хасах`}
-                        className="text-[#b3a69e] transition hover:text-[#b04a4a]"
-                      >
-                        <CloseIcon className="h-4 w-4" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="border-t border-[#eadfd5] px-8 py-6">
-                  <div className="flex items-center justify-between text-[12px]">
-                    <span className="text-[#6f625b]">Нийт дүн</span>
-                    <strong className="text-[#2f2420]">{cartTotal.toLocaleString("en-US")}₮</strong>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsCartOpen(false);
-                      requireAuth("/checkout");
-                    }}
-                    className="mt-5 flex w-full items-center justify-center gap-3 rounded-[14px] bg-[#6e4f45] px-6 py-4 text-[12px] font-medium text-white transition hover:bg-[#5c4038]"
-                  >
-                    Захиалах
-                  </button>
-                  {!isSignedIn ? (
-                    <p className="mt-3 text-center text-[11px] text-[#8a7b73]">Захиалахын тулд утас эсвэл имэйлээр нэвтэрнэ</p>
-                  ) : null}
-                </div>
-              </>
-            )}
-          </aside>
-        </div>
-      ) : null}
     </>
   );
 }

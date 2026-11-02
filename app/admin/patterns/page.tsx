@@ -39,7 +39,7 @@ export default async function AdminPatternsPage({ searchParams }: { searchParams
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-semibold">{pattern.name}</p>
                 <p className="mt-1 text-[11px] text-[#7a6b63]">
-                  {pattern.typeLabel} · {pattern.levelLabel} · PDF {pattern.pages} хуудас
+                  {pattern.isFree ? "Үнэгүй" : "Төлбөртэй"} · {pattern.typeLabel} · {pattern.levelLabel}
                 </p>
                 <p className="mt-1 text-[12px]">
                   {formatPrice(pattern.price)} · <span className="text-[#7a6b63]">{sold} борлуулалт</span>

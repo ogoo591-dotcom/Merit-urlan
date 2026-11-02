@@ -17,7 +17,8 @@ export async function purchasePattern(patternId: string): Promise<PurchaseResult
 
   const pattern = await getPattern(patternId);
   if (!pattern) return { ok: false, error: "Схем олдсонгүй." };
-  if (await hasPatternAccess(userId, patternId)) return { ok: true };
+  // Үнэгүй схемд худалдан авалт бүртгэхгүй: хэн ч шууд үзнэ.
+  if (pattern.isFree || (await hasPatternAccess(userId, patternId))) return { ok: true };
 
   await wait(2000);
   await recordPurchase({

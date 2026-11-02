@@ -1,8 +1,8 @@
 "use client";
 
-import { FileCheck, X } from "lucide-react";
+import { FileCheck } from "lucide-react";
 import Image from "next/image";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
 import { savePatternAction, type FormState } from "@/app/admin/patterns/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
@@ -11,7 +11,6 @@ import type { DbPattern } from "@/lib/mock/db";
 
 export function PatternForm({ pattern, materialOptions }: { pattern?: DbPattern; materialOptions: Array<{ id: string; name: string }> }) {
   const [state, action] = useActionState<FormState, FormData>(savePatternAction, {});
-  const [previews, setPreviews] = useState(pattern?.previews ?? []);
 
   return (
     <form action={action} className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
@@ -39,7 +38,8 @@ export function PatternForm({ pattern, materialOptions }: { pattern?: DbPattern;
         <div className="grid gap-4 sm:grid-cols-3">
           <label className={labelClass}>
             Үнэ (₮)
-            <input name="price" type="number" min={0} step={500} required defaultValue={pattern?.price} className={inputClass} />
+            <input name="price" type="number" min={0} step={500} required defaultValue={pattern?.price ?? 0} className={inputClass} />
+            <span className={hintClass}>0 бол үнэгүй: хэн ч нэвтрэлгүй үзэж, татна.</span>
           </label>
           <label className={labelClass}>
             Төрөл
@@ -67,8 +67,8 @@ export function PatternForm({ pattern, materialOptions }: { pattern?: DbPattern;
             <input name="sourceLanguage" defaultValue={pattern?.sourceLanguage ?? "Англи"} className={inputClass} />
           </label>
           <label className={labelClass}>
-            PDF хуудас
-            <input name="pages" type="number" min={1} defaultValue={pattern?.pages ?? 1} className={inputClass} />
+            Эх зохиогч
+            <input name="credit" defaultValue={pattern?.credit} placeholder="@designer" className={inputClass} />
           </label>
         </div>
         <label className={labelClass}>
@@ -89,48 +89,25 @@ export function PatternForm({ pattern, materialOptions }: { pattern?: DbPattern;
 
       <div className="space-y-6">
         <div className={cardClass}>
-          <p className={labelClass}>Схемийн PDF</p>
+          <p className={labelClass}>Бүтэн схем (зураг эсвэл PDF)</p>
           {pattern ? (
             <p className="mt-2 flex items-center gap-2 text-[12px] text-[#2e7a43]">
-              <FileCheck aria-hidden className="h-4 w-4" /> PDF байгаа · солих бол шинийг сонгоно
+              <FileCheck aria-hidden className="h-4 w-4" /> Файл байгаа · солих бол шинийг сонгоно
             </p>
           ) : null}
-          <input name="pdf" type="file" accept="application/pdf" required={!pattern} className={`${inputClass} mt-3`} />
+          <input name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" required={!pattern} className={`${inputClass} mt-3`} />
           <span className={hintClass}>20MB хүртэл. Нийтэд нээлттэй биш газар хадгалагдана (mock: .mock-db/files, дараа нь Supabase private bucket).</span>
         </div>
 
         <div className={cardClass}>
           <p className={labelClass}>Нүүр зураг</p>
+          <span className={hintClass}>Жагсаалтад хүн бүрт харагдана. Зөвхөн бүтээлийн зургийг оруулна, схемийн заавар орж болохгүй.</span>
           {pattern?.coverImage ? (
             <div className="relative mt-3 aspect-square w-32 overflow-hidden rounded-xl bg-[#faf7f6]">
               <Image src={pattern.coverImage} alt="" fill sizes="128px" className="object-cover" />
             </div>
           ) : null}
           <input name="cover" type="file" accept="image/jpeg,image/png,image/webp" required={!pattern} className={`${inputClass} mt-3`} />
-        </div>
-
-        <div className={cardClass}>
-          <p className={labelClass}>Урьдчилан харах хуудсууд (1–2)</p>
-          {previews.length ? (
-            <ul className="mt-3 flex gap-3">
-              {previews.map((src) => (
-                <li key={src} className="relative h-28 w-20 overflow-hidden rounded-lg border border-[#eadfd5] bg-white">
-                  <input type="hidden" name="keepPreviews" value={src} />
-                  <Image src={src} alt="" fill sizes="80px" className="object-contain" />
-                  <button
-                    type="button"
-                    onClick={() => setPreviews((list) => list.filter((item) => item !== src))}
-                    aria-label="Хасах"
-                    className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white/90 text-[#a33a3a]"
-                  >
-                    <X aria-hidden className="h-3 w-3" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <input name="previews" type="file" accept="image/jpeg,image/png,image/webp" multiple className={`${inputClass} mt-3`} />
-          <span className={hintClass}>Схемийн хуудасны зураг (“ДЭЭЖ” тэмдэгтэй хувилбар оруулахыг зөвлөнө).</span>
         </div>
 
         <SubmitButton className={`${primaryButton} w-full py-3`} pendingText="Хадгалж байна…">

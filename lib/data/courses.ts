@@ -1,5 +1,6 @@
 import "server-only";
 
+import { buildListing, type ListingFilters } from "@/lib/data/listing";
 import { hasAccess } from "@/lib/data/purchases";
 import { readDb, updateDb, type DbCourse } from "@/lib/mock/db";
 import type { CourseLevel } from "@/lib/mock/courses";
@@ -17,6 +18,8 @@ export type CourseSummary = {
   description: string;
   price: number;
   cover: { src: string };
+  // Нүүр зураг + нэмэлт зургууд (сургалтын хуудасны gallery).
+  images: string[];
   level: CourseLevel;
   levelLabel: string;
   totalDuration: string;
@@ -41,6 +44,7 @@ function toSummary(course: DbCourse): CourseSummary {
     description: course.description,
     price: course.price,
     cover: { src: course.coverImage },
+    images: [course.coverImage, ...(course.images ?? []).filter((src) => src !== course.coverImage)],
     level: course.level,
     levelLabel: levelLabels[course.level],
     totalDuration: course.totalDuration,
@@ -55,6 +59,19 @@ export async function getCourses(filter: { level?: string; topic?: string } = {}
   return (await readDb()).courses
     .filter((course) => (!filter.level || course.level === filter.level) && (!filter.topic || course.topics.includes(filter.topic)))
     .map(toSummary);
+}
+
+const topicLabels: Record<string, string> = { amigurumi: "Amigurumi", basics: "Суурь", business: "Бизнес" };
+
+// Сургалтын жагсаалтын хуудас: сэдэв нь ангилал, түвшин нь шүүлтүүр.
+export async function getCourseCatalog(filters: ListingFilters) {
+  return buildListing((await readDb()).courses.map(toSummary), filters, {
+    categoriesOf: (course) => course.topics,
+    categoryLabel: (topic) => topicLabels[topic] ?? topic,
+    levelLabels,
+    textOf: (course) => `${course.title} ${course.description} ${course.levelLabel} ${course.topics.map((topic) => topicLabels[topic] ?? topic).join(" ")}`,
+    nameOf: (course) => course.title,
+  });
 }
 
 export async function getCourse(id: string): Promise<CourseDetail | null> {

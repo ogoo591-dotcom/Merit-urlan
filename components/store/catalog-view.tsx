@@ -1,7 +1,9 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-import { CatalogToolbar } from "@/components/store/catalog-toolbar";
+import { ActiveFilters } from "@/components/store/active-filters";
+import { list, price, single, type CatalogSearchParams } from "@/components/store/catalog-params";
+import { CatalogSidebar } from "@/components/store/catalog-sidebar";
 import { ProductCard } from "@/components/store/product-card";
 import { storeMeta } from "@/components/store/store-paths";
 import { getCatalog, type ColorKey, type ProductSort, type ProductType } from "@/lib/data/products";
@@ -15,15 +17,7 @@ export const sortOptions: Array<{ value: ProductSort; label: string }> = [
   { value: "name", label: "Нэрээр (А–Я)" },
 ];
 
-type Param = string | string[] | undefined;
-export type CatalogSearchParams = Record<string, Param>;
-
-const list = (value: Param) => (Array.isArray(value) ? value : value ? [value] : []).flatMap((item) => item.split(",")).filter(Boolean);
-const single = (value: Param) => (Array.isArray(value) ? value[0] : value)?.trim() || undefined;
-const price = (value: Param) => {
-  const number = Number(single(value));
-  return Number.isFinite(number) && number >= 0 && single(value) !== undefined ? Math.floor(number) : undefined;
-};
+export type { CatalogSearchParams };
 
 // Бүтээгдэхүүн / Материалын жагсаалт (server). Ангилал, шүүлтүүр, эрэмбэ, хуудас бүгд URL-д хадгалагдана.
 export async function CatalogView({ type, searchParams }: { type: ProductType; searchParams: CatalogSearchParams }) {
@@ -92,26 +86,46 @@ export async function CatalogView({ type, searchParams }: { type: ProductType; s
   const clearFilters = href({ brand: [], color: [], origin: [], avail: [], min: undefined, max: undefined });
 
   const allCount = catalog.categories.reduce((sum, item) => sum + item.count, 0);
-  const tab = (active: boolean) =>
-    `whitespace-nowrap rounded-full px-5 py-2.5 text-[12px] font-semibold transition ${
-      active ? "bg-[#a24456] text-white" : "bg-white text-[#4a3b35] ring-1 ring-[#eadfd5] hover:ring-[#a24456]"
-    }`;
-  const subChip = (active: boolean) =>
-    `whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[11px] font-medium transition ${
-      active ? "border-[#a24456] bg-[#f7e9ec] text-[#a24456]" : "border-[#eadfd5] text-[#7a6b63] hover:border-[#a24456] hover:text-[#a24456]"
-    }`;
 
   const from = catalog.total ? (catalog.page - 1) * catalog.perPage + 1 : 0;
   const to = Math.min(catalog.page * catalog.perPage, catalog.total);
 
   return (
-    <>
-      <section className="mx-auto w-full max-w-[1600px] px-6 pt-10 lg:px-[60px]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#a24456]">Дэлгүүр</p>
-        <h1 className="mt-2 font-serif text-[40px] leading-tight text-[#2f2420] lg:text-[48px]">
-          {state.sub ?? state.category ?? meta.title}
-        </h1>
-        <p className="mt-2 text-[12px] text-[#7a6b63]">{meta.description}</p>
+    <div className="mx-auto grid w-full max-w-[1600px] gap-6 px-6 pb-16 pt-8 lg:grid-cols-[270px_minmax(0,1fr)] lg:gap-10 lg:px-[60px] lg:pt-10">
+      <CatalogSidebar
+        action={meta.base}
+        query={state.q}
+        allLink={{ label: "Бүгд", count: allCount, href: href({ category: undefined, sub: undefined }), active: !state.category && !state.sub }}
+        categories={catalog.categories.map((item) => ({
+          label: item.label,
+          count: item.count,
+          href: href({ category: item.value, sub: undefined }),
+          active: state.category === item.value && !state.sub,
+          subcategories: item.subcategories.map((sub) => ({
+            label: sub.label,
+            count: sub.count,
+            href: href({ category: item.value, sub: sub.value }),
+            active: state.category === item.value && state.sub === sub.value,
+          })),
+        }))}
+        groups={[
+          { name: "brand", title: "Брэнд", options: catalog.facets.brands },
+          { name: "color", title: "Өнгө", options: catalog.facets.colors },
+          { name: "origin", title: "Улс", options: catalog.facets.origins },
+          { name: "avail", title: "Бэлэн байдал", options: catalog.facets.availability },
+        ]}
+        selected={{ brand: state.brand, color: state.color, origin: state.origin, avail: state.avail }}
+        price={{ min: state.min, max: state.max }}
+        keep={{ category: state.category, sub: state.sub, sort: state.sort === "default" ? undefined : state.sort }}
+        clearHref={clearFilters}
+        sortLinks={sortOptions.map((option) => ({ ...option, href: href({ sort: option.value }), active: option.value === state.sort }))}
+      />
+
+      <section className="min-w-0">
+        <h1 className="font-serif text-[32px] leading-tight text-[#2f2420] lg:text-[40px]">{state.sub ?? state.category ?? meta.title}</h1>
+        <p className="mt-2 text-[12px] text-[#7a6b63]">
+          {meta.description} · <b className="text-[#2f2420]">{catalog.total}</b> бараа
+        </p>
         {state.q ? (
           <p className="mt-3 flex flex-wrap items-center gap-3 text-[12px] text-[#4a3b35]">
             «{state.q}» хайлтын үр дүн
@@ -121,69 +135,10 @@ export async function CatalogView({ type, searchParams }: { type: ProductType; s
           </p>
         ) : null}
 
-        {/* Үндсэн ангилал */}
-        <nav aria-label="Ангилал" className="-mx-6 mt-7 flex gap-2 overflow-x-auto px-6 pb-1 lg:mx-0 lg:flex-wrap lg:px-0">
-          <Link href={href({ category: undefined, sub: undefined })} aria-current={!state.category ? "page" : undefined} className={tab(!state.category)}>
-            Бүгд <span className="opacity-70">({allCount})</span>
-          </Link>
-          {catalog.categories.map((item) => (
-            <Link
-              key={item.value}
-              href={href({ category: item.value, sub: undefined })}
-              aria-current={state.category === item.value ? "page" : undefined}
-              className={tab(state.category === item.value)}
-            >
-              {item.label} <span className="opacity-70">({item.count})</span>
-            </Link>
-          ))}
-        </nav>
-
-        {/* Дэд ангилал */}
-        {catalog.subcategories.length > 1 ? (
-          <nav aria-label="Дэд ангилал" className="-mx-6 mt-4 flex gap-2 overflow-x-auto px-6 pb-1 lg:mx-0 lg:flex-wrap lg:px-0">
-            <Link href={href({ sub: undefined })} className={subChip(!state.sub)}>
-              Бүгд
-            </Link>
-            {catalog.subcategories.map((item) => (
-              <Link key={item.value} href={href({ sub: item.value })} className={subChip(state.sub === item.value)}>
-                {item.label} ({item.count})
-              </Link>
-            ))}
-          </nav>
-        ) : null}
-      </section>
-
-      <CatalogToolbar
-        action={meta.base}
-        total={catalog.total}
-        facets={catalog.facets}
-        selected={{ brand: state.brand, color: state.color, origin: state.origin, avail: state.avail, min: state.min, max: state.max }}
-        keep={{ category: state.category, sub: state.sub, q: state.q, sort: state.sort === "default" ? undefined : state.sort }}
-        clearHref={clearFilters}
-        sortLinks={sortOptions.map((option) => ({ ...option, href: href({ sort: option.value }), active: option.value === state.sort }))}
-      />
-
-      <section className="mx-auto w-full max-w-[1600px] px-6 pb-16 lg:px-[60px]">
-        {activeFilters.length ? (
-          <div className="mt-6 flex flex-wrap items-center gap-2">
-            {activeFilters.map((filter) => (
-              <Link
-                key={filter.label}
-                href={filter.href}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#3d302c] px-3.5 py-1.5 text-[11px] font-medium text-white transition hover:bg-[#2f2420]"
-              >
-                {filter.label}
-                <X aria-label="хасах" className="h-3.5 w-3.5" />
-              </Link>
-            ))}
-            <Link href={clearFilters} className="ml-1 text-[11px] font-medium text-[#a24456] underline underline-offset-4">
-              Бүгдийг цэвэрлэх
-            </Link>
-          </div>
-        ) : null}
+        <ActiveFilters filters={activeFilters} clearHref={clearFilters} />
 
         {catalog.items.length ? (
-          <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
             {catalog.items.map((product) => (
               <li key={product.id}>
                 <ProductCard product={product} />
@@ -206,7 +161,7 @@ export async function CatalogView({ type, searchParams }: { type: ProductType; s
           </Pagination>
         ) : null}
       </section>
-    </>
+    </div>
   );
 }
 

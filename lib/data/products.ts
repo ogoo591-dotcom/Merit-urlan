@@ -69,8 +69,7 @@ export type Catalog = {
   page: number;
   pageCount: number;
   perPage: number;
-  categories: FacetOption[];
-  subcategories: FacetOption[];
+  categories: Array<FacetOption & { subcategories: FacetOption[] }>;
   facets: { brands: FacetOption[]; colors: FacetOption[]; origins: FacetOption[]; availability: FacetOption[] };
 };
 
@@ -116,8 +115,10 @@ export async function getCatalog(filters: CatalogFilters): Promise<Catalog> {
     page,
     pageCount,
     perPage,
-    categories: toOptions(countBy(searched, (item) => item.category)),
-    subcategories: toOptions(countBy(inCategory, (item) => item.subcategory)),
+    categories: toOptions(countBy(searched, (item) => item.category)).map((category) => ({
+      ...category,
+      subcategories: toOptions(countBy(searched.filter((item) => item.category === category.value), (item) => item.subcategory)),
+    })),
     facets: {
       brands: toOptions(countBy(scope, (item) => item.brand)).sort((a, b) => a.label.localeCompare(b.label)),
       colors: (Object.keys(productColors) as ColorKey[])

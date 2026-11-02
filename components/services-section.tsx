@@ -79,14 +79,14 @@ function ArrowUpRightIcon() {
 
 const services = [
   {
-    title: "Хийх заавар",
-    description: "Алхам алхмаар өөрөө урлаарай",
-    cta: "Заавар үзэх",
-    href: "/courses",
+    title: "Схем орчуулга",
+    description: "Монгол хэлнээ орчуулсан схемээр өөрөө урлаарай",
+    cta: "Схем үзэх",
+    href: "/patterns",
     icon: BookIcon,
-    // Бичлэг, схемийн зураг бэлэн болтол хоосон харагдана.
+    // Зургийг нь patternImage-аас авна (админаас хамгийн сүүлд нэмсэн схемийн нүүр зураг).
     image: null,
-    placeholder: "Схем, зааврын зураг удахгүй нэмэгдэнэ",
+    placeholder: "Схемийн зураг удахгүй нэмэгдэнэ",
     card: "bg-[#fdf6ee] border-[#f3e6d8]",
   },
   {
@@ -113,7 +113,7 @@ const services = [
   },
 ] as const;
 
-export function ServicesSection() {
+export function ServicesSection({ patternImage }: { patternImage: string | null }) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -130,7 +130,7 @@ export function ServicesSection() {
             Бүтээх, сурах, сонгох
           </h2>
           <p className="mt-6 text-[12px] leading-[1.9] text-[#7a6b63]">
-            Өөрийн гараар чихмэл тоглоом урлах заавар, видео сургалт болон бэлэн бүтээлүүдээс
+            Орчуулсан схем, видео сургалт болон гараар урласан бэлэн бүтээлүүдээс
             хэрэгтэй чиглэлээ сонгоорой.
           </p>
         </div>
@@ -159,6 +159,7 @@ export function ServicesSection() {
           <div className="mt-5 grid gap-6 md:grid-cols-3">
             {services.map((service, index) => {
               const Icon = service.icon;
+              const image = service.href === "/patterns" ? patternImage : service.image;
 
               return (
                 <article
@@ -166,10 +167,10 @@ export function ServicesSection() {
                   className={`flex flex-col rounded-[28px] border p-4 shadow-[0_20px_40px_-34px_rgba(70,45,35,0.5)] ${service.card}`}
                 >
                   <div className="relative">
-                    {service.image ? (
+                    {image ? (
                       <div className="relative aspect-[16/10] overflow-hidden rounded-[20px] bg-[#f3ebe2]">
                         <Image
-                          src={service.image}
+                          src={image}
                           alt={service.title}
                           fill
                           sizes="(max-width: 768px) 90vw, 30vw"
@@ -184,7 +185,7 @@ export function ServicesSection() {
                         <span className="text-[11px] font-medium">{service.placeholder}</span>
                       </div>
                     )}
-                    {service.image ? (
+                    {image ? (
                       <span className="absolute left-5 top-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 text-[#2f2420]">
                         <Icon />
                       </span>

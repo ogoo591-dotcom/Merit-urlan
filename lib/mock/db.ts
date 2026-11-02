@@ -13,8 +13,8 @@ import type { Order } from "@/lib/orders";
 // Анх уншихад lib/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд lib/data/* функцууд энэ файлын оронд Supabase-ийг дуудна.
 // Анхаар: Vercel production дээр файл бичих боломжгүй — энэ нь зөвхөн локал хөгжүүлэлтэд зориулагдсан.
 
-export type DbCourse = Omit<MockCourse, "coverSource"> & { coverImage: string };
-export type DbPattern = Omit<MockPattern, "coverSource"> & { coverImage: string };
+export type DbCourse = Omit<MockCourse, "coverSource" | "gallerySources"> & { coverImage: string; images?: string[] };
+export type DbPattern = MockPattern;
 
 export type DbNotification = {
   id: string;
@@ -56,8 +56,12 @@ function seed(): Db {
     products: mockProducts,
     orders: [],
     notifications: [],
-    courses: mockCourses.map(({ coverSource, ...course }) => ({ ...course, coverImage: coverFor(coverSource) })),
-    patterns: mockPatterns.map(({ coverSource, ...pattern }) => ({ ...pattern, coverImage: coverFor(coverSource) })),
+    courses: mockCourses.map(({ coverSource, gallerySources = [], ...course }) => ({
+      ...course,
+      coverImage: coverFor(coverSource),
+      images: gallerySources.map(coverFor),
+    })),
+    patterns: mockPatterns,
     purchases: [],
     catalogVersion: mockCatalogVersion,
   });
@@ -69,6 +73,11 @@ async function load(): Promise<Db> {
     const stored = JSON.parse(await readFile(dbFile, "utf8")) as Partial<Db>;
     const db = { ...seed(), ...stored };
     // Mock барааны жагсаалт шинэчлэгдсэн бол хуучныг нь солино (захиалга, мэдэгдэл хэвээр).
+    // Өмнө үүссэн санд сургалтын нэмэлт зураг байхгүй бол mock-оос нөхнө.
+    const seeded = seed();
+    for (const course of db.courses) {
+      course.images ??= seeded.courses.find((item) => item.id === course.id)?.images;
+    }
     if (stored.catalogVersion !== mockCatalogVersion) {
       db.products = structuredClone(mockProducts);
       db.catalogVersion = mockCatalogVersion;

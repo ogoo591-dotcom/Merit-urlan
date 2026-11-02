@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/auth";
-import { deleteCourse, saveCourse } from "@/lib/data/courses";
+import { deleteCourse, getCourseForAdmin, saveCourse } from "@/lib/data/courses";
 import { saveImageUpload } from "@/lib/data/uploads";
 import type { DbCourse } from "@/lib/mock/db";
 import type { CourseLevel } from "@/lib/mock/courses";
@@ -64,7 +64,7 @@ export async function saveCourseAction(_state: FormState, formData: FormData): P
   let coverImage = text(formData, "currentCover", 500);
   const cover = formData.get("cover");
   try {
-    if (cover instanceof File && cover.size > 0) coverImage = await saveImageUpload(cover);
+    if (cover instanceof File && cover.size > 0) coverImage = await saveImageUpload(cover, "courses");
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Зураг хадгалахад алдаа гарлаа." };
   }
@@ -78,6 +78,8 @@ export async function saveCourseAction(_state: FormState, formData: FormData): P
         description: text(formData, "description", 2000),
         price,
         coverImage,
+        // Нэмэлт зургийг админ форм засахгүй тул хуучнаараа үлдээнэ.
+        images: originalId ? (await getCourseForAdmin(originalId))?.images : undefined,
         level,
         totalDuration: text(formData, "totalDuration", 40),
         topics: text(formData, "topics")

@@ -46,7 +46,7 @@ export async function saveProductAction(_state: FormState, formData: FormData): 
   let images = formData.getAll("keepImages").map(String);
   try {
     for (const file of formData.getAll("images")) {
-      if (file instanceof File && file.size > 0) images.push(await saveImageUpload(file));
+      if (file instanceof File && file.size > 0) images.push(await saveImageUpload(file, type === "material" ? "materials" : "products"));
     }
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Зураг хадгалахад алдаа гарлаа." };

@@ -20,6 +20,8 @@ export type MockCourse = {
   price: number;
   // raw-images доторх файлын нэр (gallery-images.json-оос олно).
   coverSource: string;
+  // Сургалтын хуудасны нэмэлт зургууд (coverSource-ын дараа харагдана).
+  gallerySources?: string[];
   level: CourseLevel;
   totalDuration: string;
   topics: string[];
@@ -48,6 +50,7 @@ export const mockCourses: MockCourse[] = [
       "Дэгээ барихаас эхлээд үндсэн хатгаас, тойрог нэхэх, хэмжээ тааруулах хүртэл анх удаа нэхэж буй хүнд зориулсан суурь сургалт.",
     price: 45000,
     coverSource: "3.jpg",
+    gallerySources: ["4.jpg", "5.jpg"],
     level: "beginner",
     totalDuration: "2 цаг 10 мин",
     topics: ["basics"],
@@ -73,6 +76,7 @@ export const mockCourses: MockCourse[] = [
       "Толгой, бие, гар хөлийг тусад нь нэхэж, чихэж, угсран чихмэл тоглоом бүтээх алхамчилсан сургалт.",
     price: 65000,
     coverSource: "22.jpg",
+    gallerySources: ["23.jpg", "24.jpg", "25.jpg"],
     level: "intermediate",
     totalDuration: "3 цаг 05 мин",
     topics: ["amigurumi"],
@@ -98,6 +102,7 @@ export const mockCourses: MockCourse[] = [
       "Гар урлалаа борлуулах түвшинд хүргэх: цуврал бүтээл төлөвлөх, өртгөө тооцох, зураг авах, захиалга авах.",
     price: 55000,
     coverSource: "8.jpg",
+    gallerySources: ["9.jpg", "12.jpg"],
     level: "advanced",
     totalDuration: "1 цаг 50 мин",
     topics: ["business"],
@@ -120,6 +125,7 @@ export const mockCourses: MockCourse[] = [
     description: "Хамгийн хурдан сурч болох жижиг бүтээл — өнгөлөг түлхүүрийн оосор хийж, бэлэг болгох эсвэл зарах.",
     price: 35000,
     coverSource: "16.jpg",
+    gallerySources: ["17.jpg", "15.jpg"],
     level: "beginner",
     totalDuration: "1 цаг 15 мин",
     topics: ["amigurumi", "basics"],
