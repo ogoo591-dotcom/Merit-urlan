@@ -71,9 +71,9 @@ export async function getPatterns(filter: { type?: string; sort?: string } = {})
   return filter.sort === "new" ? items.sort((a, b) => b.createdAt.localeCompare(a.createdAt)) : items;
 }
 
-const accessLabels: Record<string, string> = { free: "Үнэгүй", paid: "Төлбөртэй" };
+const accessLabels: Record<string, string> = { free: "Үнэгүй схем", paid: "Төлбөртэй схем" };
 
-// Схемийн жагсаалтын хуудас: үнэгүй/төлбөртэй нь ангилал, түвшин нь шүүлтүүр.
+// Схемийн жагсаалт: үнэгүй/төлбөртэй нь ангилал (?access=free|paid), түвшин нь шүүлтүүр.
 export async function getPatternCatalog(filters: ListingFilters) {
   return buildListing((await readDb()).patterns.map(toSummary), filters, {
     categoriesOf: (pattern) => [pattern.isFree ? "free" : "paid"],

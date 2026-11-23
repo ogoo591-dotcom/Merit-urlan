@@ -52,7 +52,18 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
               ))}
             </ul>
             <div className="mt-3 flex justify-between border-t border-[#f1ebe5] pt-4 text-[13px]">
-              <span className="text-[#7a6b63]">Нийт (QPay · {order.payment.transactionId})</span>
+              <span className="text-[#7a6b63]">
+                Нийт ({order.payment.provider === "qpay" ? "QPay" : "Дансаар"} · {order.payment.transactionId}
+                {order.payment.status === "pending" ? (
+                  <>
+                    {" · "}
+                    <Link href="/admin/payments" className="font-semibold text-[#9a6412] underline">төлбөр шалгах</Link>
+                  </>
+                ) : order.payment.status === "rejected" ? (
+                  <b className="text-[#a33a3a]"> · төлбөр татгалзсан</b>
+                ) : null}
+                )
+              </span>
               <strong>{formatPrice(order.total)}</strong>
             </div>
           </section>

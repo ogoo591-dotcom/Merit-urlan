@@ -4,7 +4,7 @@ export const storeMeta: Record<ProductType, { base: string; title: string; descr
   product: {
     base: "/products",
     title: "Бүтээгдэхүүн",
-    description: "Гараар урласан тоглоом, бэлгийн багц, хавтага",
+    description: "Гараар урласан сүлжмэл бүтээгдэхүүн, бэлгийн багц, зүү ороосон бүтээл",
   },
   material: {
     base: "/materials",

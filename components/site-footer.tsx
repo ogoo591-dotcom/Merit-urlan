@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { ADDRESS, BANK, MESSENGER_URL, PHONE } from "@/lib/site-config";
+
 const quickLinks = [
   { href: "/", label: "Нүүр" },
   { href: "/#about", label: "Бидний тухай" },
@@ -13,7 +15,7 @@ const quickLinks = [
 const socialLinks = [
   { href: "https://www.facebook.com/meriturlan", label: "Facebook", icon: ArrowUpRightIcon },
   { href: "https://www.instagram.com/merit_urlan/", label: "Instagram", icon: ArrowUpRightIcon },
-  { href: "https://m.me/meriturlan", label: "Messenger", icon: MessengerIcon },
+  { href: MESSENGER_URL, label: "Messenger", icon: MessengerIcon },
 ] as const;
 
 const titleClass = "text-[12px] font-semibold text-white";
@@ -36,6 +38,14 @@ function PinIcon() {
     <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none">
       <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
       <circle cx="12" cy="10" r="2.3" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function BankIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+      <path d="M3.5 9 12 4l8.5 5M5 20h14M6.5 11v6M10 11v6M14 11v6M17.5 11v6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -114,12 +124,17 @@ export function SiteFooter() {
             <p className={titleClass}>Холбоо барих</p>
             <ul className="mt-6 space-y-5">
               <ContactItem icon={<PhoneIcon />} label="Утас">
-                <a href="tel:+97699129445" className="transition hover:text-white">
-                  +976 9912 9445
+                <a href={`tel:${PHONE.tel}`} className="transition hover:text-white">
+                  {PHONE.display}
                 </a>
               </ContactItem>
               <ContactItem icon={<PinIcon />} label="Хаяг">
-                Улаанбаатар хот, БГД, 11-р хороо, Богд арын 813-32 тоот
+                {ADDRESS}
+              </ContactItem>
+              <ContactItem icon={<BankIcon />} label="Данс">
+                {BANK.name} · {BANK.account}
+                <br />
+                IBAN: {BANK.iban}
               </ContactItem>
               <ContactItem icon={<ClockIcon />} label="Захиалга">
                 Сайтаар 24/7 захиалж болно. Messenger-ээр асуултад тань хариулна.

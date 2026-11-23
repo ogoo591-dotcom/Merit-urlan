@@ -11,11 +11,11 @@ import { CartLineRow, SelectAllRow } from "@/components/cart/cart-lines";
 import { useCart } from "@/components/cart-provider";
 import { formatAddress, useDeliveryAddress } from "@/components/delivery-address-provider";
 import { checkCart, placeOrder } from "@/app/actions";
-import { QPayDialog } from "@/components/store/qpay-dialog";
-import { createQPayInvoice, type QPayInvoice } from "@/lib/data/payments";
+import { BankTransferDialog } from "@/components/store/bank-transfer-dialog";
 import { useData } from "@/lib/data/use-data";
 import { formatPrice } from "@/lib/format";
 import { formatOrderAddress, type Order } from "@/lib/orders";
+import { newPaymentCode, type PaymentInvoice } from "@/lib/payments";
 
 type Props = {
   defaults: { name: string; phone: string };
@@ -29,7 +29,8 @@ const labelClass = "mb-2 block text-[12px] font-semibold text-[#2f2420]";
 const cardClass = "rounded-[24px] border border-[#eadfd5] bg-white";
 const required = <span className="text-[#a24456]">*</span>;
 
-// Захиалгын урсгал: сагснаас сонгох → 1. Мэдээлэл → 2. Төлбөр (QPay mock) → захиалга / сургалт нээгдэнэ.
+// Захиалгын урсгал: сагснаас сонгох → 1. Мэдээлэл → 2. Дансаар шилжүүлэх → "Төлбөр шилжүүлсэн" →
+// админ баталгаажуулмагц захиалга төлөгдөж, сургалт нээгдэнэ (lib/payments.ts).
 // Зөвхөн сонгосон мөрүүд худалдан авагдана; бусад нь сагсандаа үлдэнэ.
 export function CheckoutForm({ defaults }: Props) {
   const router = useRouter();
@@ -38,8 +39,9 @@ export function CheckoutForm({ defaults }: Props) {
   const [step, setStep] = useState<"info" | "payment">("info");
   const [formError, setFormError] = useState<string>();
   const [pending, setPending] = useState<PendingOrder | null>(null);
-  const [invoice, setInvoice] = useState<QPayInvoice | null>(null);
+  const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
   const [paying, setPaying] = useState(false);
+  const [placed, setPlaced] = useState<{ orderId?: number } | null>(null);
   const [payError, setPayError] = useState<string>();
 
   const productLines = selectedItems.filter((item) => item.kind !== "course");
@@ -85,24 +87,31 @@ export function CheckoutForm({ defaults }: Props) {
       return;
     }
     setPayError(undefined);
-    setInvoice(await createQPayInvoice(latest.total));
+    setPlaced(null);
+    setInvoice({ code: newPaymentCode(), amount: latest.total });
   };
 
   const pay = async () => {
     if (!invoice || !pending) return;
     setPaying(true);
     setPayError(undefined);
-    // Сервер төлбөрийг (mock) шалгаж, үнэ, үлдэгдлийг дахин тулгаад захиалга үүсгэнэ.
-    const result = await placeOrder({ ...pending, cart, courses: courseIds });
+    // Сервер үнэ, үлдэгдлийг дахин тулгаж захиалга + хүлээгдэж буй төлбөр үүсгэнэ, админд мэдэгдэнэ.
+    const result = await placeOrder({ ...pending, code: invoice.code, cart, courses: courseIds }).catch(() => ({
+      ok: false as const,
+      error: "Илгээж чадсангүй. Дахин оролдоно уу.",
+    }));
+    setPaying(false);
     if (!result.ok) {
       setPayError(result.error);
-      setPaying(false);
       return;
     }
     removeSelected();
-    if (result.orderId) router.push(`/account/orders?new=${result.orderId}`);
-    else if (result.courseIds.length === 1) router.push(`/courses/${result.courseIds[0]}/learn`);
-    else router.push("/library");
+    setPlaced({ orderId: result.orderId });
+  };
+
+  const closePayment = () => {
+    setInvoice(null);
+    if (placed) router.push(placed.orderId ? `/account/orders?new=${placed.orderId}` : "/account/orders");
   };
 
   if (!ready) return <div className="mt-10 h-64 animate-pulse rounded-[24px] bg-white/70" />;
@@ -183,7 +192,7 @@ export function CheckoutForm({ defaults }: Props) {
 
           <ul className="grid gap-3 text-[11px] text-[#7a6b63] sm:grid-cols-3">
             {[
-              { icon: ShieldCheck, text: "QPay-ээр аюулгүй төлбөр" },
+              { icon: ShieldCheck, text: "Дансаар шилжүүлж, админ баталгаажуулна" },
               { icon: Truck, text: "УБ болон орон нутагт хүргэнэ" },
               { icon: GraduationCap, text: "Сургалт төлбөрийн дараа шууд нээгдэнэ" },
             ].map(({ icon: Icon, text }) => (
@@ -260,7 +269,7 @@ export function CheckoutForm({ defaults }: Props) {
                 </div>
               ) : (
                 <p className="rounded-[16px] bg-[#f7e9ec] px-4 py-3 text-[12px] leading-relaxed text-[#8a3748]">
-                  Онлайн сургалт тул хүргэлтийн хаяг шаардлагагүй. Төлбөр төлөгдмөгц бүх хичээл “Миний сан”-д нээгдэнэ.
+                  Онлайн сургалт тул хүргэлтийн хаяг шаардлагагүй. Төлбөр төлөгдмөгц бүх хичээл “Миний захиалгууд”-д нээгдэнэ.
                 </p>
               )}
 
@@ -325,14 +334,24 @@ export function CheckoutForm({ defaults }: Props) {
                 disabled={!selectedItems.length || errors.length > 0}
                 className="w-full rounded-2xl bg-[#a24456] px-6 py-4 text-[13px] font-semibold text-white transition hover:bg-[#8a3748] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                QPay-ээр төлөх
+                Дансаар шилжүүлж төлөх
               </button>
             </div>
           ) : null}
         </div>
       </div>
 
-      {invoice ? <QPayDialog invoice={invoice} paying={paying} error={payError} onPay={pay} onClose={() => setInvoice(null)} /> : null}
+      {invoice ? (
+        <BankTransferDialog
+          invoice={invoice}
+          submitting={paying}
+          done={Boolean(placed)}
+          error={payError}
+          doneText="Захиалга тань бүртгэгдлээ. Админ шилжүүлгийг шалгаад баталгаажуулмагц танд мэдэгдэл очно. Явцыг “Миний захиалгууд”-аас харна уу."
+          onConfirm={pay}
+          onClose={closePayment}
+        />
+      ) : null}
     </>
   );
 }

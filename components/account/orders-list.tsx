@@ -47,9 +47,9 @@ export function OrdersList({ orders, newOrderId }: { orders: Order[]; newOrderId
         <div className="flex items-start gap-3 rounded-[20px] border border-[#cfe9d7] bg-[#eef8f1] px-5 py-4 text-[12px] text-[#1f6b3a]">
           <CircleCheck aria-hidden className="mt-0.5 h-5 w-5 shrink-0" />
           <p>
-            <strong className="font-semibold">Төлбөр амжилттай. Захиалга #{newOrderId} хүлээн авлаа.</strong>
+            <strong className="font-semibold">Захиалга #{newOrderId} бүртгэгдлээ.</strong>
             <br />
-            Явцыг нь эндээс харах боломжтой.
+            Админ шилжүүлгийг шалгаад баталгаажуулмагц танд мэдэгдэл очно. Явцыг нь эндээс харах боломжтой.
           </p>
         </div>
       ) : null}
@@ -84,7 +84,18 @@ export function OrdersList({ orders, newOrderId }: { orders: Order[]; newOrderId
             ) : null}
 
             <div className="mt-6">
-              <StatusSteps order={order} />
+              {order.payment.status === "pending" ? (
+                <p className="flex items-center gap-2 rounded-xl bg-[#fdf0dc] px-4 py-3 text-[12px] font-medium text-[#9a6412]">
+                  <Clock aria-hidden className="h-4 w-4 shrink-0" />
+                  Төлбөр шалгагдаж байна ({order.payment.transactionId}). Баталгаажмагц захиалга хийгдэж эхэлнэ.
+                </p>
+              ) : order.payment.status === "rejected" ? (
+                <p className="rounded-xl bg-[#fbeaea] px-4 py-3 text-[12px] font-medium text-[#a33a3a]">
+                  Төлбөр баталгаажсангүй — шилжүүлэг орж ирээгүй тул захиалга цуцлагдсан. Асуух зүйл байвал Messenger-ээр холбогдоно уу.
+                </p>
+              ) : (
+                <StatusSteps order={order} />
+              )}
             </div>
 
             <ul className="mt-6 divide-y divide-[#f1ebe5] border-t border-[#f1ebe5]">

@@ -3,31 +3,27 @@
 import { auth } from "@clerk/nextjs/server";
 
 import type { PurchaseResult } from "@/components/purchase-button";
+import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
 import { getPattern } from "@/lib/data/patterns";
-import { hasPatternAccess, recordPurchase } from "@/lib/data/purchases";
-import { formatPrice } from "@/lib/format";
-import { wait } from "@/lib/mock/store";
-import { notifyAdmin } from "@/lib/notify";
+import { hasPatternAccess } from "@/lib/data/purchases";
 
-// Mock QPay: сервер талд 2 секунд "төлбөр шалгаад" амжилттай гэж тооцно.
-// Жинхэнэ QPay холбоход энд invoice-ийн төлөвийг QPay API-аас шалгаж байж худалдан авалтыг бүртгэнэ.
-export async function purchasePattern(patternId: string): Promise<PurchaseResult> {
+// "Төлбөр шилжүүлсэн" дарахад: хүлээгдэж буй төлбөр үүсгэж админд мэдэгдэнэ.
+// Админ баталгаажуулмагц схем нээгдэнэ (lib/data/payments.ts → approvePayment).
+export async function purchasePattern(patternId: string, code: string): Promise<PurchaseResult> {
   const { userId } = await auth();
   if (!userId) return { ok: false, error: "Схем авахын тулд нэвтэрнэ үү." };
+  if (!isValidPaymentCode(code)) return { ok: false, error: "Гүйлгээний утга буруу байна. Цонхыг хаагаад дахин оролдоно уу." };
 
   const pattern = await getPattern(patternId);
   if (!pattern) return { ok: false, error: "Схем олдсонгүй." };
-  // Үнэгүй схемд худалдан авалт бүртгэхгүй: хэн ч шууд үзнэ.
+  // Үнэгүй схемд төлбөр бүртгэхгүй: хэн ч шууд үзнэ.
   if (pattern.isFree || (await hasPatternAccess(userId, patternId))) return { ok: true };
+  if (await hasPendingPayment(userId, "pattern", patternId)) return { ok: true, pending: true };
 
-  await wait(2000);
-  await recordPurchase({
-    kind: "pattern",
-    itemId: patternId,
-    userId,
-    price: pattern.price,
-    transactionId: `TX-MOCK-${Date.now().toString(36).toUpperCase()}`,
-  });
-  await notifyAdmin({ message: `Схем зарагдлаа: ${pattern.name} — ${formatPrice(pattern.price)}`, href: "/admin/patterns" });
-  return { ok: true };
+  try {
+    await createPayment({ code, userId, amount: pattern.price, courseIds: [], patternIds: [patternId], summary: `Схем: ${pattern.name}` });
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Төлбөр бүртгэхэд алдаа гарлаа." };
+  }
+  return { ok: true, pending: true };
 }

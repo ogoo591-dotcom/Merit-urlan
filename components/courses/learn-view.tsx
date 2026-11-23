@@ -17,6 +17,8 @@ type Props = {
   // Түгжээтэй хичээлд сервер null дамжуулна — линк client руу огт ирэхгүй.
   videoUrl: string | null;
   owned: boolean;
+  // Төлбөр админы шалгалтад хүлээгдэж байна.
+  paymentPending?: boolean;
 };
 
 function youTubeEmbed(url: string) {
@@ -42,7 +44,7 @@ function VideoPlayer({ url, title, onEnded }: { url: string; title: string; onEn
 
 const price = (value: number) => `${value.toLocaleString("en-US")}₮`;
 
-export function LearnView({ course, lessons, currentId, videoUrl, owned }: Props) {
+export function LearnView({ course, lessons, currentId, videoUrl, owned, paymentPending = false }: Props) {
   const lessonIds = lessons.map((lesson) => lesson.id);
   const { userId, completed, percent, doneCount } = useCourseProgress(course.id, lessonIds);
   const index = lessons.findIndex((lesson) => lesson.id === currentId);
@@ -73,7 +75,7 @@ export function LearnView({ course, lessons, currentId, videoUrl, owned }: Props
               <p className="max-w-[360px] text-[12px] leading-relaxed text-white/70">
                 Сургалтыг авснаар бүх {lessons.length} хичээл нээгдэж, хүссэн үедээ дахин үзэх боломжтой.
               </p>
-              <PurchaseButton action={purchaseCourse} itemId={course.id} price={course.price} label={`Энэ сургалтыг авах — ${price(course.price)}`} />
+              <PurchaseButton action={purchaseCourse} pending={paymentPending} itemId={course.id} price={course.price} label={`Энэ сургалтыг авах — ${price(course.price)}`} />
             </div>
           )}
         </div>
@@ -175,6 +177,7 @@ export function LearnView({ course, lessons, currentId, videoUrl, owned }: Props
           <div className="border-t border-[#f1ebe5] p-4">
             <PurchaseButton
               action={purchaseCourse}
+              pending={paymentPending}
               itemId={course.id}
               price={course.price}
               label={`Бүх хичээлийг нээх — ${price(course.price)}`}

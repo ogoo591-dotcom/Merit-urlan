@@ -91,7 +91,7 @@ const services = [
   },
   {
     title: "Онлайн сургалт",
-    description: "Анхан шатнаас ур чадвараа хөгжүүлээрэй",
+    description: "Хүүхдийн, Шинэ жилийн, Ороолт малгайны 3 багц",
     cta: "Сургалт сонгох",
     href: "/courses",
     icon: GraduationCapIcon,

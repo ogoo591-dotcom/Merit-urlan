@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   // Хуучин дэлгүүрийн хаягууд шинэ /products, /materials хуудас руу шилжинэ (id нь хуучин slug-тай ижил).
   async redirects() {
     return [
+      // "Миний сан" нь "Миний захиалгууд" дотор нэгдсэн.
+      { source: "/library", destination: "/account/orders", permanent: false },
+      { source: "/free-tutorials", destination: "/patterns?access=free", permanent: false },
       { source: "/shop", destination: "/products", permanent: false },
       { source: "/shop/finished", destination: "/products", permanent: false },
       { source: "/shop/supplies", destination: "/materials", permanent: false },

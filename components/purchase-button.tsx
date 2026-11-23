@@ -1,58 +1,79 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
+import { Clock } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
-import { QPayDialog } from "@/components/store/qpay-dialog";
-import { createQPayInvoice, type QPayInvoice } from "@/lib/data/payments";
+import { BankTransferDialog } from "@/components/store/bank-transfer-dialog";
+import { newPaymentCode, type PaymentInvoice } from "@/lib/payments";
 
-export type PurchaseResult = { ok: true } | { ok: false; error: string };
+// pending: админы шалгалтад хүлээгдэж буй төлбөр бүртгэгдсэн.
+export type PurchaseResult = { ok: true; pending?: boolean } | { ok: false; error: string };
 
-// Сургалт, схем худалдаж авах товч: (нэвтрэх) → mock QPay → `action` (server action) худалдан авалтыг бүртгэж,
-// хуудас шинэчлэгдэн хичээл нээгдэх / PDF татах товч гарна.
+// Сургалт, схем худалдаж авах товч: (нэвтрэх) → дансаар шилжүүлэх цонх → "Төлбөр шилжүүлсэн" →
+// `action` хүлээгдэж буй төлбөр үүсгэж, админ баталгаажуулмагц нээгдэнэ (lib/payments.ts).
 export function PurchaseButton({
   action,
   itemId,
   price,
   label,
   className = "",
+  pending = false,
 }: {
-  action: (itemId: string) => Promise<PurchaseResult>;
+  action: (itemId: string, code: string) => Promise<PurchaseResult>;
   itemId: string;
   price: number;
   label: string;
   className?: string;
+  // Төлбөр нь аль хэдийн шалгагдаж байгаа бол товчны оронд мэдээлэл харуулна.
+  pending?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isSignedIn } = useUser();
   const { requireAuth } = useAuthModal();
-  const [invoice, setInvoice] = useState<QPayInvoice | null>(null);
-  const [paying, setPaying] = useState(false);
+  const [invoice, setInvoice] = useState<PaymentInvoice | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
   const [error, setError] = useState<string>();
 
-  const start = async () => {
+  if (pending) {
+    return (
+      <p className={`flex items-center justify-center gap-2 rounded-2xl bg-[#fdf0dc] px-6 py-4 text-[12px] font-semibold text-[#9a6412] ${className}`}>
+        <Clock aria-hidden className="h-4 w-4 shrink-0" /> Төлбөр шалгагдаж байна. Баталгаажмагц нээгдэнэ.
+      </p>
+    );
+  }
+
+  const start = () => {
     if (!isSignedIn) {
       const query = searchParams.toString();
       requireAuth(query ? `${pathname}?${query}` : pathname);
       return;
     }
     setError(undefined);
-    setInvoice(await createQPayInvoice(price));
+    setDone(false);
+    setInvoice({ code: newPaymentCode(), amount: price });
   };
 
-  const pay = async () => {
-    setPaying(true);
+  const confirm = async () => {
+    if (!invoice) return;
+    setSubmitting(true);
     setError(undefined);
-    const result = await action(itemId);
-    setPaying(false);
+    const result = await action(itemId, invoice.code).catch(() => ({ ok: false as const, error: "Илгээж чадсангүй. Дахин оролдоно уу." }));
+    setSubmitting(false);
     if (!result.ok) {
       setError(result.error);
       return;
     }
+    if (result.pending) setDone(true);
+    else close();
+  };
+
+  const close = () => {
     setInvoice(null);
     router.refresh();
   };
@@ -66,7 +87,17 @@ export function PurchaseButton({
       >
         {label}
       </button>
-      {invoice ? <QPayDialog invoice={invoice} paying={paying} error={error} onPay={pay} onClose={() => setInvoice(null)} /> : null}
+      {invoice ? (
+        <BankTransferDialog
+          invoice={invoice}
+          submitting={submitting}
+          done={done}
+          error={error}
+          doneText="Админ шилжүүлгийг шалгаад баталгаажуулмагц танд мэдэгдэл очиж, энэ хуудсанд нээгдэнэ."
+          onConfirm={confirm}
+          onClose={close}
+        />
+      ) : null}
     </>
   );
 }

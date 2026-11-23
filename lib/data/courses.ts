@@ -61,15 +61,16 @@ export async function getCourses(filter: { level?: string; topic?: string } = {}
     .map(toSummary);
 }
 
-const topicLabels: Record<string, string> = { amigurumi: "Amigurumi", basics: "Суурь", business: "Бизнес" };
+const topicLabels: Record<string, string> = { kids: "Хүүхэд", "new-year": "Шинэ жил", "scarf-hat": "Ороолт малгай" };
 
-// Сургалтын жагсаалтын хуудас: сэдэв нь ангилал, түвшин нь шүүлтүүр.
-export async function getCourseCatalog(filters: ListingFilters) {
-  return buildListing((await readDb()).courses.map(toSummary), filters, {
-    categoriesOf: (course) => course.topics,
-    categoryLabel: (topic) => topicLabels[topic] ?? topic,
-    levelLabels,
-    textOf: (course) => `${course.title} ${course.description} ${course.levelLabel} ${course.topics.map((topic) => topicLabels[topic] ?? topic).join(" ")}`,
+// Сургалтын жагсаалтын хуудас: зүүн самбарын ангилал нь сургалтын багц бүр (?package=<id>), түвшингүй.
+export async function getCourseCatalog(filters: Omit<ListingFilters, "levels">) {
+  const courses = (await readDb()).courses.map(toSummary);
+  return buildListing(courses, filters, {
+    categoriesOf: (course) => [course.id],
+    categoryLabel: (id) => courses.find((course) => course.id === id)?.title ?? id,
+    levelLabels: {},
+    textOf: (course) => `${course.title} ${course.description} ${course.topics.map((topic) => topicLabels[topic] ?? topic).join(" ")}`,
     nameOf: (course) => course.title,
   });
 }

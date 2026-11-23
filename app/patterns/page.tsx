@@ -34,7 +34,7 @@ export default async function PatternsPage({ searchParams }: { searchParams: Pro
         <ListingView
           base="/patterns"
           title="Схем заавар"
-          description="Үнэгүй схемийг шууд үзэж, төлбөртэйг нь төлбөр төлөөд авна. Авсан схем тань “Миний сан”-д хадгалагдана."
+          description="Орчуулсан схемүүд. Үнэгүй схем дээр дарахад шууд нээгдэнэ, төлбөртэйг нь төлбөр төлсний дараа үзнэ. Авсан схем тань “Миний захиалгууд”-д хадгалагдана."
           unit="схем"
           categoryParam="access"
           state={state}

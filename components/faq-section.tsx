@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useId, useState } from "react";
 
 import { FeedbackDialog } from "@/components/feedback-dialog";
+import { MESSENGER_URL } from "@/lib/site-config";
 
 const faqs = [
   {
@@ -167,7 +168,7 @@ export function FaqSection() {
           </p>
           <div className="mt-10 grid grid-cols-2 gap-3">
             <Link
-              href="https://m.me/meriturlan"
+              href={MESSENGER_URL}
               target="_blank"
               rel="noreferrer"
               className="flex min-w-0 items-center gap-2.5 rounded-2xl border border-[#efe0d6] bg-[#fdf7f1] p-3 transition hover:border-[#a24456]"

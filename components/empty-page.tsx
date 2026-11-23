@@ -12,7 +12,7 @@ type EmptyPageProps = {
   actions: Array<{ label: string; href: string }>;
 };
 
-// Агуулга нь хараахан бэлэн болоогүй хэсгүүдийн (Схем, Хадгалсан, Миний сан) нийтлэг хуудас.
+// Агуулга нь хараахан бэлэн болоогүй хэсгүүдийн (Схем, Хадгалсан г.м.) нийтлэг хуудас.
 export function EmptyPage({ icon: Icon, eyebrow, title, description, actions }: EmptyPageProps) {
   return (
     <>

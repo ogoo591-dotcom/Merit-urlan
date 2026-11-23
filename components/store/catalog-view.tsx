@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/store/product-card";
 import { storeMeta } from "@/components/store/store-paths";
 import { getCatalog, type ColorKey, type ProductSort, type ProductType } from "@/lib/data/products";
 import { formatPrice } from "@/lib/format";
+import { categoryOrder, categorySlug, resolveCatalogParams, subOrder, subSlug } from "@/lib/navigation";
 import { productColors, type Availability, type Origin } from "@/lib/mock/products";
 
 export const sortOptions: Array<{ value: ProductSort; label: string }> = [
@@ -22,9 +23,11 @@ export type { CatalogSearchParams };
 // Бүтээгдэхүүн / Материалын жагсаалт (server). Ангилал, шүүлтүүр, эрэмбэ, хуудас бүгд URL-д хадгалагдана.
 export async function CatalogView({ type, searchParams }: { type: ProductType; searchParams: CatalogSearchParams }) {
   const meta = storeMeta[type];
+  // URL-д slug (?category=suljmel&sub=togloom), өгөгдөлд монгол нэр — lib/navigation.ts хөрвүүлнэ.
+  const resolved = resolveCatalogParams(type, single(searchParams.category), single(searchParams.sub));
   const state = {
-    category: single(searchParams.category),
-    sub: single(searchParams.sub),
+    category: resolved.category,
+    sub: resolved.sub,
     q: single(searchParams.q),
     sort: sortOptions.find((option) => option.value === single(searchParams.sort))?.value ?? "default",
     brand: list(searchParams.brand),
@@ -55,8 +58,8 @@ export async function CatalogView({ type, searchParams }: { type: ProductType; s
   const href = (next: Partial<typeof state>) => {
     const merged = { ...state, page: 1, ...next };
     const params = new URLSearchParams();
-    if (merged.category) params.set("category", merged.category);
-    if (merged.sub) params.set("sub", merged.sub);
+    if (merged.category) params.set("category", categorySlug(type, merged.category));
+    if (merged.sub) params.set("sub", subSlug(type, merged.category, merged.sub));
     if (merged.q) params.set("q", merged.q);
     if (merged.sort !== "default") params.set("sort", merged.sort);
     for (const key of ["brand", "color", "origin", "avail"] as const) for (const value of merged[key]) params.append(key, value);
@@ -96,12 +99,12 @@ export async function CatalogView({ type, searchParams }: { type: ProductType; s
         action={meta.base}
         query={state.q}
         allLink={{ label: "Бүгд", count: allCount, href: href({ category: undefined, sub: undefined }), active: !state.category && !state.sub }}
-        categories={catalog.categories.map((item) => ({
+        categories={[...catalog.categories].sort((a, b) => categoryOrder(type, a.value) - categoryOrder(type, b.value)).map((item) => ({
           label: item.label,
           count: item.count,
           href: href({ category: item.value, sub: undefined }),
           active: state.category === item.value && !state.sub,
-          subcategories: item.subcategories.map((sub) => ({
+          subcategories: [...item.subcategories].sort((a, b) => subOrder(type, item.value, a.value) - subOrder(type, item.value, b.value)).map((sub) => ({
             label: sub.label,
             count: sub.count,
             href: href({ category: item.value, sub: sub.value }),
@@ -116,7 +119,11 @@ export async function CatalogView({ type, searchParams }: { type: ProductType; s
         ]}
         selected={{ brand: state.brand, color: state.color, origin: state.origin, avail: state.avail }}
         price={{ min: state.min, max: state.max }}
-        keep={{ category: state.category, sub: state.sub, sort: state.sort === "default" ? undefined : state.sort }}
+        keep={{
+          category: state.category && categorySlug(type, state.category),
+          sub: state.sub && subSlug(type, state.category, state.sub),
+          sort: state.sort === "default" ? undefined : state.sort,
+        }}
         clearHref={clearFilters}
         sortLinks={sortOptions.map((option) => ({ ...option, href: href({ sort: option.value }), active: option.value === state.sort }))}
       />

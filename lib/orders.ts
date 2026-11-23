@@ -40,7 +40,8 @@ export type Order = {
   total: number;
   status: OrderStatus;
   history: Array<{ status: OrderStatus; at: string }>;
-  payment: { provider: "qpay"; transactionId: string };
+  // status байхгүй (хуучин захиалга) бол төлөгдсөн гэж үзнэ. "pending": админ шилжүүлгийг шалгаж байна.
+  payment: { provider: "qpay" | "bank_transfer"; transactionId: string; status?: "pending" | "paid" | "rejected" };
   createdAt: string;
   // Захиалгаар хийх бараа байвал тооцсон, эсвэл админы сонгосон бэлэн болох огноо.
   readyBy?: string;

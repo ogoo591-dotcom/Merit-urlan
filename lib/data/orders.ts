@@ -1,8 +1,8 @@
 import "server-only";
 
-import { formatPrice, formatReadyDate, formatShortDate } from "@/lib/format";
+import { formatReadyDate, formatShortDate } from "@/lib/format";
 import { readDb, updateDb, type Db } from "@/lib/mock/db";
-import { notifyAdmin, notifyCustomer } from "@/lib/notify";
+import { notifyCustomer } from "@/lib/notify";
 import { orderStatusLabel, type CartInput, type Order, type OrderLine, type OrderStatus } from "@/lib/orders";
 
 // Захиалга. Одоогоор mock сан, дараа нь Supabase (place_order RPC г.м.) руу солино.
@@ -86,7 +86,7 @@ export async function createOrder(input: {
     return created;
   });
 
-  await notifyAdmin({ message: `Шинэ захиалга #${order.id} — ${formatPrice(order.total)}`, href: `/admin/orders/${order.id}` });
+  // Админы мэдэгдлийг төлбөр (lib/data/payments.ts → createPayment) илгээнэ.
   return order;
 }
 

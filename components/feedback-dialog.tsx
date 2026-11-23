@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowUpRight, CheckCircle2, Clock, MapPin, MessageCircle, MessageSquareText, Phone, Send, X } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Clock, Landmark, MapPin, MessageCircle, MessageSquareText, Phone, Send, X } from "lucide-react";
 import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { sendFeedback, type FeedbackState } from "@/app/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
+import { ADDRESS, BANK, MESSENGER_URL, PHONE } from "@/lib/site-config";
 
 const labelClass = "block text-[12px] font-semibold text-[#2f2420]";
 const inputClass =
@@ -201,8 +202,8 @@ export function FeedbackDialog() {
 
               <ul className="mt-6 border-b border-white/10">
                 <ContactRow icon={<Phone aria-hidden className="h-[18px] w-[18px]" />} label="Утас">
-                  <a href="tel:+97699129445" className="transition hover:text-[#ecd3dd]">
-                    +976 9912 9445
+                  <a href={`tel:${PHONE.tel}`} className="transition hover:text-[#ecd3dd]">
+                    {PHONE.display}
                   </a>
                 </ContactRow>
                 <ContactRow icon={<ArrowUpRight aria-hidden className="h-[18px] w-[18px]" />} label="Facebook">
@@ -211,7 +212,10 @@ export function FeedbackDialog() {
                   </a>
                 </ContactRow>
                 <ContactRow icon={<MapPin aria-hidden className="h-[18px] w-[18px]" />} label="Хаяг">
-                  Улаанбаатар хот, БГД, 11-р хороо, Богд арын 813-32 тоот
+                  {ADDRESS}
+                </ContactRow>
+                <ContactRow icon={<Landmark aria-hidden className="h-[18px] w-[18px]" />} label="Данс">
+                  {BANK.name} · {BANK.account} · IBAN: {BANK.iban}
                 </ContactRow>
                 <ContactRow icon={<Clock aria-hidden className="h-[18px] w-[18px]" />} label="Захиалга">
                   Сайтаар 24/7 захиалж болно
@@ -219,7 +223,7 @@ export function FeedbackDialog() {
               </ul>
 
               <a
-                href="https://m.me/meriturlan"
+                href={MESSENGER_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-6 flex items-center justify-center gap-2.5 rounded-xl bg-[#75574f] px-6 py-3.5 text-[12px] font-semibold text-white transition hover:bg-[#866459]"

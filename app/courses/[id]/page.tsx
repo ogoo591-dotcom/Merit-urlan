@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { BadgeCheck, Check, CheckCircle2, Clock, Layers, Lock, PlayCircle, Signal } from "lucide-react";
+import { BadgeCheck, Check, CheckCircle2, Clock, Layers, Lock, PlayCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,6 +9,7 @@ import { CourseProgressBar } from "@/components/courses/course-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { formatCoursePrice, getCourse } from "@/lib/data/courses";
+import { hasPendingPayment } from "@/lib/data/payments";
 import { hasAccess } from "@/lib/data/purchases";
 
 type Props = { params: Promise<{ id: string }> };
@@ -24,11 +25,12 @@ export default async function CourseDetailPage({ params }: Props) {
   if (!course) notFound();
   const { userId } = await auth();
   const owned = await hasAccess(userId, course.id);
+  const paymentPending = !owned && (await hasPendingPayment(userId, "course", course.id));
   const firstFree = course.lessons.find((lesson) => lesson.isFree);
   const perks = [
     `${course.lessonCount} видео хичээл, нийт ${course.totalDuration}`,
     "Эхнээс нь дуустал алхам алхмаар заасан",
-    ...(course.level === "beginner" ? ["Анхан шатныхан ч хамрагдах боломжтой"] : []),
+    "Анх удаа нэхэж буй хүн ч хамрагдах боломжтой",
     "Материалын талаарх мэдээллийг хичээл бүрт өгнө",
     "Хүссэн үедээ, хэдэн ч удаа үзэх эрхтэй",
     "Асуух зүйлээ Messenger-ээр асууж болно",
@@ -48,7 +50,6 @@ export default async function CourseDetailPage({ params }: Props) {
               <ShareButton title={course.title} />
             </div>
             <ul className="mt-4 flex flex-wrap gap-2 text-[11px] text-[#4a3b35]">
-              <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-[#eadfd5]"><Signal aria-hidden className="h-3.5 w-3.5" />{course.levelLabel}</li>
               <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-[#eadfd5]"><Layers aria-hidden className="h-3.5 w-3.5" />{course.lessonCount} хичээл</li>
               <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 ring-1 ring-[#eadfd5]"><Clock aria-hidden className="h-3.5 w-3.5" />{course.totalDuration}</li>
             </ul>
@@ -77,7 +78,13 @@ export default async function CourseDetailPage({ params }: Props) {
               </div>
             ) : (
               <div className="mt-8 space-y-4">
-                <CourseCartActions course={{ id: course.id, title: course.title, price: course.price, image: course.cover.src }} />
+                {paymentPending ? (
+                  <p className="flex items-center gap-2 rounded-2xl bg-[#fdf0dc] px-5 py-4 text-[12px] font-semibold text-[#9a6412]">
+                    <Clock aria-hidden className="h-4 w-4 shrink-0" /> Төлбөр шалгагдаж байна. Админ баталгаажуулмагц бүх хичээл нээгдэнэ.
+                  </p>
+                ) : (
+                  <CourseCartActions course={{ id: course.id, title: course.title, price: course.price, image: course.cover.src }} />
+                )}
                 {firstFree ? (
                   <Link
                     href={`/courses/${course.id}/learn?lesson=${firstFree.id}`}
@@ -87,7 +94,7 @@ export default async function CourseDetailPage({ params }: Props) {
                   </Link>
                 ) : null}
                 <p className="text-[11px] leading-relaxed text-[#9c8c84]">
-                  QPay-ээр төлсний дараа бүх хичээл шууд нээгдэж, “Миний сан” хэсэгт хадгалагдана.
+                  Дансаар шилжүүлээд “Төлбөр шилжүүлсэн” дарна. Админ баталгаажуулмагц бүх хичээл нээгдэж, “Миний захиалгууд”-д хадгалагдана.
                 </p>
               </div>
             )}

@@ -8,7 +8,8 @@ export function PatternCard({ pattern, purchased }: { pattern: PatternSummary; p
   const open = pattern.isFree || purchased;
 
   return (
-    <Link href={`/patterns/${pattern.id}`} className="group block">
+    // Үнэгүй схем шууд нээгдэнэ; төлбөртэй нь дэлгэрэнгүй (төлбөр) хуудас руу, авсан бол мөн шууд нээгдэнэ.
+    <Link href={open ? `/patterns/${pattern.id}/view` : `/patterns/${pattern.id}`} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden rounded-[20px] bg-[#faf7f6] shadow-[0_18px_36px_-28px_rgba(70,45,35,0.6)]">
         <Image
           src={pattern.cover.src}

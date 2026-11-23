@@ -36,6 +36,24 @@ export type DbPurchase = {
   createdAt: string;
 };
 
+// Дансаар шилжүүлсэн төлбөр (lib/payments.ts). Админ баталгаажуулсны дараа захиалга төлөгдөж, сургалт/схем нээгдэнэ.
+export type DbPayment = {
+  id: string;
+  // Гүйлгээний утга (MU-XXXXXX) — банкны хуулгатай тулгахад ашиглана.
+  code: string;
+  userId: string;
+  customer?: { name: string; phone: string };
+  amount: number;
+  status: "pending" | "approved" | "rejected";
+  orderId?: number;
+  courseIds: string[];
+  patternIds: string[];
+  // Админ, хэрэглэгчид харагдах товч тайлбар ("Захиалга #1023, Хүүхдийн багц").
+  summary: string;
+  createdAt: string;
+  reviewedAt?: string;
+};
+
 export type Db = {
   products: StoreProduct[];
   orders: Order[];
@@ -43,6 +61,7 @@ export type Db = {
   courses: DbCourse[];
   patterns: DbPattern[];
   purchases: DbPurchase[];
+  payments: DbPayment[];
   catalogVersion?: number;
 };
 
@@ -63,6 +82,7 @@ function seed(): Db {
     })),
     patterns: mockPatterns,
     purchases: [],
+    payments: [],
     catalogVersion: mockCatalogVersion,
   });
 }

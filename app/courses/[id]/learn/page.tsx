@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { LearnView } from "@/components/courses/learn-view";
 import { SiteHeader } from "@/components/site-header";
 import { getCourse, getLessonVideo } from "@/lib/data/courses";
+import { hasPendingPayment } from "@/lib/data/payments";
 import { hasAccess } from "@/lib/data/purchases";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ lesson?: string }> };
@@ -22,6 +23,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
 
   const { userId } = await auth();
   const owned = await hasAccess(userId, course.id);
+  const paymentPending = !owned && (await hasPendingPayment(userId, "course", course.id));
   const current = course.lessons.find((item) => item.id === lesson) ?? course.lessons[0];
   const videoUrl = await getLessonVideo(course.id, current.id, userId);
 
@@ -35,6 +37,7 @@ export default async function LearnPage({ params, searchParams }: Props) {
           currentId={current.id}
           videoUrl={videoUrl}
           owned={owned}
+          paymentPending={paymentPending}
         />
       </main>
     </>

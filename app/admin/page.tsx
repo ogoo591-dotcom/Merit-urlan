@@ -1,10 +1,11 @@
-import { Bell, CalendarClock, Clock, ShoppingBag } from "lucide-react";
+import { Banknote, Bell, CalendarClock, Clock, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 import { PageHeader, StatusPill, cardClass } from "@/components/admin/ui";
 import { requireAdmin } from "@/lib/auth";
 import { getAdminNotifications } from "@/lib/data/notifications";
 import { getAllOrders } from "@/lib/data/orders";
+import { countPendingPayments } from "@/lib/data/payments";
 import { getAllPurchases } from "@/lib/data/purchases";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { orderStatusLabel, orderStatusTone } from "@/lib/orders";
@@ -14,7 +15,14 @@ const ubDate = (iso: string) => new Intl.DateTimeFormat("en-CA", { timeZone: "As
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
-  const [orders, purchases, notifications] = await Promise.all([getAllOrders(), getAllPurchases(), getAdminNotifications()]);
+  const [allOrders, purchases, notifications, pendingPayments] = await Promise.all([
+    getAllOrders(),
+    getAllPurchases(),
+    getAdminNotifications(),
+    countPendingPayments(),
+  ]);
+  // Төлбөр нь баталгаажаагүй (шалгагдаж буй / татгалзсан) захиалгыг орлого, хүлээгдэж буй захиалгад тоолохгүй.
+  const orders = allOrders.filter((order) => !order.payment.status || order.payment.status === "paid");
 
   const today = ubDate(new Date().toISOString());
   const month = today.slice(0, 7);
@@ -27,6 +35,7 @@ export default async function AdminDashboardPage() {
   };
 
   const stats = [
+    { label: "Шалгах төлбөр", value: String(pendingPayments), icon: Banknote, href: "/admin/payments" },
     { label: "Өнөөдрийн захиалга", value: String(todayOrders.length), icon: ShoppingBag, href: "/admin/orders" },
     { label: "Хүлээгдэж буй захиалга", value: String(pending.length), icon: Clock, href: "/admin/orders?status=received" },
     { label: "Уншаагүй мэдэгдэл", value: String(notifications.filter((item) => !item.read).length), icon: Bell, href: "/admin/notifications" },
@@ -36,7 +45,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8">
       <PageHeader title="Хянах самбар" description="Захиалга, орлого, мэдэгдлийн товч мэдээлэл" />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon, href }) => (
           <Link key={label} href={href} className={`${cardClass} transition hover:border-[#a24456]`}>
             <Icon aria-hidden className="h-5 w-5 text-[#a24456]" />

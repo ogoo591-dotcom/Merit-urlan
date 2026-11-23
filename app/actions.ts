@@ -2,15 +2,14 @@
 
 import { auth } from "@clerk/nextjs/server";
 
-import { getCourse } from "@/lib/data/courses";
+import { getCourse, getCourses } from "@/lib/data/courses";
 import { countUnread, markRead } from "@/lib/data/notifications";
 import { createOrder, validateCart } from "@/lib/data/orders";
 import { searchProducts } from "@/lib/data/products";
-import { hasAccess, recordPurchase } from "@/lib/data/purchases";
-import { formatPrice } from "@/lib/format";
+import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
+import { hasAccess } from "@/lib/data/purchases";
 import { notifyAdmin } from "@/lib/notify";
 import { getAdminUser } from "@/lib/auth";
-import { wait } from "@/lib/mock/store";
 import type { CartInput, Order } from "@/lib/orders";
 
 // Client компонентууд lib/data-г шууд импортлохгүй (сервер талын сан) — эдгээр server action-оор дамжина.
@@ -56,6 +55,20 @@ export async function searchCatalog(query: string) {
   return searchProducts(String(query));
 }
 
+export type DrawerCourse = { id: string; title: string; cover: string; price: number; lessonCount: number; freeLessonCount: number };
+
+// "☰ Бүгд" drawer-ийн "Сургалт" хэсэг: бүх сургалтын товч мэдээлэл (видео линкгүй).
+export async function getDrawerCourses(): Promise<DrawerCourse[]> {
+  return (await getCourses()).map((course) => ({
+    id: course.id,
+    title: course.title,
+    cover: course.cover.src,
+    price: course.price,
+    lessonCount: course.lessonCount,
+    freeLessonCount: course.freeLessonCount,
+  }));
+}
+
 const cleanCourses = (courses: string[] | undefined) =>
   [...new Set((Array.isArray(courses) ? courses : []).slice(0, 20).map((id) => String(id).slice(0, 100)))];
 
@@ -75,6 +88,10 @@ async function checkCourses(courseIds: string[], userId: string | null) {
       errors.push(`"${course.title}" сургалтыг та аль хэдийн авсан байна — сагснаас хасна уу.`);
       continue;
     }
+    if (await hasPendingPayment(userId, "course", id)) {
+      errors.push(`"${course.title}" сургалтын төлбөр шалгагдаж байна — сагснаас хасна уу.`);
+      continue;
+    }
     lines.push({ id, title: course.title, price: course.price });
   }
   return { lines, errors, total: lines.reduce((sum, line) => sum + line.price, 0) };
@@ -92,11 +109,12 @@ export async function checkCart(cart: CartInput, courses: string[] = []) {
   };
 }
 
-export type PlaceOrderResult = { ok: true; orderId?: number; courseIds: string[] } | { ok: false; error: string };
+export type PlaceOrderResult = { ok: true; code: string; orderId?: number } | { ok: false; error: string };
 
-// Mock QPay: сервер талд 2 секунд "төлбөр шалгаад" захиалга үүсгэнэ. Жинхэнэ QPay-д invoice төлөгдсөнийг энд шалгана.
-// Бараа байвал хүргэлтийн захиалга үүснэ, сургалт байвал худалдан авалт бүртгэгдэж хичээл шууд нээгдэнэ.
+// "Төлбөр шилжүүлсэн" дарахад: үнэ, үлдэгдлийг дахин тулгаж захиалга (үлдэгдэл нөөцөлнө) + хүлээгдэж буй төлбөр үүсгэнэ.
+// Админ /admin/payments-д баталгаажуулмагц захиалга төлөгдөж, сургалт нээгдэнэ (lib/data/payments.ts).
 export async function placeOrder(input: {
+  code: string;
   customer: Order["customer"];
   address: Order["address"];
   note: string;
@@ -105,6 +123,7 @@ export async function placeOrder(input: {
 }): Promise<PlaceOrderResult> {
   const { userId } = await auth();
   if (!userId) return { ok: false, error: "Захиалахын тулд нэвтэрнэ үү." };
+  if (!isValidPaymentCode(input.code)) return { ok: false, error: "Гүйлгээний утга буруу байна. Цонхыг хаагаад дахин оролдоно уу." };
 
   const customer = { name: String(input.customer?.name ?? "").trim().slice(0, 120), phone: String(input.customer?.phone ?? "").trim().slice(0, 20) };
   const address = {
@@ -125,30 +144,31 @@ export async function placeOrder(input: {
   const errors = [...check.errors, ...courseCheck.errors];
   if (errors.length || (!check.lines.length && !courseCheck.lines.length)) return { ok: false, error: errors[0] ?? "Сагс хоосон байна." };
 
-  await wait(2000);
-  const transactionId = `TX-MOCK-${Date.now().toString(36).toUpperCase()}`;
-  let orderId: number | undefined;
   try {
-    if (check.lines.length) {
-      const order = await createOrder({
-        userId,
-        customer,
-        address,
-        note: String(input.note ?? "").trim().slice(0, 1000),
-        cart,
-        payment: { provider: "qpay", transactionId },
-      });
-      orderId = order.id;
-    }
+    const order = check.lines.length
+      ? await createOrder({
+          userId,
+          customer,
+          address,
+          note: String(input.note ?? "").trim().slice(0, 1000),
+          cart,
+          payment: { provider: "bank_transfer", transactionId: input.code, status: "pending" },
+        })
+      : undefined;
+    await createPayment({
+      code: input.code,
+      userId,
+      customer,
+      amount: (order?.total ?? 0) + courseCheck.total,
+      orderId: order?.id,
+      courseIds: courseCheck.lines.map((line) => line.id),
+      patternIds: [],
+      summary: [order ? `Захиалга #${order.id}` : "", ...courseCheck.lines.map((line) => line.title)].filter(Boolean).join(", "),
+    });
+    return { ok: true, code: input.code, orderId: order?.id };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Захиалга үүсгэхэд алдаа гарлаа." };
   }
-
-  for (const course of courseCheck.lines) {
-    await recordPurchase({ kind: "course", itemId: course.id, userId, price: course.price, transactionId });
-    await notifyAdmin({ message: `Сургалт зарагдлаа: ${course.title} — ${formatPrice(course.price)}`, href: "/admin/courses" });
-  }
-  return { ok: true, orderId, courseIds: courseCheck.lines.map((line) => line.id) };
 }
 
 // Header: админ эсэх + уншаагүй мэдэгдлийн тоо (админ бол админы мэдэгдлийг ч оруулна).

@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { ArrowRight, BadgeCheck, Download, Gift, Languages, Lock, PenLine, Ruler, Signal } from "lucide-react";
+import { ArrowRight, BadgeCheck, Download, Eye, Gift, Languages, Lock, PenLine, Ruler, Signal } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { PurchaseButton } from "@/components/purchase-button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { formatPatternPrice, getPattern } from "@/lib/data/patterns";
+import { hasPendingPayment } from "@/lib/data/payments";
 import { hasPatternAccess } from "@/lib/data/purchases";
 
 type Props = { params: Promise<{ id: string }> };
@@ -26,6 +27,7 @@ export default async function PatternDetailPage({ params }: Props) {
   const { userId } = await auth();
   const owned = !pattern.isFree && (await hasPatternAccess(userId, pattern.id));
   const open = pattern.isFree || owned;
+  const paymentPending = !open && (await hasPendingPayment(userId, "pattern", pattern.id));
   const fileUrl = `/api/patterns/${pattern.id}/download`;
 
   // "Энэ схемд хэрэгтэй утас →" — дэлгүүрт байгаа эхний материал руу.
@@ -70,7 +72,9 @@ export default async function PatternDetailPage({ params }: Props) {
           </section>
 
           <div className="lg:sticky lg:top-[calc(var(--header-h,130px)+1.5rem)] lg:self-start">
-            <Link href="/patterns" className="block text-[11px] text-[#9c8c84] hover:text-[#a24456]">← Бүх схем</Link>
+            <Link href={`/patterns?access=${pattern.isFree ? "free" : "paid"}`} className="block text-[11px] text-[#9c8c84] hover:text-[#a24456]">
+              ← {pattern.isFree ? "Үнэгүй схем" : "Төлбөртэй схем"}
+            </Link>
             <p
               className={`mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-semibold ${
                 pattern.isFree ? "bg-[#e7f4ea] text-[#1f7a3d]" : "bg-[#f7e9ec] text-[#a24456]"
@@ -87,21 +91,29 @@ export default async function PatternDetailPage({ params }: Props) {
                 <>
                   {owned ? (
                     <p className="mb-3 inline-flex items-center gap-2 text-[12px] font-semibold text-[#1f7a3d]">
-                      <BadgeCheck aria-hidden className="h-4 w-4" /> Та энэ схемийг авсан · “Миний сан”-д хадгалагдсан
+                      <BadgeCheck aria-hidden className="h-4 w-4" /> Та энэ схемийг авсан · “Миний захиалгууд”-д хадгалагдсан
                     </p>
                   ) : null}
-                  <a
-                    href={`${fileUrl}?download=1`}
-                    className="flex items-center justify-center gap-2 rounded-2xl bg-[#a24456] px-6 py-4 text-[13px] font-semibold text-white transition hover:bg-[#8a3748]"
-                  >
-                    <Download aria-hidden className="h-5 w-5" /> {pattern.fileKind === "pdf" ? "PDF татах" : "Схем татах"}
-                  </a>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <a
+                      href={`${fileUrl}?download=1`}
+                      className="flex items-center justify-center gap-2 rounded-2xl bg-[#a24456] px-6 py-4 text-[13px] font-semibold text-white transition hover:bg-[#8a3748]"
+                    >
+                      <Download aria-hidden className="h-5 w-5" /> {pattern.fileKind === "pdf" ? "PDF татах" : "Схем татах"}
+                    </a>
+                    <Link
+                      href={`/patterns/${pattern.id}/view`}
+                      className="flex items-center justify-center gap-2 rounded-2xl border border-[#a24456] bg-white px-6 py-4 text-[13px] font-semibold text-[#a24456] transition hover:bg-[#f7e9ec]"
+                    >
+                      <Eye aria-hidden className="h-5 w-5" /> Онлайнаар нээж харах
+                    </Link>
+                  </div>
                 </>
               ) : (
                 <>
                   <p className="text-[28px] font-bold text-[#a24456]">{formatPatternPrice(pattern.price)}</p>
-                  <p className="mt-1 text-[11px] text-[#9c8c84]">Төлбөр төлөгдмөгц схем нээгдэж, “Миний сан”-д хадгалагдана.</p>
-                  <PurchaseButton action={purchasePattern} itemId={pattern.id} price={pattern.price} label="Төлөөд авах" className="mt-4 w-full" />
+                  <p className="mt-1 text-[11px] text-[#9c8c84]">Дансаар шилжүүлээд “Төлбөр шилжүүлсэн” дарна. Админ баталгаажуулмагц схем нээгдэж, “Миний захиалгууд”-д хадгалагдана.</p>
+                  <PurchaseButton action={purchasePattern} itemId={pattern.id} price={pattern.price} label="Төлөөд авах" className="mt-4 w-full" pending={paymentPending} />
                 </>
               )}
             </div>

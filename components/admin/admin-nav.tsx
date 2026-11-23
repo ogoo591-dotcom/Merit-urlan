@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, BookOpen, GraduationCap, LayoutDashboard, Package, ShoppingBag } from "lucide-react";
+import { Banknote, Bell, BookOpen, GraduationCap, LayoutDashboard, Package, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/admin", label: "Хянах самбар", icon: LayoutDashboard },
+  { href: "/admin/payments", label: "Төлбөр", icon: Banknote },
   { href: "/admin/orders", label: "Захиалгууд", icon: ShoppingBag },
   { href: "/admin/products", label: "Бүтээгдэхүүн / Материал", icon: Package },
   { href: "/admin/courses", label: "Сургалт", icon: GraduationCap },
@@ -13,7 +14,7 @@ const links = [
   { href: "/admin/notifications", label: "Мэдэгдэл", icon: Bell },
 ];
 
-export function AdminNav({ compact = false, unread = 0 }: { compact?: boolean; unread?: number }) {
+export function AdminNav({ compact = false, unread = 0, pendingPayments = 0 }: { compact?: boolean; unread?: number; pendingPayments?: number }) {
   const pathname = usePathname();
 
   return (
@@ -33,6 +34,9 @@ export function AdminNav({ compact = false, unread = 0 }: { compact?: boolean; u
             <span className="flex-1">{label}</span>
             {href === "/admin/notifications" && unread > 0 ? (
               <span className="rounded-full bg-[#a24456] px-1.5 py-0.5 text-[10px] font-semibold text-white">{unread}</span>
+            ) : null}
+            {href === "/admin/payments" && pendingPayments > 0 ? (
+              <span className="rounded-full bg-[#d97706] px-1.5 py-0.5 text-[10px] font-semibold text-white">{pendingPayments}</span>
             ) : null}
           </Link>
         );

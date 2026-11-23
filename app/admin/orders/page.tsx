@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 import { getAllOrders } from "@/lib/data/orders";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { orderStatusLabel, orderStatuses, orderStatusTone, type OrderStatus } from "@/lib/orders";
+import { paymentStatusTone } from "@/lib/payments";
 
 export default async function AdminOrdersPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   await requireAdmin();
@@ -61,7 +62,13 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams: 
                 </td>
                 <td className="px-5 py-3 text-[#7a6b63]">{order.items.reduce((sum, line) => sum + line.quantity, 0)} ширхэг</td>
                 <td className="px-5 py-3">
-                  <StatusPill className={orderStatusTone[order.status]}>{orderStatusLabel(order.status)}</StatusPill>
+                  {order.payment.status === "pending" || order.payment.status === "rejected" ? (
+                    <StatusPill className={paymentStatusTone[order.payment.status === "pending" ? "pending" : "rejected"]}>
+                      Төлбөр: {order.payment.status === "pending" ? "шалгах" : "татгалзсан"}
+                    </StatusPill>
+                  ) : (
+                    <StatusPill className={orderStatusTone[order.status]}>{orderStatusLabel(order.status)}</StatusPill>
+                  )}
                 </td>
                 <td className="px-5 py-3 text-right font-semibold">{formatPrice(order.total)}</td>
               </tr>

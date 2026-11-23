@@ -3,12 +3,11 @@
 import { UserButton, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Heart, Library, Menu, ShieldCheck, ShoppingBag, ShoppingCart, User } from "lucide-react";
+import { Bell, Heart, Menu, ShieldCheck, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
-import { AddressButton } from "@/components/address-button";
 import { AllMenuDrawer } from "@/components/all-menu-drawer";
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
 import { CartPopover } from "@/components/cart/cart-popover";
@@ -310,10 +309,6 @@ export function SiteHeader() {
           </div>
 
           <div className="flex items-center justify-end gap-2 sm:gap-4">
-            <div className="hidden xl:block">
-              <AddressButton />
-            </div>
-
             {isSignedIn ? (
               <div className={headerActionClass}>
                 <UserButton>
@@ -343,11 +338,6 @@ export function SiteHeader() {
               <Heart aria-hidden className="h-6 w-6" strokeWidth={1.7} />
               {savedCount > 0 ? <CountBadge count={savedCount} /> : null}
               <ActionLabel>Хадгалсан</ActionLabel>
-            </Link>
-
-            <Link href="/library" className={`${headerActionClass} max-md:hidden`}>
-              <Library aria-hidden className="h-6 w-6" strokeWidth={1.7} />
-              <ActionLabel>Миний сан</ActionLabel>
             </Link>
 
             <div className="relative">

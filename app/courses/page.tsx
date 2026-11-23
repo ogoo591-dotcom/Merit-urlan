@@ -19,10 +19,11 @@ const sortOptions = [
 ];
 
 export default async function CoursesPage({ searchParams }: { searchParams: Promise<CatalogSearchParams> }) {
-  const state = parseListingParams(await searchParams, "topic", sortOptions);
+  // Ангилал нь сургалтын багц бүр (Хүүхдийн, Шинэ жилийн, Ороолт малгайны), түвшингээр шүүхгүй.
+  const state = { ...parseListingParams(await searchParams, "package", sortOptions), level: [] };
   const { userId } = await auth();
   const [catalog, purchased] = await Promise.all([
-    getCourseCatalog({ category: state.category, levels: state.level, query: state.q, sort: state.sort, minPrice: state.min, maxPrice: state.max }),
+    getCourseCatalog({ category: state.category, query: state.q, sort: state.sort, minPrice: state.min, maxPrice: state.max }),
     getPurchasedCourseIds(userId),
   ]);
 
@@ -33,9 +34,9 @@ export default async function CoursesPage({ searchParams }: { searchParams: Prom
         <ListingView
           base="/courses"
           title="Сургалт"
-          description="Видео хичээлээр алхам алхмаар сураарай. Сургалт бүрийн 1-р хичээлийг үнэгүй үзэж болно."
+          description="Хүүхдийн, Шинэ жилийн, Ороолт малгайны гэсэн 3 сургалтын багц. Багц бүрийн 1-р хичээлийг үнэгүй үзэж болно."
           unit="сургалт"
-          categoryParam="topic"
+          categoryParam="package"
           state={state}
           catalog={catalog}
           sortOptions={sortOptions}

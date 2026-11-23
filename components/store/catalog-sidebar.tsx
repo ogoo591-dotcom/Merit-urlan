@@ -104,58 +104,63 @@ export function CatalogSidebar({
         className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#eadfd5] bg-white px-4 py-2.5 text-[12px] font-semibold text-[#2f2420] lg:hidden"
       >
         <SlidersHorizontal aria-hidden className="h-4 w-4" />
-        Ангилал, шүүлтүүр
+        {categories.length ? "Ангилал, шүүлтүүр" : "Шүүлтүүр"}
         {activeCount ? (
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#a24456] px-1.5 text-[10px] text-white">{activeCount}</span>
         ) : null}
       </button>
 
       <div id="catalog-panel" className={`mt-3 rounded-[22px] border border-[#eadfd5] bg-white p-4 lg:mt-4 lg:block lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 ${mobileOpen ? "block" : "hidden"}`}>
-        <p className={`${sectionTitle} px-3`}>Ангиллууд</p>
-        <nav aria-label="Ангилал" className="mt-2">
-          <ul className="space-y-0.5">
-            <li>
-              <Link href={allLink.href} onClick={closeMobile} aria-current={allLink.active ? "page" : undefined} className={categoryClass(allLink.active)}>
-                <span className="flex-1">{allLink.label}</span>
-                <span className="text-[11px] font-normal opacity-70">{allLink.count}</span>
-              </Link>
-            </li>
-            {categories.map((category) => {
-              const hasSubs = category.subcategories.length > 1;
-              const expanded = category.active || category.subcategories.some((sub) => sub.active);
-              return (
-                <li key={category.label}>
-                  <Link href={category.href} onClick={hasSubs ? undefined : closeMobile} aria-current={category.active ? "page" : undefined} className={categoryClass(category.active)}>
-                    <span className="flex-1">{category.label}</span>
-                    <span className="text-[11px] font-normal opacity-70">{category.count}</span>
-                    {hasSubs ? <ChevronRight aria-hidden className={`h-3.5 w-3.5 transition ${expanded ? "rotate-90" : ""}`} /> : null}
+        {/* Ангилалгүй жагсаалтад (сургалт, схем) ангиллын хэсэг харагдахгүй. */}
+        {categories.length ? (
+          <>
+            <p className={`${sectionTitle} px-3`}>Ангиллууд</p>
+            <nav aria-label="Ангилал" className="mt-2">
+              <ul className="space-y-0.5">
+                <li>
+                  <Link href={allLink.href} onClick={closeMobile} aria-current={allLink.active ? "page" : undefined} className={categoryClass(allLink.active)}>
+                    <span className="flex-1">{allLink.label}</span>
+                    <span className="text-[11px] font-normal opacity-70">{allLink.count}</span>
                   </Link>
-                  {hasSubs && expanded ? (
-                    <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-[#f1ebe5] pl-2">
-                      {category.subcategories.map((sub) => (
-                        <li key={sub.label}>
-                          <Link
-                            href={sub.href}
-                            onClick={closeMobile}
-                            aria-current={sub.active ? "page" : undefined}
-                            className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] transition ${
-                              sub.active ? "font-semibold text-[#a24456]" : "text-[#7a6b63] hover:bg-[#faf6f3] hover:text-[#a24456]"
-                            }`}
-                          >
-                            <span className="flex-1">{sub.label}</span>
-                            <span className="font-normal opacity-70">{sub.count}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
                 </li>
-              );
-            })}
-          </ul>
-        </nav>
+                {categories.map((category) => {
+                  const hasSubs = category.subcategories.length > 1;
+                  const expanded = category.active || category.subcategories.some((sub) => sub.active);
+                  return (
+                    <li key={category.label}>
+                      <Link href={category.href} onClick={hasSubs ? undefined : closeMobile} aria-current={category.active ? "page" : undefined} className={categoryClass(category.active)}>
+                        <span className="flex-1">{category.label}</span>
+                        <span className="text-[11px] font-normal opacity-70">{category.count}</span>
+                        {hasSubs ? <ChevronRight aria-hidden className={`h-3.5 w-3.5 transition ${expanded ? "rotate-90" : ""}`} /> : null}
+                      </Link>
+                      {hasSubs && expanded ? (
+                        <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-[#f1ebe5] pl-2">
+                          {category.subcategories.map((sub) => (
+                            <li key={sub.label}>
+                              <Link
+                                href={sub.href}
+                                onClick={closeMobile}
+                                aria-current={sub.active ? "page" : undefined}
+                                className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[11px] transition ${
+                                  sub.active ? "font-semibold text-[#a24456]" : "text-[#7a6b63] hover:bg-[#faf6f3] hover:text-[#a24456]"
+                                }`}
+                              >
+                                <span className="flex-1">{sub.label}</span>
+                                <span className="font-normal opacity-70">{sub.count}</span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </>
+        ) : null}
 
-        <div className="mt-4 border-t border-[#f1ebe5] px-3 pt-2">
+        <div className={`px-3 ${categories.length ? "mt-4 border-t border-[#f1ebe5] pt-2" : ""}`}>
           <Group title={`Эрэмблэх${activeSort ? `: ${activeSort.label}` : ""}`} icon={<ArrowDownUp aria-hidden className="h-4 w-4" />}>
             <ul className="space-y-0.5">
               {sortLinks.map((link) => (

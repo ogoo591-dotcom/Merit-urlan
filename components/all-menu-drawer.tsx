@@ -1,14 +1,17 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { ChevronLeft, ChevronRight, LogIn, User, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Gift, Loader2, LogIn, PlayCircle, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
+import { getDrawerCourses, type DrawerCourse } from "@/app/actions";
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
-import { navSections, utilityLinks } from "@/lib/navigation";
+import { MessengerConfirmDialog } from "@/components/messenger-confirm-dialog";
+import { formatPrice } from "@/lib/format";
+import { navSections, utilityLinks, type NavCard } from "@/lib/navigation";
 
 const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -22,6 +25,21 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
   const sectionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const panelRef = useRef<HTMLDivElement>(null);
   const active = navSections.find((section) => section.id === activeId) ?? null;
+  const [messengerOpen, setMessengerOpen] = useState(false);
+  // Сургалтын жагсаалт: "Сургалт" хэсэг анх нээгдэхэд сервероос нэг удаа уншина. null = уншиж байна.
+  const [courses, setCourses] = useState<DrawerCourse[] | "error" | null>(null);
+  const needsCourses = active?.layout === "courses";
+
+  useEffect(() => {
+    if (!needsCourses || courses !== null) return;
+    let cancelled = false;
+    getDrawerCourses()
+      .then((items) => !cancelled && setCourses(items))
+      .catch(() => !cancelled && setCourses("error"));
+    return () => {
+      cancelled = true;
+    };
+  }, [needsCourses, courses]);
 
   // Нээгдэхэд эхний хэсэгт focus өгч, хаагдахад өмнөх элемент рүү (☰ товч) буцаана. Арын хуудсыг гүйлгэхгүй.
   useEffect(() => {
@@ -56,8 +74,10 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
     }
 
     // Focus drawer-ээс гарахгүй (Tab / Shift+Tab эргэлдэнэ).
-    if (event.key === "Tab" && dialogRef.current) {
-      const nodes = [...dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector)].filter(
+    // Messenger цонх нээлттэй бол focus зөвхөн тэр цонхонд эргэлдэнэ.
+    const trapRoot = dialogRef.current?.querySelector<HTMLElement>('[role="alertdialog"]') ?? dialogRef.current;
+    if (event.key === "Tab" && trapRoot) {
+      const nodes = [...trapRoot.querySelectorAll<HTMLElement>(focusableSelector)].filter(
         (node) => node.offsetParent !== null,
       );
       const first = nodes[0];
@@ -71,6 +91,8 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
       }
       return;
     }
+
+    if (messengerOpen) return;
 
     // Хэсгүүдийн дунд ↑/↓, самбар руу →, буцах ←.
     const sectionIndex = sectionRefs.current.findIndex((node) => node === document.activeElement);
@@ -216,23 +238,15 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
               </div>
             </div>
 
-            <ul className="grid grid-cols-2 gap-3 p-6">
-              {active.links.map(({ label, href, icon: Icon, external }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    onClick={onClose}
-                    {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-                    className="group flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border border-[#efe4da] bg-white p-4 text-center transition hover:-translate-y-0.5 hover:border-[#a24456] hover:shadow-[0_16px_30px_-22px_rgba(162,68,86,0.6)] focus-visible:border-[#a24456]"
-                  >
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f7e9ec] text-[#a24456] transition group-hover:bg-[#a24456] group-hover:text-white">
-                      <Icon aria-hidden className="h-6 w-6" strokeWidth={1.6} />
-                    </span>
-                    <span className="text-[12px] font-medium leading-snug text-[#2f2420]">{label}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {active.layout === "courses" ? (
+              <CourseList courses={courses} onNavigate={onClose} />
+            ) : (
+              <ul className="grid grid-cols-2 gap-3 p-6">
+                {active.cards.map((card) => (
+                  <NavCardItem key={card.label} card={card} onNavigate={onClose} onMessenger={() => setMessengerOpen(true)} />
+                ))}
+              </ul>
+            )}
           </div>
         ) : null}
 
@@ -246,6 +260,129 @@ export function AllMenuDrawer({ onClose }: { onClose: () => void }) {
           <X aria-hidden className="h-5 w-5" />
         </button>
       </div>
+
+      {messengerOpen ? <MessengerConfirmDialog onClose={() => setMessengerOpen(false)} /> : null}
     </div>
+  );
+}
+
+const cardClass =
+  "group flex h-full w-full flex-col items-center rounded-2xl border border-[#efe4da] bg-white p-4 text-center transition hover:-translate-y-0.5 hover:border-[#a24456] hover:shadow-[0_16px_30px_-22px_rgba(162,68,86,0.6)] focus-within:border-[#a24456]";
+
+// w-full + h-full: дэд жагсаалтгүй карт хамгийн багадаа дөрвөлжин, хажуугийн карт өндөр бол түүнтэй ижил өндөр болно
+// (зөвхөн aspect-square + h-full бол өндрөөсөө өргөн тооцогдож баганаасаа халидаг).
+// Drawer-ийн карт: дүрс + гарчиг (гарчиг дээр дарахад бүх бараа), доор нь жижиг текстэн дэд жагсаалт (зөвхөн тэр дэд ангилал).
+function NavCardItem({ card, onNavigate, onMessenger }: { card: NavCard; onNavigate: () => void; onMessenger: () => void }) {
+  const Icon = card.icon;
+  const groups = card.groups?.filter((group) => group.links.length) ?? [];
+
+  const head = (
+    <>
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f7e9ec] text-[#a24456] transition group-hover:bg-[#a24456] group-hover:text-white">
+        <Icon aria-hidden className="h-6 w-6" strokeWidth={1.6} />
+      </span>
+      <span className="text-[12px] font-medium leading-snug text-[#2f2420] group-hover/title:text-[#a24456]">{card.label}</span>
+    </>
+  );
+  const headClass = "group/title flex flex-col items-center gap-3 rounded-xl outline-none";
+
+  return (
+    <li>
+      <div className={`${cardClass} ${groups.length ? "justify-start gap-3" : "aspect-square justify-center"}`}>
+        {card.action === "messenger" ? (
+          <button type="button" onClick={onMessenger} className={headClass}>
+            {head}
+          </button>
+        ) : (
+          <Link href={card.href ?? "#"} onClick={onNavigate} className={headClass}>
+            {head}
+          </Link>
+        )}
+
+        {groups.length ? (
+          <div className="w-full space-y-2 border-t border-[#f5eee8] pt-3">
+            {groups.map((group) => (
+              <div key={group.title ?? "default"}>
+                {group.title ? (
+                  <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#b3a69e]">{group.title}</p>
+                ) : null}
+                <ul className="flex flex-col items-center gap-0.5">
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        onClick={onNavigate}
+                        className="inline-block rounded-md px-1.5 py-1 text-[11px] text-[#7a6b63] transition hover:bg-[#f7e9ec] hover:text-[#a24456]"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            {card.more ? (
+              <Link
+                href={card.more.href}
+                onClick={onNavigate}
+                aria-label={`${card.label} — бусад ${card.more.label.replace("+", "")} ангилал`}
+                className="inline-block rounded-md px-1.5 py-1 text-[11px] font-semibold text-[#a24456] transition hover:bg-[#f7e9ec]"
+              >
+                {card.more.label}
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </li>
+  );
+}
+
+// "Сургалт" хэсэг: ангилалгүй, бүх сургалт доошоо цуварсан жагсаалт.
+function CourseList({ courses, onNavigate }: { courses: DrawerCourse[] | "error" | null; onNavigate: () => void }) {
+  if (courses === null) {
+    return (
+      <p className="flex items-center justify-center gap-2 p-10 text-[12px] text-[#7a6b63]">
+        <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> Уншиж байна…
+      </p>
+    );
+  }
+  if (courses === "error" || !courses.length) {
+    return (
+      <p className="p-10 text-center text-[12px] text-[#7a6b63]">
+        {courses === "error" ? "Сургалтыг уншиж чадсангүй. Дахин оролдоно уу." : "Одоогоор сургалт алга."}
+      </p>
+    );
+  }
+  return (
+    <ul className="space-y-3 p-6">
+      {courses.map((course) => (
+        <li key={course.id}>
+          <Link
+            href={`/courses/${course.id}`}
+            onClick={onNavigate}
+            className="group flex items-center gap-4 rounded-2xl border border-[#efe4da] bg-white p-3 transition hover:-translate-y-0.5 hover:border-[#a24456] hover:shadow-[0_16px_30px_-22px_rgba(162,68,86,0.6)] focus-visible:border-[#a24456]"
+          >
+            <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f7e9ec]">
+              <Image src={course.cover} alt="" fill sizes="64px" className="object-cover" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[13px] font-semibold text-[#2f2420] group-hover:text-[#a24456]">{course.title}</span>
+              <span className="mt-1 flex items-center gap-1.5 text-[11px] text-[#7a6b63]">
+                <PlayCircle aria-hidden className="h-3.5 w-3.5" /> {course.lessonCount} хичээл
+                <span aria-hidden>·</span>
+                <b className="font-semibold text-[#a24456]">{formatPrice(course.price)}</b>
+              </span>
+              {course.freeLessonCount ? (
+                <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#e7f4ea] px-2 py-0.5 text-[10px] font-semibold text-[#1f7a3d]">
+                  <Gift aria-hidden className="h-3 w-3" /> 1-р хичээл үнэгүй
+                </span>
+              ) : null}
+            </span>
+            <ChevronRight aria-hidden className="h-4 w-4 shrink-0 text-[#b3a69e]" />
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -29,7 +29,7 @@ export function CourseCard({ course, purchased }: { course: CourseSummary; purch
         ) : null}
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-[10px] uppercase tracking-[0.12em] text-[#9c8c84]">{course.levelLabel}</p>
+        <p className="text-[10px] uppercase tracking-[0.12em] text-[#9c8c84]">Сургалтын багц</p>
         <h3 className="mt-1.5 text-[15px] font-semibold text-[#2f2420]">{course.title}</h3>
         <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#7a6b63]">{course.description}</p>
         <div className="mt-auto flex items-center justify-between pt-5">
