@@ -1,15 +1,9 @@
 import "server-only";
 
-import { formatPrice } from "@/lib/format";
-import { readDb, updateDb } from "@/server/mock/db";
-import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/server/mock/products";
+import { readDb } from "@/server/mock/db";
+import { productColors, type Availability, type Catalog, type CatalogFilters, type ColorKey, type ProductSort, type ProductType, type StoreProduct } from "@/types/catalog";
 
-// Бараа, материал. Одоогоор mock сан (.mock-db), дараа нь зөвхөн эдгээр функцын дотор талыг Supabase руу солино.
-
-export type { Availability, ColorKey, Origin, ProductType, StoreProduct } from "@/server/mock/products";
-export { formatPrice };
-
-export type ProductSort = "default" | "price_asc" | "price_desc" | "name";
+// Бараа, материал унших. Одоогоор mock сан (.mock-db), DB-д шилжихэд зөвхөн функцын дотор талыг солино.
 
 function matches(item: StoreProduct, query: string) {
   const text = `${item.name} ${item.category} ${item.subcategory ?? ""} ${item.brand ?? ""} ${item.description}`.toLowerCase();
@@ -44,34 +38,6 @@ function sortItems(items: StoreProduct[], sort: ProductSort) {
   // "Санал болгох": дууссан бараа хамгийн сүүлд.
   return items.sort((a, b) => Number(a.stock < 1) - Number(b.stock < 1));
 }
-
-export type CatalogFilters = {
-  type: ProductType;
-  category?: string;
-  subcategory?: string;
-  brands?: string[];
-  colors?: ColorKey[];
-  origins?: Origin[];
-  availability?: Availability[];
-  minPrice?: number;
-  maxPrice?: number;
-  query?: string;
-  sort?: ProductSort;
-  page?: number;
-  perPage?: number;
-};
-
-export type FacetOption = { value: string; label: string; count: number; swatch?: string };
-
-export type Catalog = {
-  items: StoreProduct[];
-  total: number;
-  page: number;
-  pageCount: number;
-  perPage: number;
-  categories: Array<FacetOption & { subcategories: FacetOption[] }>;
-  facets: { brands: FacetOption[]; colors: FacetOption[]; origins: FacetOption[]; availability: FacetOption[] };
-};
 
 const availabilityLabels: Record<Availability, string> = { ready: "Бэлэн", made_to_order: "Захиалгаар" };
 
@@ -137,34 +103,4 @@ export async function searchProducts(query: string, limit = 5): Promise<StorePro
 
 export async function getProduct(id: string): Promise<StoreProduct | null> {
   return (await readDb()).products.find((item) => item.id === id) ?? null;
-}
-
-// ---- Админ ----
-
-export async function saveProduct(product: StoreProduct, originalId?: string) {
-  await updateDb((db) => {
-    const index = db.products.findIndex((item) => item.id === (originalId ?? product.id));
-    if (originalId && product.id !== originalId && db.products.some((item) => item.id === product.id)) {
-      throw new Error("Энэ ID-тай бараа аль хэдийн байна.");
-    }
-    if (index === -1) {
-      if (db.products.some((item) => item.id === product.id)) throw new Error("Энэ ID-тай бараа аль хэдийн байна.");
-      db.products.unshift(product);
-    } else {
-      db.products[index] = product;
-    }
-  });
-}
-
-export async function deleteProduct(id: string) {
-  await updateDb((db) => {
-    db.products = db.products.filter((item) => item.id !== id);
-  });
-}
-
-export async function setProductStock(id: string, stock: number) {
-  await updateDb((db) => {
-    const item = db.products.find((entry) => entry.id === id);
-    if (item) item.stock = Math.max(0, Math.floor(stock));
-  });
 }

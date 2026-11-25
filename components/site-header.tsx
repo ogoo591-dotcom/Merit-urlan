@@ -14,9 +14,10 @@ import { CartPopover } from "@/components/cart/cart-popover";
 import { useCart } from "@/components/cart-provider";
 import { useSaved } from "@/components/saved-provider";
 import { storeMeta } from "@/components/store/store-paths";
-import { getViewerStatus, searchCatalog } from "@/app/actions";
+import { getViewerStatus } from "@/app/actions";
+import { searchCatalog } from "@/server/modules/catalog/actions";
 import { formatPrice } from "@/lib/format";
-import type { StoreProduct } from "@/server/mock/products";
+import type { StoreProduct } from "@/types/catalog";
 import { navSections } from "@/lib/navigation";
 
 function SearchIcon({ className = "h-6 w-6" }: { className?: string }) {

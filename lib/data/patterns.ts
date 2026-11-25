@@ -1,7 +1,7 @@
 import "server-only";
 
 import { buildListing, type ListingFilters } from "@/server/listing";
-import { getProduct } from "@/lib/data/products";
+import { getProduct } from "@/server/modules/catalog/queries";
 import { readDb, updateDb, type DbPattern } from "@/server/mock/db";
 import type { PatternLevel, PatternType } from "@/server/mock/patterns";
 

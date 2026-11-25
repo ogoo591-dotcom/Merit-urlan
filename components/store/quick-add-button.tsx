@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { useCart } from "@/components/cart-provider";
 import { formatPrice } from "@/lib/format";
-import type { StoreProduct } from "@/server/mock/products";
+import type { StoreProduct } from "@/types/catalog";
 
 // Картан дээрээс 1 ширхэгийг шууд сагсанд нэмнэ. Сагсанд байгаа тоо үлдэгдлээс хэтрэхгүй.
 export function QuickAddButton({ product, className = "" }: { product: StoreProduct; className?: string }) {

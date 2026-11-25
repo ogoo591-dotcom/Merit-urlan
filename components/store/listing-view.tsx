@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { ActiveFilters } from "@/components/store/active-filters";
 import { list, price, single, type CatalogSearchParams } from "@/components/store/catalog-params";
 import { CatalogSidebar } from "@/components/store/catalog-sidebar";
-import type { FacetOption } from "@/lib/data/products";
+import type { FacetOption } from "@/types/catalog";
 import { formatPrice } from "@/lib/format";
 
 export type ListingState = { category?: string; q?: string; sort: string; level: string[]; min?: number; max?: number };

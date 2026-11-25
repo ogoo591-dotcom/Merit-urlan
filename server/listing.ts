@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { FacetOption } from "@/lib/data/products";
+import type { FacetOption } from "@/types/catalog";
 
 // Сургалт, схемийн жагсаалтын дундын шүүлт. Бараа, материал нь getCatalog() (lib/data/products.ts)-ийг ашиглана.
 

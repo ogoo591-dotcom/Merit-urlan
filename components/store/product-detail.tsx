@@ -11,7 +11,7 @@ import { SaveButton } from "@/components/save-button";
 import { AvailabilityBadge } from "@/components/store/availability-badge";
 import { storeMeta } from "@/components/store/store-paths";
 import { formatPrice } from "@/lib/format";
-import { productColors, type StoreProduct } from "@/server/mock/products";
+import { productColors, type StoreProduct } from "@/types/catalog";
 
 export function ProductDetailView({ product }: { product: StoreProduct }) {
   const meta = storeMeta[product.type];

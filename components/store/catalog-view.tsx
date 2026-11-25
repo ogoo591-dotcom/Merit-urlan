@@ -6,10 +6,10 @@ import { list, price, single, type CatalogSearchParams } from "@/components/stor
 import { CatalogSidebar } from "@/components/store/catalog-sidebar";
 import { ProductCard } from "@/components/store/product-card";
 import { storeMeta } from "@/components/store/store-paths";
-import { getCatalog, type ColorKey, type ProductSort, type ProductType } from "@/lib/data/products";
+import { getCatalog } from "@/server/modules/catalog/queries";
+import { productColors, type Availability, type ColorKey, type Origin, type ProductSort, type ProductType } from "@/types/catalog";
 import { formatPrice } from "@/lib/format";
 import { categoryOrder, categorySlug, resolveCatalogParams, subOrder, subSlug } from "@/lib/navigation";
-import { productColors, type Availability, type Origin } from "@/server/mock/products";
 
 export const sortOptions: Array<{ value: ProductSort; label: string }> = [
   { value: "default", label: "Санал болгох" },

@@ -1,50 +1,9 @@
 // Бүтээгдэхүүн, материалын mock өгөгдөл. Үнэ, үлдэгдэл түр утга — жинхэнэ тоогоор солино.
 // id нь хуучин /shop/... хаягийн slug-тай ижил тул хуучин холбоосууд шинэ хуудас руу зөв шилжинэ.
 
-export type ProductType = "product" | "material";
-export type Availability = "ready" | "made_to_order";
-export type Origin = "Хятад" | "Турк";
+import "server-only";
 
-// Шүүлтүүрийн өнгө. Бараанд түлхүүрийг нь хадгална (colors: ["red", "white"]).
-export const productColors = {
-  red: { label: "Улаан", hex: "#D9473F" },
-  pink: { label: "Ягаан", hex: "#EE9AB4" },
-  orange: { label: "Улбар шар", hex: "#F08A3E" },
-  yellow: { label: "Шар", hex: "#F3CF4A" },
-  green: { label: "Ногоон", hex: "#5DAA66" },
-  blue: { label: "Цэнхэр", hex: "#6BB4E3" },
-  purple: { label: "Нил ягаан", hex: "#A78BD0" },
-  brown: { label: "Бор", hex: "#9A6644" },
-  beige: { label: "Шаргал", hex: "#E7D3B6" },
-  white: { label: "Цагаан", hex: "#FFFFFF" },
-  gray: { label: "Саарал", hex: "#A3A3A6" },
-  black: { label: "Хар", hex: "#2F2A2B" },
-  multi: { label: "Алаг", hex: "conic-gradient(#D9473F, #F3CF4A, #5DAA66, #6BB4E3, #A78BD0, #D9473F)" },
-} as const;
-export type ColorKey = keyof typeof productColors;
-
-// Материалын 2 үндсэн ангилал.
-export const materialCategories = ["Нэхмэлийн утас", "Туслах материал"] as const;
-
-export type StoreProduct = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  images: string[];
-  category: string;
-  type: ProductType;
-  stock: number;
-  availability: Availability;
-  // Захиалгаар хийх бол хэдэн хоногт бэлэн болох.
-  leadDays?: number;
-  // Ангилал доторх дэд ангилал (жишээ нь "Даавуун утас", "Дэгээ зүү").
-  subcategory?: string;
-  brand?: string;
-  colors?: ColorKey[];
-  // Зөвхөн материалд.
-  origin?: Origin;
-};
+import { materialCategories, type StoreProduct } from "@/types/catalog";
 
 // ---- Материал: туслах функцууд (mock өгөгдлийг товч бичихэд) ----
 

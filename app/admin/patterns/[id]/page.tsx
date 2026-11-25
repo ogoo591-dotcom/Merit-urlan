@@ -7,7 +7,7 @@ import { PatternForm } from "@/components/admin/pattern-form";
 import { PageHeader } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
 import { getPatternForAdmin } from "@/lib/data/patterns";
-import { getProducts } from "@/lib/data/products";
+import { getProducts } from "@/server/modules/catalog/queries";
 
 export default async function EditPatternPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

@@ -6,7 +6,8 @@ import path from "node:path";
 import galleryImages from "@/lib/content/gallery-images.json";
 import { mockCourses, type MockCourse } from "@/server/mock/courses";
 import { mockPatterns, type MockPattern } from "@/server/mock/patterns";
-import { mockCatalogVersion, mockProducts, type StoreProduct } from "@/server/mock/products";
+import { mockCatalogVersion, mockProducts } from "@/server/mock/products";
+import type { StoreProduct } from "@/types/catalog";
 import type { Order } from "@/lib/orders";
 
 // Сервер талын mock өгөгдлийн сан: .mock-db/db.json файл. Админ, захиалагч бүгд нэг өгөгдлийг харна.

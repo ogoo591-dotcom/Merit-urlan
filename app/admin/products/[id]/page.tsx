@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { deleteProductAction } from "@/app/admin/products/actions";
+import { deleteProductAction } from "@/server/modules/catalog/admin-actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ProductForm } from "@/components/admin/product-form";
 import { PageHeader } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
-import { getProduct, getProducts } from "@/lib/data/products";
+import { getProduct, getProducts } from "@/server/modules/catalog/queries";
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

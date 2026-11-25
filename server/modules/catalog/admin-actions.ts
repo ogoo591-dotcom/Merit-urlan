@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/server/auth";
-import { deleteProduct, getProduct, saveProduct, setProductStock } from "@/lib/data/products";
+import { deleteProduct, saveProduct, setProductStock } from "@/server/modules/catalog/service";
+import { getProduct } from "@/server/modules/catalog/queries";
 import { saveImageUpload } from "@/server/storage/images";
-import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/server/mock/products";
+import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/types/catalog";
 
 export type FormState = { error?: string };
 

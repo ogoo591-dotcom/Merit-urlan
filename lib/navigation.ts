@@ -21,7 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { ProductType } from "@/server/mock/products";
+import type { ProductType } from "@/types/catalog";
 
 // ---- Ангиллын бүтэц ----
 

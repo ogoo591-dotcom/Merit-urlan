@@ -5,7 +5,6 @@ import { auth } from "@clerk/nextjs/server";
 import { getCourse, getCourses } from "@/lib/data/courses";
 import { countUnread, markRead } from "@/lib/data/notifications";
 import { createOrder, validateCart } from "@/lib/data/orders";
-import { searchProducts } from "@/lib/data/products";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
 import { hasAccess } from "@/lib/data/purchases";
 import { notifyAdmin } from "@/lib/notify";
@@ -49,10 +48,6 @@ export async function sendFeedback(_state: FeedbackState, formData: FormData): P
     return { error: "Илгээж чадсангүй. Дахин оролдох эсвэл Messenger-ээр бичнэ үү.", values };
   }
   return { sent: true };
-}
-
-export async function searchCatalog(query: string) {
-  return searchProducts(String(query));
 }
 
 export type DrawerCourse = { id: string; title: string; cover: string; price: number; lessonCount: number; freeLessonCount: number };

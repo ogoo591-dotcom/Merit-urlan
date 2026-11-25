@@ -5,7 +5,7 @@ import Form from "next/form";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 
-import type { FacetOption } from "@/lib/data/products";
+import type { FacetOption } from "@/types/catalog";
 
 export type CategoryLink = { label: string; count: number; href: string; active: boolean };
 

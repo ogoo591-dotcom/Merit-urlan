@@ -6,7 +6,7 @@ import { AvailabilityBadge } from "@/components/store/availability-badge";
 import { QuickAddButton } from "@/components/store/quick-add-button";
 import { storeMeta } from "@/components/store/store-paths";
 import { formatPrice } from "@/lib/format";
-import { productColors, type StoreProduct } from "@/server/mock/products";
+import { productColors, type StoreProduct } from "@/types/catalog";
 
 export function ProductCard({ product }: { product: StoreProduct }) {
   const base = storeMeta[product.type].base;
