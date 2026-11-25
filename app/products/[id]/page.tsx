@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { ProductDetailView } from "@/components/store/product-detail";
-import { getProduct } from "@/lib/data/products";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { ProductDetailView } from "@/features/catalog/components/product-detail";
+import { getProduct } from "@/server/modules/catalog/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

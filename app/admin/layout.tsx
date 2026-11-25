@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { AdminNav } from "@/components/admin/admin-nav";
-import { getAdminUser } from "@/lib/auth";
-import { countUnread } from "@/lib/data/notifications";
-import { countPendingPayments } from "@/lib/data/payments";
+import { AdminNav } from "@/features/admin/components/admin-nav";
+import { getAdminUser } from "@/server/auth";
+import { countUnread } from "@/server/modules/notifications/queries";
+import { countPendingPayments } from "@/server/modules/payments/queries";
 
 export const metadata: Metadata = { title: "Админ | Merit Urlan" };
 

@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-import { approvePaymentAction, rejectPaymentAction } from "@/app/admin/payments/actions";
-import { ConfirmButton } from "@/components/admin/confirm-button";
-import { PageHeader, StatusPill } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
-import { getPayments } from "@/lib/data/payments";
+import { approvePaymentAction, rejectPaymentAction } from "@/server/modules/payments/admin-actions";
+import { ConfirmButton } from "@/components/ui/confirm-button";
+import { PageHeader, StatusPill } from "@/features/admin/components/ui";
+import { requireAdmin } from "@/server/auth";
+import { getPayments } from "@/server/modules/payments/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
-import { paymentStatusLabel, paymentStatusTone, type PaymentStatus } from "@/lib/payments";
+import { paymentStatusLabel, paymentStatusTone, type PaymentStatus } from "@/types/payments";
 import { BANK } from "@/lib/site-config";
 
 const filters: Array<{ key?: PaymentStatus; label: string }> = [

@@ -1,13 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 
-import { PatternCard } from "@/components/patterns/pattern-card";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import type { CatalogSearchParams } from "@/components/store/catalog-params";
-import { ListingView, parseListingParams } from "@/components/store/listing-view";
-import { getPatternCatalog } from "@/lib/data/patterns";
-import { getPurchasedPatternIds } from "@/lib/data/purchases";
+import { PatternCard } from "@/features/patterns/components/pattern-card";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import type { CatalogSearchParams } from "@/features/catalog/catalog-params";
+import { ListingView, parseListingParams } from "@/features/catalog/components/listing-view";
+import { getPatternCatalog } from "@/server/modules/patterns/queries";
+import { getPurchasedPatternIds } from "@/server/modules/purchases/queries";
 
 export const metadata: Metadata = { title: "Схем заавар | Merit Urlan" };
 

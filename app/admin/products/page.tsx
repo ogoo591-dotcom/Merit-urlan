@@ -2,11 +2,12 @@ import { Pencil, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { updateStockAction } from "@/app/admin/products/actions";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { Notice, PageHeader, StatusPill, primaryButton } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
-import { getProducts, type ProductType } from "@/lib/data/products";
+import { updateStockAction } from "@/server/modules/catalog/admin-actions";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { Notice, PageHeader, StatusPill, primaryButton } from "@/features/admin/components/ui";
+import { requireAdmin } from "@/server/auth";
+import { getProducts } from "@/server/modules/catalog/queries";
+import type { ProductType } from "@/types/catalog";
 import { formatPrice } from "@/lib/format";
 
 export default async function AdminProductsPage({

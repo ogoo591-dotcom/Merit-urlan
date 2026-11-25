@@ -1,8 +1,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 
-import { CheckoutForm } from "@/components/checkout-form";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { CheckoutForm } from "@/features/checkout/components/checkout-form";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 
 export default async function CheckoutPage() {
   const user = await currentUser();

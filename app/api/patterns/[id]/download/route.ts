@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 
-import { readPatternFile } from "@/lib/data/pattern-files";
-import { getPattern } from "@/lib/data/patterns";
-import { hasPatternAccess } from "@/lib/data/purchases";
+import { readPatternFile } from "@/server/storage/pattern-files";
+import { getPattern } from "@/server/modules/patterns/queries";
+import { hasPatternAccess } from "@/server/modules/purchases/queries";
 
 // private/ хавтаснаас файл уншдаг тул Node.js runtime (edge биш).
 export const runtime = "nodejs";

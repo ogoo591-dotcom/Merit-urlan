@@ -1,13 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 
-import { CourseCard } from "@/components/courses/course-card";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import type { CatalogSearchParams } from "@/components/store/catalog-params";
-import { ListingView, parseListingParams } from "@/components/store/listing-view";
-import { getCourseCatalog } from "@/lib/data/courses";
-import { getPurchasedCourseIds } from "@/lib/data/purchases";
+import { CourseCard } from "@/features/courses/components/course-card";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import type { CatalogSearchParams } from "@/features/catalog/catalog-params";
+import { ListingView, parseListingParams } from "@/features/catalog/components/listing-view";
+import { getCourseCatalog } from "@/server/modules/courses/queries";
+import { getPurchasedCourseIds } from "@/server/modules/purchases/queries";
 
 export const metadata: Metadata = { title: "Сургалт | Merit Urlan" };
 

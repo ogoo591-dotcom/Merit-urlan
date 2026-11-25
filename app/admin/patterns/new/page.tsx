@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-import { PatternForm } from "@/components/admin/pattern-form";
-import { PageHeader } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
-import { getProducts } from "@/lib/data/products";
+import { PatternForm } from "@/features/admin/components/pattern-form";
+import { PageHeader } from "@/features/admin/components/ui";
+import { requireAdmin } from "@/server/auth";
+import { getProducts } from "@/server/modules/catalog/queries";
 
 export default async function NewPatternPage() {
   await requireAdmin();

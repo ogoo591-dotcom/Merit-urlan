@@ -2,10 +2,10 @@ import { Pencil, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Notice, PageHeader, primaryButton } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
-import { getPatterns } from "@/lib/data/patterns";
-import { getAllPurchases } from "@/lib/data/purchases";
+import { Notice, PageHeader, primaryButton } from "@/features/admin/components/ui";
+import { requireAdmin } from "@/server/auth";
+import { getPatterns } from "@/server/modules/patterns/queries";
+import { getAllPurchases } from "@/server/modules/purchases/queries";
 import { formatPrice } from "@/lib/format";
 
 export default async function AdminPatternsPage({ searchParams }: { searchParams: Promise<{ saved?: string; deleted?: string }> }) {

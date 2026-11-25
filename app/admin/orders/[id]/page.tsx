@@ -3,13 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { changeOrderStatus, changeReadyDate } from "@/app/admin/orders/actions";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { PageHeader, StatusPill, cardClass, inputClass, primaryButton } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
-import { getOrder } from "@/lib/data/orders";
+import { changeOrderStatus, changeReadyDate } from "@/server/modules/orders/admin-actions";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { PageHeader, StatusPill, cardClass, inputClass, primaryButton } from "@/features/admin/components/ui";
+import { requireAdmin } from "@/server/auth";
+import { getOrder } from "@/server/modules/orders/queries";
 import { formatDateTime, formatPrice, formatReadyDate } from "@/lib/format";
-import { formatOrderAddress, orderStatusLabel, orderStatuses, orderStatusTone } from "@/lib/orders";
+import { formatOrderAddress, orderStatusLabel, orderStatuses, orderStatusTone } from "@/types/orders";
 
 const dateInputValue = (iso?: string) =>
   iso ? new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ulaanbaatar" }).format(new Date(iso)) : "";

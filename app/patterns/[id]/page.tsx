@@ -5,13 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { purchasePattern } from "@/app/patterns/actions";
-import { PurchaseButton } from "@/components/purchase-button";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { formatPatternPrice, getPattern } from "@/lib/data/patterns";
-import { hasPendingPayment } from "@/lib/data/payments";
-import { hasPatternAccess } from "@/lib/data/purchases";
+import { purchasePattern } from "@/server/modules/payments/actions";
+import { PurchaseButton } from "@/features/checkout/components/purchase-button";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { formatPatternPrice } from "@/types/patterns";
+import { getPattern } from "@/server/modules/patterns/queries";
+import { hasPendingPayment } from "@/server/modules/payments/queries";
+import { hasPatternAccess } from "@/server/modules/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

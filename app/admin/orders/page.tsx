@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-import { PageHeader, StatusPill } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
-import { getAllOrders } from "@/lib/data/orders";
+import { PageHeader, StatusPill } from "@/features/admin/components/ui";
+import { requireAdmin } from "@/server/auth";
+import { getAllOrders } from "@/server/modules/orders/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
-import { orderStatusLabel, orderStatuses, orderStatusTone, type OrderStatus } from "@/lib/orders";
-import { paymentStatusTone } from "@/lib/payments";
+import { orderStatusLabel, orderStatuses, orderStatusTone, type OrderStatus } from "@/types/orders";
+import { paymentStatusTone } from "@/types/payments";
 
 export default async function AdminOrdersPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   await requireAdmin();

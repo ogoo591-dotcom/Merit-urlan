@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { SavedList } from "@/components/saved-list";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { SavedList } from "@/features/saved/components/saved-list";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 
 export const metadata: Metadata = { title: "Хадгалсан | Merit Urlan" };
 
