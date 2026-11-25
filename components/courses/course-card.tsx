@@ -2,7 +2,7 @@ import { BadgeCheck, Clock, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { formatCoursePrice, type CourseSummary } from "@/lib/data/courses";
+import { formatCoursePrice, type CourseSummary } from "@/types/courses";
 
 export function CourseCard({ course, purchased }: { course: CourseSummary; purchased: boolean }) {
   return (

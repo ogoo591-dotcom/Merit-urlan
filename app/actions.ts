@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 
-import { getCourse, getCourses } from "@/lib/data/courses";
+import { getCourse } from "@/server/modules/courses/queries";
 import { countUnread, markRead } from "@/lib/data/notifications";
 import { createOrder, validateCart } from "@/lib/data/orders";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
@@ -48,20 +48,6 @@ export async function sendFeedback(_state: FeedbackState, formData: FormData): P
     return { error: "Илгээж чадсангүй. Дахин оролдох эсвэл Messenger-ээр бичнэ үү.", values };
   }
   return { sent: true };
-}
-
-export type DrawerCourse = { id: string; title: string; cover: string; price: number; lessonCount: number; freeLessonCount: number };
-
-// "☰ Бүгд" drawer-ийн "Сургалт" хэсэг: бүх сургалтын товч мэдээлэл (видео линкгүй).
-export async function getDrawerCourses(): Promise<DrawerCourse[]> {
-  return (await getCourses()).map((course) => ({
-    id: course.id,
-    title: course.title,
-    cover: course.cover.src,
-    price: course.price,
-    lessonCount: course.lessonCount,
-    freeLessonCount: course.freeLessonCount,
-  }));
 }
 
 const cleanCourses = (courses: string[] | undefined) =>

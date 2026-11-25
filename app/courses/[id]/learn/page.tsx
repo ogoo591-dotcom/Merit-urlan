@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { LearnView } from "@/components/courses/learn-view";
 import { SiteHeader } from "@/components/site-header";
-import { getCourse, getLessonVideo } from "@/lib/data/courses";
+import { getCourse, getLessonVideo } from "@/server/modules/courses/queries";
 import { hasPendingPayment } from "@/lib/data/payments";
 import { hasAccess } from "@/server/modules/purchases/queries";
 

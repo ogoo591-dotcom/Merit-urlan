@@ -4,12 +4,12 @@ import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 
-import { saveCourseAction, type FormState } from "@/app/admin/courses/actions";
+import { saveCourseAction, type FormState } from "@/server/modules/courses/admin-actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton, secondaryButton } from "@/components/admin/ui";
-import type { DbCourse } from "@/server/mock/db";
+import type { Course } from "@/types/courses";
 
-type LessonDraft = DbCourse["lessons"][number] & { key: string };
+type LessonDraft = Course["lessons"][number] & { key: string };
 
 const newLesson = (): LessonDraft => ({
   key: crypto.randomUUID(),
@@ -21,7 +21,7 @@ const newLesson = (): LessonDraft => ({
 });
 
 // Админ хуудсанд зөвхөн админ ордог тул видео линкийг энд харуулж болно.
-export function CourseForm({ course }: { course?: DbCourse }) {
+export function CourseForm({ course }: { course?: Course }) {
   const [state, action] = useActionState<FormState, FormData>(saveCourseAction, {});
   const [lessons, setLessons] = useState<LessonDraft[]>(
     course?.lessons.map((lesson) => ({ ...lesson, key: lesson.id })) ?? [{ ...newLesson(), isFree: true }],

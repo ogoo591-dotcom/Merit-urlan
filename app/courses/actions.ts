@@ -3,7 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 
 import type { PurchaseResult } from "@/components/purchase-button";
-import { getCourse } from "@/lib/data/courses";
+import { getCourse } from "@/server/modules/courses/queries";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
 import { hasAccess } from "@/server/modules/purchases/queries";
 

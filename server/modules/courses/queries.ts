@@ -1,43 +1,14 @@
 import "server-only";
 
+import { readDb } from "@/server/mock/db";
 import { buildListing, type ListingFilters } from "@/server/listing";
 import { hasAccess } from "@/server/modules/purchases/queries";
-import { readDb, updateDb, type DbCourse } from "@/server/mock/db";
-import type { CourseLevel } from "@/server/mock/courses";
+import { levelLabels, type Course, type CourseDetail, type CourseSummary } from "@/types/courses";
 
 // Сургалтын өгөгдөл. Client руу дамжих бүх зүйл videoUrl-гүй байна;
 // видео линкийг зөвхөн getLessonVideo() эрх шалгасны дараа буцаана.
 
-export type { CourseLevel } from "@/server/mock/courses";
-
-export type LessonInfo = { id: string; title: string; duration: string; isFree: boolean };
-
-export type CourseSummary = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  cover: { src: string };
-  // Нүүр зураг + нэмэлт зургууд (сургалтын хуудасны gallery).
-  images: string[];
-  level: CourseLevel;
-  levelLabel: string;
-  totalDuration: string;
-  topics: string[];
-  outcomes: string[];
-  lessonCount: number;
-  freeLessonCount: number;
-};
-
-export type CourseDetail = CourseSummary & { lessons: LessonInfo[] };
-
-export const levelLabels: Record<CourseLevel, string> = {
-  beginner: "Анхан шат",
-  intermediate: "Дунд шат",
-  advanced: "Ахисан шат",
-};
-
-function toSummary(course: DbCourse): CourseSummary {
+function toSummary(course: Course): CourseSummary {
   return {
     id: course.id,
     title: course.title,
@@ -92,28 +63,6 @@ export async function getLessonVideo(courseId: string, lessonId: string, userId:
   return null;
 }
 
-export function formatCoursePrice(value: number) {
-  return `${value.toLocaleString("en-US")}₮`;
-}
-
-// ---- Админ (видео линктэй бүтэн өгөгдөл — зөвхөн админ хуудсанд) ----
-
-export async function getCourseForAdmin(id: string): Promise<DbCourse | null> {
+export async function getCourseForAdmin(id: string): Promise<Course | null> {
   return (await readDb()).courses.find((item) => item.id === id) ?? null;
-}
-
-export async function saveCourse(course: DbCourse, originalId?: string) {
-  await updateDb((db) => {
-    const index = db.courses.findIndex((item) => item.id === (originalId ?? course.id));
-    const clash = db.courses.some((item, itemIndex) => item.id === course.id && itemIndex !== index);
-    if (clash) throw new Error("Энэ ID-тай сургалт аль хэдийн байна.");
-    if (index === -1) db.courses.push(course);
-    else db.courses[index] = course;
-  });
-}
-
-export async function deleteCourse(id: string) {
-  await updateDb((db) => {
-    db.courses = db.courses.filter((item) => item.id !== id);
-  });
 }

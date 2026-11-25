@@ -3,15 +3,7 @@ import "server-only";
 // Сургалтын mock өгөгдөл. videoUrl-ууд энд байгаа тул энэ файлыг зөвхөн сервер импортолно
 // ("server-only" — client component-оос импортолбол build алдаа өгнө). Үнэ, текст түр утга.
 
-export type CourseLevel = "beginner" | "intermediate" | "advanced";
-
-export type MockLesson = {
-  id: string;
-  title: string;
-  duration: string;
-  videoUrl: string;
-  isFree: boolean;
-};
+import type { CourseLevel, Lesson } from "@/types/courses";
 
 export type MockCourse = {
   id: string;
@@ -26,14 +18,14 @@ export type MockCourse = {
   totalDuration: string;
   topics: string[];
   outcomes: string[];
-  lessons: MockLesson[];
+  lessons: Lesson[];
 };
 
 // Жишээ видео (MDN-ийн CC0 лицензтэй). Жинхэнэ хичээлийн бичлэгээр солино.
 const sampleA = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
 const sampleB = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4";
 
-const lessons = (titles: Array<[string, string]>): MockLesson[] =>
+const lessons = (titles: Array<[string, string]>): Lesson[] =>
   titles.map(([title, duration], index) => ({
     id: `l${index + 1}`,
     title,

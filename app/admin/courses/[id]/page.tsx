@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { deleteCourseAction } from "@/app/admin/courses/actions";
+import { deleteCourseAction } from "@/server/modules/courses/admin-actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { CourseForm } from "@/components/admin/course-form";
 import { PageHeader } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
-import { getCourseForAdmin } from "@/lib/data/courses";
+import { getCourseForAdmin } from "@/server/modules/courses/queries";
 
 export default async function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();

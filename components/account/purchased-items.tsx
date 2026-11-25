@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { CourseProgressBar } from "@/components/courses/course-progress";
-import type { CourseDetail } from "@/lib/data/courses";
+import type { CourseDetail } from "@/types/courses";
 import type { Payment } from "@/lib/data/payments";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { paymentStatusLabel, paymentStatusTone } from "@/lib/payments";

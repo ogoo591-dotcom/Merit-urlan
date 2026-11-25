@@ -8,7 +8,8 @@ import { CourseCartActions, CourseGallery, ShareButton } from "@/components/cour
 import { CourseProgressBar } from "@/components/courses/course-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { formatCoursePrice, getCourse } from "@/lib/data/courses";
+import { formatCoursePrice } from "@/types/courses";
+import { getCourse } from "@/server/modules/courses/queries";
 import { hasPendingPayment } from "@/lib/data/payments";
 import { hasAccess } from "@/server/modules/purchases/queries";
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Notice, PageHeader, primaryButton } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
-import { getCourses } from "@/lib/data/courses";
+import { getCourses } from "@/server/modules/courses/queries";
 import { getAllPurchases } from "@/server/modules/purchases/queries";
 import { formatPrice } from "@/lib/format";
 

@@ -4,10 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/server/auth";
-import { deleteCourse, getCourseForAdmin, saveCourse } from "@/lib/data/courses";
+import { deleteCourse, saveCourse } from "@/server/modules/courses/service";
+import { getCourseForAdmin } from "@/server/modules/courses/queries";
 import { saveImageUpload } from "@/server/storage/images";
-import type { DbCourse } from "@/server/mock/db";
-import type { CourseLevel } from "@/server/mock/courses";
+import type { Course, CourseLevel } from "@/types/courses";
 
 export type FormState = { error?: string };
 
@@ -44,7 +44,7 @@ export async function saveCourseAction(_state: FormState, formData: FormData): P
   if (!["beginner", "intermediate", "advanced"].includes(level)) return { error: "Түвшин буруу байна." };
   if (!Number.isFinite(price) || price < 0) return { error: "Үнэ буруу байна." };
 
-  let lessons: DbCourse["lessons"];
+  let lessons: Course["lessons"];
   try {
     const raw = JSON.parse(text(formData, "lessons", 100_000)) as Array<Record<string, unknown>>;
     lessons = raw.map((lesson, index) => ({

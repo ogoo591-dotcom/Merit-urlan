@@ -4,18 +4,18 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import galleryImages from "@/lib/content/gallery-images.json";
-import { mockCourses, type MockCourse } from "@/server/mock/courses";
+import { mockCourses } from "@/server/mock/courses";
 import { mockPatterns, type MockPattern } from "@/server/mock/patterns";
 import { mockCatalogVersion, mockProducts } from "@/server/mock/products";
 import type { StoreProduct } from "@/types/catalog";
 import type { Order } from "@/lib/orders";
+import type { Course } from "@/types/courses";
 import type { Purchase } from "@/types/purchases";
 
 // Сервер талын mock өгөгдлийн сан: .mock-db/db.json файл. Админ, захиалагч бүгд нэг өгөгдлийг харна.
 // Анх уншихад lib/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд lib/data/* функцууд энэ файлын оронд Supabase-ийг дуудна.
 // Анхаар: Vercel production дээр файл бичих боломжгүй — энэ нь зөвхөн локал хөгжүүлэлтэд зориулагдсан.
 
-export type DbCourse = Omit<MockCourse, "coverSource" | "gallerySources"> & { coverImage: string; images?: string[] };
 export type DbPattern = MockPattern;
 
 export type DbNotification = {
@@ -50,7 +50,7 @@ export type Db = {
   products: StoreProduct[];
   orders: Order[];
   notifications: DbNotification[];
-  courses: DbCourse[];
+  courses: Course[];
   patterns: DbPattern[];
   purchases: Purchase[];
   payments: DbPayment[];

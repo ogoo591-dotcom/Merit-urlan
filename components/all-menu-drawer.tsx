@@ -7,7 +7,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
-import { getDrawerCourses, type DrawerCourse } from "@/app/actions";
+import { getDrawerCourses } from "@/server/modules/courses/actions";
+import type { DrawerCourse } from "@/types/courses";
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
 import { MessengerConfirmDialog } from "@/components/messenger-confirm-dialog";
 import { formatPrice } from "@/lib/format";
