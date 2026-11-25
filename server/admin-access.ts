@@ -23,3 +23,8 @@ export function isAdminUser(user: AdminCandidate | null | undefined) {
     (email) => email.verification?.status === "verified" && allowed.includes(email.emailAddress.toLowerCase()),
   );
 }
+
+// ТҮР: локал dev-д админ шалгалтыг алгасна (.env.local: ADMIN_AUTH_BYPASS=true). Production build-д хэзээ ч ажиллахгүй.
+export function adminAuthBypassed() {
+  return process.env.NODE_ENV !== "production" && process.env.ADMIN_AUTH_BYPASS === "true";
+}

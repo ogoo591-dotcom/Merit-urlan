@@ -1,13 +1,14 @@
 import { clerkClient, clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { isAdminUser } from "@/server/admin-access";
+import { adminAuthBypassed, isAdminUser } from "@/server/admin-access";
 
 // Сайтыг хэн ч нэвтрэлгүй үзнэ. Зөвхөн захиалга, хувийн хуудас, админд нэвтрэлт шаардана.
 const isProtectedRoute = createRouteMatcher(["/checkout(.*)", "/account(.*)", "/admin(.*)"]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export default clerkMiddleware(async (auth, request) => {
+  if (isAdminRoute(request) && adminAuthBypassed()) return;
   if (!isProtectedRoute(request)) return;
   const { userId } = await auth.protect();
 
