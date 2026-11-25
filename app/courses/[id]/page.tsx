@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { formatCoursePrice } from "@/types/courses";
 import { getCourse } from "@/server/modules/courses/queries";
-import { hasPendingPayment } from "@/lib/data/payments";
+import { hasPendingPayment } from "@/server/modules/payments/queries";
 import { hasAccess } from "@/server/modules/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };

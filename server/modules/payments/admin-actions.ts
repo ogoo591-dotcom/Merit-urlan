@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/server/auth";
-import { approvePayment, rejectPayment } from "@/lib/data/payments";
+import { approvePayment, rejectPayment } from "@/server/modules/payments/service";
 
 // Банкны хуулгатай тулгаад баталгаажуулах / татгалзах.
 export async function approvePaymentAction(formData: FormData) {

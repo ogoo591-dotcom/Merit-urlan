@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { LearnView } from "@/components/courses/learn-view";
 import { SiteHeader } from "@/components/site-header";
 import { getCourse, getLessonVideo } from "@/server/modules/courses/queries";
-import { hasPendingPayment } from "@/lib/data/payments";
+import { hasPendingPayment } from "@/server/modules/payments/queries";
 import { hasAccess } from "@/server/modules/purchases/queries";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ lesson?: string }> };

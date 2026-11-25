@@ -8,34 +8,17 @@ import { mockCourses } from "@/server/mock/courses";
 import { mockPatterns } from "@/server/mock/patterns";
 import { mockCatalogVersion, mockProducts } from "@/server/mock/products";
 import type { StoreProduct } from "@/types/catalog";
-import type { Order } from "@/lib/orders";
 import type { Course } from "@/types/courses";
 import type { AppNotification } from "@/types/notifications";
+import type { Order } from "@/types/orders";
 import type { Pattern } from "@/types/patterns";
+import type { Payment } from "@/types/payments";
 import type { Purchase } from "@/types/purchases";
 
 // Сервер талын mock өгөгдлийн сан: .mock-db/db.json файл. Админ, захиалагч бүгд нэг өгөгдлийг харна.
 // Анх уншихад lib/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд lib/data/* функцууд энэ файлын оронд Supabase-ийг дуудна.
 // Анхаар: Vercel production дээр файл бичих боломжгүй — энэ нь зөвхөн локал хөгжүүлэлтэд зориулагдсан.
 
-
-// Дансаар шилжүүлсэн төлбөр (lib/payments.ts). Админ баталгаажуулсны дараа захиалга төлөгдөж, сургалт/схем нээгдэнэ.
-export type DbPayment = {
-  id: string;
-  // Гүйлгээний утга (MU-XXXXXX) — банкны хуулгатай тулгахад ашиглана.
-  code: string;
-  userId: string;
-  customer?: { name: string; phone: string };
-  amount: number;
-  status: "pending" | "approved" | "rejected";
-  orderId?: number;
-  courseIds: string[];
-  patternIds: string[];
-  // Админ, хэрэглэгчид харагдах товч тайлбар ("Захиалга #1023, Хүүхдийн багц").
-  summary: string;
-  createdAt: string;
-  reviewedAt?: string;
-};
 
 export type Db = {
   products: StoreProduct[];
@@ -44,7 +27,7 @@ export type Db = {
   courses: Course[];
   patterns: Pattern[];
   purchases: Purchase[];
-  payments: DbPayment[];
+  payments: Payment[];
   catalogVersion?: number;
 };
 

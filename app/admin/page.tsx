@@ -4,11 +4,11 @@ import Link from "next/link";
 import { PageHeader, StatusPill, cardClass } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
 import { getAdminNotifications } from "@/server/modules/notifications/queries";
-import { getAllOrders } from "@/lib/data/orders";
-import { countPendingPayments } from "@/lib/data/payments";
+import { getAllOrders } from "@/server/modules/orders/queries";
+import { countPendingPayments } from "@/server/modules/payments/queries";
 import { getAllPurchases } from "@/server/modules/purchases/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
-import { orderStatusLabel, orderStatusTone } from "@/lib/orders";
+import { orderStatusLabel, orderStatusTone } from "@/types/orders";
 
 // Улаанбаатарын цагаар өнөөдөр / энэ сар эсэх.
 const ubDate = (iso: string) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ulaanbaatar" }).format(new Date(iso));

@@ -10,12 +10,12 @@ import { AddressFields, readAddressFields } from "@/components/address-fields";
 import { CartLineRow, SelectAllRow } from "@/components/cart/cart-lines";
 import { useCart } from "@/components/cart-provider";
 import { formatAddress, useDeliveryAddress } from "@/components/delivery-address-provider";
-import { checkCart, placeOrder } from "@/app/actions";
+import { checkCart, placeOrder } from "@/server/modules/orders/actions";
 import { BankTransferDialog } from "@/components/store/bank-transfer-dialog";
 import { useData } from "@/hooks/use-data";
 import { formatPrice } from "@/lib/format";
-import { formatOrderAddress, type Order } from "@/lib/orders";
-import { newPaymentCode, type PaymentInvoice } from "@/lib/payments";
+import { formatOrderAddress, type Order } from "@/types/orders";
+import { newPaymentCode, type PaymentInvoice } from "@/types/payments";
 
 type Props = {
   defaults: { name: string; phone: string };

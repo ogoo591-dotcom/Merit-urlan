@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { formatDateTime, formatPrice, formatReadyDate } from "@/lib/format";
-import { formatOrderAddress, orderStatuses, type Order } from "@/lib/orders";
+import { formatOrderAddress, orderStatuses, type Order } from "@/types/orders";
 
 // Хүлээн авсан → Хийгдэж байна → Бэлэн → Хүргэлтэнд гарсан → Хүргэгдсэн
 function StatusSteps({ order }: { order: Order }) {

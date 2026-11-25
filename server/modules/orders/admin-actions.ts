@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/server/auth";
-import { setOrderReadyDate, updateOrderStatus } from "@/lib/data/orders";
-import { orderStatuses, type OrderStatus } from "@/lib/orders";
+import { setOrderReadyDate, updateOrderStatus } from "@/server/modules/orders/service";
+import { orderStatuses, type OrderStatus } from "@/types/orders";
 
 export async function changeOrderStatus(formData: FormData) {
   await requireAdmin();

@@ -1,13 +1,11 @@
 import "server-only";
 
-import { formatReadyDate, formatShortDate } from "@/lib/format";
+import { formatShortDate } from "@/lib/format";
 import { readDb, updateDb, type Db } from "@/server/mock/db";
 import { notifyCustomer } from "@/server/modules/notifications/service";
-import { orderStatusLabel, type CartInput, type Order, type OrderLine, type OrderStatus } from "@/lib/orders";
+import { orderStatusLabel, type CartInput, type Order, type OrderLine, type OrderStatus } from "@/types/orders";
 
 // Захиалга. Одоогоор mock сан, дараа нь Supabase (place_order RPC г.м.) руу солино.
-
-export type { CartInput, Order, OrderLine, OrderStatus } from "@/lib/orders";
 
 const firstOrderId = 1023;
 
@@ -86,20 +84,8 @@ export async function createOrder(input: {
     return created;
   });
 
-  // Админы мэдэгдлийг төлбөр (lib/data/payments.ts → createPayment) илгээнэ.
+  // Админы мэдэгдлийг төлбөр (server/modules/payments/service.ts → createPayment) илгээнэ.
   return order;
-}
-
-export async function getOrdersByUser(userId: string): Promise<Order[]> {
-  return (await readDb()).orders.filter((order) => order.userId === userId);
-}
-
-export async function getAllOrders(status?: OrderStatus): Promise<Order[]> {
-  return (await readDb()).orders.filter((order) => !status || order.status === status);
-}
-
-export async function getOrder(id: number): Promise<Order | null> {
-  return (await readDb()).orders.find((order) => order.id === id) ?? null;
 }
 
 // Статус солигдох бүрд захиалагчид мэдэгдэл очно.
@@ -133,5 +119,3 @@ export async function setOrderReadyDate(id: number, readyBy: string) {
     });
   }
 }
-
-export { formatReadyDate };

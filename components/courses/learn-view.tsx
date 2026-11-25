@@ -3,7 +3,7 @@
 import { ArrowLeft, ArrowRight, Check, CircleCheck, Lock, PlayCircle } from "lucide-react";
 import Link from "next/link";
 
-import { purchaseCourse } from "@/app/courses/actions";
+import { purchaseCourse } from "@/server/modules/payments/actions";
 import { PurchaseButton } from "@/components/purchase-button";
 import { useCourseProgress } from "@/components/courses/course-progress";
 import { setLessonCompleted } from "@/lib/progress";

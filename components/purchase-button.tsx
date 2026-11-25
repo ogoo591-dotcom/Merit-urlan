@@ -7,10 +7,7 @@ import { useState } from "react";
 
 import { useAuthModal } from "@/components/auth/auth-modal-provider";
 import { BankTransferDialog } from "@/components/store/bank-transfer-dialog";
-import { newPaymentCode, type PaymentInvoice } from "@/lib/payments";
-
-// pending: админы шалгалтад хүлээгдэж буй төлбөр бүртгэгдсэн.
-export type PurchaseResult = { ok: true; pending?: boolean } | { ok: false; error: string };
+import { newPaymentCode, type PaymentInvoice, type PurchaseResult } from "@/types/payments";
 
 // Сургалт, схем худалдаж авах товч: (нэвтрэх) → дансаар шилжүүлэх цонх → "Төлбөр шилжүүлсэн" →
 // `action` хүлээгдэж буй төлбөр үүсгэж, админ баталгаажуулмагц нээгдэнэ (lib/payments.ts).

@@ -4,9 +4,8 @@ import Link from "next/link";
 
 import { CourseProgressBar } from "@/components/courses/course-progress";
 import type { CourseDetail } from "@/types/courses";
-import type { Payment } from "@/lib/data/payments";
+import { paymentStatusLabel, paymentStatusTone, type Payment } from "@/types/payments";
 import { formatDateTime, formatPrice } from "@/lib/format";
-import { paymentStatusLabel, paymentStatusTone } from "@/lib/payments";
 import type { PatternDetail } from "@/types/patterns";
 
 const sectionTitle = "text-[16px] font-semibold text-[#2f2420]";

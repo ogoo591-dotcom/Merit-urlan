@@ -4,7 +4,7 @@ import { Check, Clock, Copy, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { formatPrice } from "@/lib/format";
-import type { PaymentInvoice } from "@/lib/payments";
+import type { PaymentInvoice } from "@/types/payments";
 import { BANK } from "@/lib/site-config";
 
 // Дансаар шилжүүлэх цонх (урсгал: lib/payments.ts).

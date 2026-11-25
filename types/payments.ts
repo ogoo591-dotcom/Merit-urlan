@@ -31,3 +31,24 @@ export function newPaymentCode() {
 }
 
 export type PaymentInvoice = { code: string; amount: number };
+
+// Дансаар шилжүүлсэн төлбөр. Админ баталгаажуулсны дараа захиалга төлөгдөж, сургалт/схем нээгдэнэ.
+export type Payment = {
+  id: string;
+  // Гүйлгээний утга (MU-XXXXXX) — банкны хуулгатай тулгахад ашиглана.
+  code: string;
+  userId: string;
+  customer?: { name: string; phone: string };
+  amount: number;
+  status: "pending" | "approved" | "rejected";
+  orderId?: number;
+  courseIds: string[];
+  patternIds: string[];
+  // Админ, хэрэглэгчид харагдах товч тайлбар ("Захиалга #1023, Хүүхдийн багц").
+  summary: string;
+  createdAt: string;
+  reviewedAt?: string;
+};
+
+// pending: админы шалгалтад хүлээгдэж буй төлбөр бүртгэгдсэн.
+export type PurchaseResult = { ok: true; pending?: boolean } | { ok: false; error: string };
