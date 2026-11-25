@@ -16,6 +16,7 @@ Merit урлан — гар урлалын (crochet, amigurumi) бизнес. 5 
 ━━━ ТӨСЛИЙН БҮТЭЦ ━━━
 ```
 app/                 ЗӨВХӨН route (page, layout, route.ts). Бизнес логик, actions.ts энд байхгүй.
+  (auth)/            sign-in, sign-up, sso-callback (route group — URL өөрчлөгдөхгүй)
 server/              BACKEND бүхэлдээ (файл бүр "server-only"; actions.ts нь "use server")
   modules/<модуль>/  catalog, courses, patterns, orders, payments, purchases, notifications, feedback
     queries.ts         унших (RSC page шууд дуудна)
