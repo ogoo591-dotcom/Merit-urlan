@@ -5,7 +5,7 @@ import { deleteProductAction } from "@/app/admin/products/actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { ProductForm } from "@/components/admin/product-form";
 import { PageHeader } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getProduct, getProducts } from "@/lib/data/products";
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {

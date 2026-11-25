@@ -16,7 +16,7 @@ import { useSaved } from "@/components/saved-provider";
 import { storeMeta } from "@/components/store/store-paths";
 import { getViewerStatus, searchCatalog } from "@/app/actions";
 import { formatPrice } from "@/lib/format";
-import type { StoreProduct } from "@/lib/mock/products";
+import type { StoreProduct } from "@/server/mock/products";
 import { navSections } from "@/lib/navigation";
 
 function SearchIcon({ className = "h-6 w-6" }: { className?: string }) {

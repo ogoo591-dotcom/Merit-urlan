@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { changeOrderStatus, changeReadyDate } from "@/app/admin/orders/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { PageHeader, StatusPill, cardClass, inputClass, primaryButton } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getOrder } from "@/lib/data/orders";
 import { formatDateTime, formatPrice, formatReadyDate } from "@/lib/format";
 import { formatOrderAddress, orderStatusLabel, orderStatuses, orderStatusTone } from "@/lib/orders";

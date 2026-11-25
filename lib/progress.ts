@@ -1,5 +1,5 @@
 // Хичээл үзэж дууссан тэмдэглэл (mock: localStorage). Нууц мэдээлэл биш тул client талд хадгална.
-import { readTable, writeTable } from "@/lib/mock/store";
+import { readTable, writeTable } from "@/lib/local-store";
 
 const table = "course-progress";
 

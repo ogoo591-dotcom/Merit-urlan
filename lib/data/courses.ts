@@ -1,14 +1,14 @@
 import "server-only";
 
-import { buildListing, type ListingFilters } from "@/lib/data/listing";
+import { buildListing, type ListingFilters } from "@/server/listing";
 import { hasAccess } from "@/lib/data/purchases";
-import { readDb, updateDb, type DbCourse } from "@/lib/mock/db";
-import type { CourseLevel } from "@/lib/mock/courses";
+import { readDb, updateDb, type DbCourse } from "@/server/mock/db";
+import type { CourseLevel } from "@/server/mock/courses";
 
 // Сургалтын өгөгдөл. Client руу дамжих бүх зүйл videoUrl-гүй байна;
 // видео линкийг зөвхөн getLessonVideo() эрх шалгасны дараа буцаана.
 
-export type { CourseLevel } from "@/lib/mock/courses";
+export type { CourseLevel } from "@/server/mock/courses";
 
 export type LessonInfo = { id: string; title: string; duration: string; isFree: boolean };
 

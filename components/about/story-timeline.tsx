@@ -1,4 +1,4 @@
-import { aboutTimeline } from "@/lib/mock/about";
+import { aboutTimeline } from "@/lib/content/about";
 
 // Бидний түүх: босоо шугамтай timeline. Том дэлгэц дээр картууд ээлжлэн зүүн, баруун талд байрлана.
 export function StoryTimeline() {

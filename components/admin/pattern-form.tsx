@@ -7,7 +7,7 @@ import { useActionState } from "react";
 import { savePatternAction, type FormState } from "@/app/admin/patterns/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton } from "@/components/admin/ui";
-import type { DbPattern } from "@/lib/mock/db";
+import type { DbPattern } from "@/server/mock/db";
 
 export function PatternForm({ pattern, materialOptions }: { pattern?: DbPattern; materialOptions: Array<{ id: string; name: string }> }) {
   const [state, action] = useActionState<FormState, FormData>(savePatternAction, {});

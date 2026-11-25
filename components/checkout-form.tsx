@@ -12,7 +12,7 @@ import { useCart } from "@/components/cart-provider";
 import { formatAddress, useDeliveryAddress } from "@/components/delivery-address-provider";
 import { checkCart, placeOrder } from "@/app/actions";
 import { BankTransferDialog } from "@/components/store/bank-transfer-dialog";
-import { useData } from "@/lib/data/use-data";
+import { useData } from "@/hooks/use-data";
 import { formatPrice } from "@/lib/format";
 import { formatOrderAddress, type Order } from "@/lib/orders";
 import { newPaymentCode, type PaymentInvoice } from "@/lib/payments";

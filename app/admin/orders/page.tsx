@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { PageHeader, StatusPill } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getAllOrders } from "@/lib/data/orders";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { orderStatusLabel, orderStatuses, orderStatusTone, type OrderStatus } from "@/lib/orders";

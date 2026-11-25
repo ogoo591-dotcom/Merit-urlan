@@ -1,4 +1,4 @@
-import type { ProductType } from "@/lib/mock/products";
+import type { ProductType } from "@/server/mock/products";
 
 export const storeMeta: Record<ProductType, { base: string; title: string; description: string }> = {
   product: {

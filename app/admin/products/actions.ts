@@ -3,10 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { deleteProduct, getProduct, saveProduct, setProductStock } from "@/lib/data/products";
-import { saveImageUpload } from "@/lib/data/uploads";
-import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/lib/mock/products";
+import { saveImageUpload } from "@/server/storage/images";
+import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/server/mock/products";
 
 export type FormState = { error?: string };
 

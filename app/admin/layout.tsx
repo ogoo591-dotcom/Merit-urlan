@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { AdminNav } from "@/components/admin/admin-nav";
-import { getAdminUser } from "@/lib/auth";
+import { getAdminUser } from "@/server/auth";
 import { countUnread } from "@/lib/data/notifications";
 import { countPendingPayments } from "@/lib/data/payments";
 

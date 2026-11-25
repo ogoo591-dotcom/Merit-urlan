@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { PatternForm } from "@/components/admin/pattern-form";
 import { PageHeader } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getProducts } from "@/lib/data/products";
 
 export default async function NewPatternPage() {

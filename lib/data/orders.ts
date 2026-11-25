@@ -1,7 +1,7 @@
 import "server-only";
 
 import { formatReadyDate, formatShortDate } from "@/lib/format";
-import { readDb, updateDb, type Db } from "@/lib/mock/db";
+import { readDb, updateDb, type Db } from "@/server/mock/db";
 import { notifyCustomer } from "@/lib/notify";
 import { orderStatusLabel, type CartInput, type Order, type OrderLine, type OrderStatus } from "@/lib/orders";
 

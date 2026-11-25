@@ -7,7 +7,7 @@ import { useActionState, useState } from "react";
 import { saveCourseAction, type FormState } from "@/app/admin/courses/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton, secondaryButton } from "@/components/admin/ui";
-import type { DbCourse } from "@/lib/mock/db";
+import type { DbCourse } from "@/server/mock/db";
 
 type LessonDraft = DbCourse["lessons"][number] & { key: string };
 

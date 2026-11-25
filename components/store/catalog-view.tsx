@@ -9,7 +9,7 @@ import { storeMeta } from "@/components/store/store-paths";
 import { getCatalog, type ColorKey, type ProductSort, type ProductType } from "@/lib/data/products";
 import { formatPrice } from "@/lib/format";
 import { categoryOrder, categorySlug, resolveCatalogParams, subOrder, subSlug } from "@/lib/navigation";
-import { productColors, type Availability, type Origin } from "@/lib/mock/products";
+import { productColors, type Availability, type Origin } from "@/server/mock/products";
 
 export const sortOptions: Array<{ value: ProductSort; label: string }> = [
   { value: "default", label: "Санал болгох" },

@@ -5,7 +5,7 @@ import { deleteCourseAction } from "@/app/admin/courses/actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { CourseForm } from "@/components/admin/course-form";
 import { PageHeader } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getCourseForAdmin } from "@/lib/data/courses";
 
 export default async function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {

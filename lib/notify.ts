@@ -1,6 +1,6 @@
 import "server-only";
 
-import { updateDb, type DbNotification } from "@/lib/mock/db";
+import { updateDb, type DbNotification } from "@/server/mock/db";
 
 // Мэдэгдэл илгээх цэг. Одоогоор: сайт доторх мэдэгдэл (mock сан) + console.log.
 // Telegram bot эсвэл имэйл нэмэхдээ доорх deliver() функцын дотор бичнэ — дуудаж буй газруудыг өөрчлөх шаардлагагүй.

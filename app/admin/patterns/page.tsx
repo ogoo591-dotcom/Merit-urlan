@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Notice, PageHeader, primaryButton } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getPatterns } from "@/lib/data/patterns";
 import { getAllPurchases } from "@/lib/data/purchases";
 import { formatPrice } from "@/lib/format";

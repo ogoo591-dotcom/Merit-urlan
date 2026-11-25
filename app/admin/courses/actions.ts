@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { deleteCourse, getCourseForAdmin, saveCourse } from "@/lib/data/courses";
-import { saveImageUpload } from "@/lib/data/uploads";
-import type { DbCourse } from "@/lib/mock/db";
-import type { CourseLevel } from "@/lib/mock/courses";
+import { saveImageUpload } from "@/server/storage/images";
+import type { DbCourse } from "@/server/mock/db";
+import type { CourseLevel } from "@/server/mock/courses";
 
 export type FormState = { error?: string };
 

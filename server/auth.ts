@@ -2,7 +2,7 @@ import "server-only";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 
-import { isAdminUser } from "@/lib/admin-access";
+import { isAdminUser } from "@/server/admin-access";
 
 export async function getAdminUser() {
   const user = await currentUser();

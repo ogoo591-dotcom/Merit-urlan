@@ -4,10 +4,9 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { mockDbDir } from "@/lib/mock/db";
+import { mockDbDir } from "@/server/mock/db";
 
 // Админы зураг: CLOUDINARY_* тохируулсан бол Cloudinary-д, үгүй бол (mock) .mock-db/uploads дотор хадгална.
-// Бүтэн схем (зураг, PDF) нь нийтэд нээлттэй биш тул .mock-db/files дотор үлдэнэ (дараа нь Supabase private bucket + signed URL).
 
 export type ImageFolder = "patterns" | "materials" | "products" | "courses";
 
@@ -19,7 +18,6 @@ const imageTypes: Record<string, string> = {
 };
 
 const uploadsDir = path.join(mockDbDir, "uploads");
-const filesDir = path.join(mockDbDir, "files");
 
 // Cloudinary-ийн signed upload: параметрүүдийг цагаан толгойн дарааллаар нэгтгээд secret-тэй sha1 хийнэ.
 async function uploadToCloudinary(
@@ -62,26 +60,6 @@ export async function saveImageUpload(file: File, folder: ImageFolder): Promise<
   const name = `${crypto.randomUUID()}.${extension}`;
   await writeFile(path.join(uploadsDir, name), Buffer.from(await file.arrayBuffer()));
   return `/api/uploads/${name}`;
-}
-
-function patternFileExtension(header: Buffer) {
-  if (header.subarray(0, 5).toString("latin1") === "%PDF-") return "pdf";
-  if (header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff) return "jpg";
-  if (header.subarray(0, 4).toString("hex") === "89504e47") return "png";
-  if (header.subarray(0, 4).toString("latin1") === "RIFF" && header.subarray(8, 12).toString("latin1") === "WEBP") return "webp";
-  return null;
-}
-
-// Бүтэн схемийг (зураг, PDF) нийтэд нээлттэй биш газар хадгалж, filePath буцаана.
-// Төлбөртэй схем холбоосоор нь үзэгдэхгүйн тулд Cloudinary руу явуулахгүй.
-export async function savePatternFile(patternId: string, file: File): Promise<string> {
-  const extension = patternFileExtension(Buffer.from(await file.slice(0, 12).arrayBuffer()));
-  if (!extension) throw new Error("Схемийн файл нь JPG, PNG, WEBP зураг эсвэл PDF байх ёстой.");
-  if (file.size > 20 * 1024 * 1024) throw new Error("Схемийн файл 20MB-аас бага байх ёстой.");
-  await mkdir(filesDir, { recursive: true });
-  const safeId = patternId.replace(/[^a-z0-9-]/g, "");
-  await writeFile(path.join(filesDir, `${safeId}.${extension}`), Buffer.from(await file.arrayBuffer()));
-  return path.join(".mock-db", "files", `${safeId}.${extension}`);
 }
 
 export async function readImageUpload(name: string): Promise<{ data: Buffer; type: string } | null> {

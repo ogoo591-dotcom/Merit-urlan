@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Invoice, InvoiceCheck, InvoiceRequest, PaymentProvider } from "@/lib/payment-provider/types";
+import type { Invoice, InvoiceCheck, InvoiceRequest, PaymentProvider } from "@/server/payment-provider/types";
 
 type MockInvoice = { request: InvoiceRequest; paid: boolean; cancelled: boolean };
 

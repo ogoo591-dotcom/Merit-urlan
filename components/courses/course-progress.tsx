@@ -3,8 +3,8 @@
 import { useUser } from "@clerk/nextjs";
 import { useCallback } from "react";
 
-import { getCompletedLessons } from "@/lib/data/progress";
-import { useData } from "@/lib/data/use-data";
+import { getCompletedLessons } from "@/lib/progress";
+import { useData } from "@/hooks/use-data";
 
 export function useCourseProgress(courseId: string, lessonIds: string[]) {
   const { user } = useUser();

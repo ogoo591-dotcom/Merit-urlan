@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { markRead, setNotificationRead } from "@/lib/data/notifications";
 
 export async function toggleNotificationRead(formData: FormData) {

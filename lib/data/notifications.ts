@@ -1,10 +1,10 @@
 import "server-only";
 
-import { readDb, updateDb, type DbNotification } from "@/lib/mock/db";
+import { readDb, updateDb, type DbNotification } from "@/server/mock/db";
 
 // Мэдэгдэл унших. Илгээх нь lib/notify.ts.
 
-export type { DbNotification as AppNotification } from "@/lib/mock/db";
+export type { DbNotification as AppNotification } from "@/server/mock/db";
 
 const isFor = (notification: DbNotification, audience: { admin?: boolean; userId?: string | null }) =>
   (audience.admin && notification.audience === "admin") ||

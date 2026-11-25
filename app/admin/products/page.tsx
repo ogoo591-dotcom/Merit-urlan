@@ -5,7 +5,7 @@ import Link from "next/link";
 import { updateStockAction } from "@/app/admin/products/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, PageHeader, StatusPill, primaryButton } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getProducts, type ProductType } from "@/lib/data/products";
 import { formatPrice } from "@/lib/format";
 

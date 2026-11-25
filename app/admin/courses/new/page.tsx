@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { CourseForm } from "@/components/admin/course-form";
 import { PageHeader } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 
 export default async function NewCoursePage() {
   await requireAdmin();

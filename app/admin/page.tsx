@@ -2,7 +2,7 @@ import { Banknote, Bell, CalendarClock, Clock, ShoppingBag } from "lucide-react"
 import Link from "next/link";
 
 import { PageHeader, StatusPill, cardClass } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getAdminNotifications } from "@/lib/data/notifications";
 import { getAllOrders } from "@/lib/data/orders";
 import { countPendingPayments } from "@/lib/data/payments";

@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 
-import { readPatternFile } from "@/lib/data/pattern-files";
+import { readPatternFile } from "@/server/storage/pattern-files";
 import { getPattern } from "@/lib/data/patterns";
 import { hasPatternAccess } from "@/lib/data/purchases";
 

@@ -9,7 +9,7 @@ import { searchProducts } from "@/lib/data/products";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
 import { hasAccess } from "@/lib/data/purchases";
 import { notifyAdmin } from "@/lib/notify";
-import { getAdminUser } from "@/lib/auth";
+import { getAdminUser } from "@/server/auth";
 import type { CartInput, Order } from "@/lib/orders";
 
 // Client компонентууд lib/data-г шууд импортлохгүй (сервер талын сан) — эдгээр server action-оор дамжина.

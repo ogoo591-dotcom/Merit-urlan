@@ -1,13 +1,13 @@
 import "server-only";
 
 import { formatPrice } from "@/lib/format";
-import { readDb, updateDb, type DbPayment } from "@/lib/mock/db";
+import { readDb, updateDb, type DbPayment } from "@/server/mock/db";
 import { notifyAdmin, notifyCustomer } from "@/lib/notify";
 import { paymentCodePattern } from "@/lib/payments";
 
 // Дансаар шилжүүлсэн төлбөр (урсгалын тайлбар: lib/payments.ts). Одоогоор mock сан, дараа нь Supabase-ийн payments хүснэгт.
 
-export type { DbPayment as Payment } from "@/lib/mock/db";
+export type { DbPayment as Payment } from "@/server/mock/db";
 
 export function isValidPaymentCode(code: unknown): code is string {
   return typeof code === "string" && paymentCodePattern.test(code);

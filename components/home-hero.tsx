@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import galleryImages from "@/lib/gallery-images.json";
+import galleryImages from "@/lib/content/gallery-images.json";
 
 // Нүүр зураг: zurag-14.webp (raw-images/14.jpg). Дугаар шилжсэн ч эх файлын нэрээр олно.
 const heroImage = galleryImages.find((image) => image.source === "14.jpg") ?? { src: "/Hero.jpg", width: 5, height: 4 };

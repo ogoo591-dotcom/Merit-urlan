@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { setOrderReadyDate, updateOrderStatus } from "@/lib/data/orders";
 import { orderStatuses, type OrderStatus } from "@/lib/orders";
 

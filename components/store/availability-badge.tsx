@@ -1,4 +1,4 @@
-import type { StoreProduct } from "@/lib/mock/products";
+import type { StoreProduct } from "@/server/mock/products";
 
 // "Бэлэн" (ногоон) / "Захиалгаар · 7 хоног" (шар) / "Дууссан" (саарал).
 export function AvailabilityBadge({ product, className = "" }: { product: StoreProduct; className?: string }) {

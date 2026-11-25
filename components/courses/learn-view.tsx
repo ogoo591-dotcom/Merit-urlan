@@ -6,7 +6,7 @@ import Link from "next/link";
 import { purchaseCourse } from "@/app/courses/actions";
 import { PurchaseButton } from "@/components/purchase-button";
 import { useCourseProgress } from "@/components/courses/course-progress";
-import { setLessonCompleted } from "@/lib/data/progress";
+import { setLessonCompleted } from "@/lib/progress";
 
 export type LearnLesson = { id: string; title: string; duration: string; isFree: boolean; locked: boolean };
 

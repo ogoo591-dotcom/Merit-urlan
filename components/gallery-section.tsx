@@ -1,5 +1,5 @@
 import { GalleryGrid } from "@/components/gallery-grid";
-import galleryImages from "@/lib/gallery-images.json";
+import galleryImages from "@/lib/content/gallery-images.json";
 
 // Нүүрэнд эхэлж гарах зургууд (raw-images доторх файлын нэрээр), эхнийх нь том нүдэнд.
 // position — зураг тасрах үед аль хэсгийг нь харуулах; fit "contain" — зургийг бүтнээр нь харуулна.

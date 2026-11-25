@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import galleryImages from "@/lib/gallery-images.json";
+import galleryImages from "@/lib/content/gallery-images.json";
 
 // zurag-11.webp (raw-images/10.jpg). Дугаар шилжсэн ч эх файлын нэрээр олно.
 const aboutImage = galleryImages.find((image) => image.source === "10.jpg")?.src ?? "/Hero.jpg";

@@ -3,10 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { deletePattern, getPatternForAdmin, savePattern } from "@/lib/data/patterns";
-import { saveImageUpload, savePatternFile } from "@/lib/data/uploads";
-import type { PatternLevel, PatternType } from "@/lib/mock/patterns";
+import { saveImageUpload } from "@/server/storage/images";
+import { savePatternFile } from "@/server/storage/pattern-files";
+import type { PatternLevel, PatternType } from "@/server/mock/patterns";
 
 export type FormState = { error?: string };
 

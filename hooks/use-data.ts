@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { subscribeMock } from "@/lib/mock/store";
+import { subscribeMock } from "@/lib/local-store";
 
 // lib/data-ийн async функцыг ачаалж, mock өгөгдөл өөрчлөгдөхөд (захиалга, админ засвар) дахин уншина.
 // `load`-ийг useCallback-аар тогтвортой болгож дамжуулна.

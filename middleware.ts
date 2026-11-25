@@ -1,7 +1,7 @@
 import { clerkClient, clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import { isAdminUser } from "@/lib/admin-access";
+import { isAdminUser } from "@/server/admin-access";
 
 // Сайтыг хэн ч нэвтрэлгүй үзнэ. Зөвхөн захиалга, хувийн хуудас, админд нэвтрэлт шаардана.
 const isProtectedRoute = createRouteMatcher(["/checkout(.*)", "/account(.*)", "/admin(.*)"]);

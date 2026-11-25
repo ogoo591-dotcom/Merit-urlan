@@ -1,4 +1,4 @@
-import { readImageUpload } from "@/lib/data/uploads";
+import { readImageUpload } from "@/server/storage/images";
 
 // Админы upload хийсэн зургийг (mock: .mock-db/uploads) буцаана. Supabase Storage руу шилжихэд хэрэггүй болно.
 export async function GET(_request: Request, { params }: { params: Promise<{ name: string }> }) {

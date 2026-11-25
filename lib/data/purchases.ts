@@ -1,11 +1,11 @@
 import "server-only";
 
-import { readDb, updateDb, type DbPurchase } from "@/lib/mock/db";
+import { readDb, updateDb, type DbPurchase } from "@/server/mock/db";
 
 // Сургалт, схемийн худалдан авалт. Одоогоор mock сан (серверт), дараа нь Supabase-ийн purchases хүснэгт рүү солино.
 // Эрхийг зөвхөн сервер шалгана — client руу видео линк, PDF зам дамжихгүй.
 
-export type { DbPurchase as Purchase } from "@/lib/mock/db";
+export type { DbPurchase as Purchase } from "@/server/mock/db";
 
 async function purchasedIds(userId: string | null, kind: DbPurchase["kind"]) {
   if (!userId) return [];

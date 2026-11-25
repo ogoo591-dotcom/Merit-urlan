@@ -1,14 +1,14 @@
 import "server-only";
 
-import { buildListing, type ListingFilters } from "@/lib/data/listing";
+import { buildListing, type ListingFilters } from "@/server/listing";
 import { getProduct } from "@/lib/data/products";
-import { readDb, updateDb, type DbPattern } from "@/lib/mock/db";
-import type { PatternLevel, PatternType } from "@/lib/mock/patterns";
+import { readDb, updateDb, type DbPattern } from "@/server/mock/db";
+import type { PatternLevel, PatternType } from "@/server/mock/patterns";
 
 // Схем зааврын өгөгдөл. Client руу дамжих зүйлд filePath байхгүй;
 // Бүтэн схемийг зөвхөн /api/patterns/[id]/download эрх шалгасны дараа lib/data/pattern-files.ts уншина.
 
-export type { PatternLevel, PatternType } from "@/lib/mock/patterns";
+export type { PatternLevel, PatternType } from "@/server/mock/patterns";
 
 export type PatternMaterial = { name: string; href?: string; category?: string };
 

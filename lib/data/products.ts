@@ -1,12 +1,12 @@
 import "server-only";
 
 import { formatPrice } from "@/lib/format";
-import { readDb, updateDb } from "@/lib/mock/db";
-import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/lib/mock/products";
+import { readDb, updateDb } from "@/server/mock/db";
+import { productColors, type Availability, type ColorKey, type Origin, type ProductType, type StoreProduct } from "@/server/mock/products";
 
 // Бараа, материал. Одоогоор mock сан (.mock-db), дараа нь зөвхөн эдгээр функцын дотор талыг Supabase руу солино.
 
-export type { Availability, ColorKey, Origin, ProductType, StoreProduct } from "@/lib/mock/products";
+export type { Availability, ColorKey, Origin, ProductType, StoreProduct } from "@/server/mock/products";
 export { formatPrice };
 
 export type ProductSort = "default" | "price_asc" | "price_desc" | "name";

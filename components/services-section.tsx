@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import galleryImages from "@/lib/gallery-images.json";
+import galleryImages from "@/lib/content/gallery-images.json";
 
 function BookIcon() {
   return (

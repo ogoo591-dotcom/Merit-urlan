@@ -7,7 +7,7 @@ import { useActionState, useState } from "react";
 import { saveProductAction, type FormState } from "@/app/admin/products/actions";
 import { SubmitButton } from "@/components/admin/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton } from "@/components/admin/ui";
-import { productColors, type ColorKey, type ProductType, type StoreProduct } from "@/lib/mock/products";
+import { productColors, type ColorKey, type ProductType, type StoreProduct } from "@/server/mock/products";
 
 export function ProductForm({
   product,

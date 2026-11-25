@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { approvePayment, rejectPayment } from "@/lib/data/payments";
 
 // Банкны хуулгатай тулгаад баталгаажуулах / татгалзах.

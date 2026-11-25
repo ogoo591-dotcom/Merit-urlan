@@ -5,7 +5,7 @@ import { deletePatternAction } from "@/app/admin/patterns/actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { PatternForm } from "@/components/admin/pattern-form";
 import { PageHeader } from "@/components/admin/ui";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/server/auth";
 import { getPatternForAdmin } from "@/lib/data/patterns";
 import { getProducts } from "@/lib/data/products";
 
