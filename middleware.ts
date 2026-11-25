@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { isAdminUser } from "@/lib/admin-access";
 
 // Сайтыг хэн ч нэвтрэлгүй үзнэ. Зөвхөн захиалга, хувийн хуудас, админд нэвтрэлт шаардана.
-const isProtectedRoute = createRouteMatcher(["/checkout(.*)", "/account(.*)", "/admin(.*)", "/courses/enroll(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/checkout(.*)", "/account(.*)", "/admin(.*)"]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export default clerkMiddleware(async (auth, request) => {
