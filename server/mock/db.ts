@@ -10,6 +10,7 @@ import { mockCatalogVersion, mockProducts } from "@/server/mock/products";
 import type { StoreProduct } from "@/types/catalog";
 import type { Order } from "@/lib/orders";
 import type { Course } from "@/types/courses";
+import type { AppNotification } from "@/types/notifications";
 import type { Pattern } from "@/types/patterns";
 import type { Purchase } from "@/types/purchases";
 
@@ -17,16 +18,6 @@ import type { Purchase } from "@/types/purchases";
 // Анх уншихад lib/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд lib/data/* функцууд энэ файлын оронд Supabase-ийг дуудна.
 // Анхаар: Vercel production дээр файл бичих боломжгүй — энэ нь зөвхөн локал хөгжүүлэлтэд зориулагдсан.
 
-
-export type DbNotification = {
-  id: string;
-  audience: "admin" | "customer";
-  userId?: string;
-  message: string;
-  href?: string;
-  createdAt: string;
-  read: boolean;
-};
 
 // Дансаар шилжүүлсэн төлбөр (lib/payments.ts). Админ баталгаажуулсны дараа захиалга төлөгдөж, сургалт/схем нээгдэнэ.
 export type DbPayment = {
@@ -49,7 +40,7 @@ export type DbPayment = {
 export type Db = {
   products: StoreProduct[];
   orders: Order[];
-  notifications: DbNotification[];
+  notifications: AppNotification[];
   courses: Course[];
   patterns: Pattern[];
   purchases: Purchase[];

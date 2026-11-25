@@ -3,11 +3,11 @@ import { Bell } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { markMyNotificationsRead } from "@/app/actions";
+import { markMyNotificationsRead } from "@/server/modules/notifications/actions";
 import { MarkReadOnView } from "@/components/mark-read-on-view";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getCustomerNotifications } from "@/lib/data/notifications";
+import { getCustomerNotifications } from "@/server/modules/notifications/queries";
 import { formatDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Мэдэгдэл | Merit Urlan" };

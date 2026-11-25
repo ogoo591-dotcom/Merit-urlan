@@ -2,7 +2,7 @@ import "server-only";
 
 import { formatReadyDate, formatShortDate } from "@/lib/format";
 import { readDb, updateDb, type Db } from "@/server/mock/db";
-import { notifyCustomer } from "@/lib/notify";
+import { notifyCustomer } from "@/server/modules/notifications/service";
 import { orderStatusLabel, type CartInput, type Order, type OrderLine, type OrderStatus } from "@/lib/orders";
 
 // Захиалга. Одоогоор mock сан, дараа нь Supabase (place_order RPC г.м.) руу солино.

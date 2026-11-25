@@ -14,7 +14,7 @@ import { CartPopover } from "@/components/cart/cart-popover";
 import { useCart } from "@/components/cart-provider";
 import { useSaved } from "@/components/saved-provider";
 import { storeMeta } from "@/components/store/store-paths";
-import { getViewerStatus } from "@/app/actions";
+import { getViewerStatus } from "@/server/modules/notifications/actions";
 import { searchCatalog } from "@/server/modules/catalog/actions";
 import { formatPrice } from "@/lib/format";
 import type { StoreProduct } from "@/types/catalog";

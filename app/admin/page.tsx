@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { PageHeader, StatusPill, cardClass } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
-import { getAdminNotifications } from "@/lib/data/notifications";
+import { getAdminNotifications } from "@/server/modules/notifications/queries";
 import { getAllOrders } from "@/lib/data/orders";
 import { countPendingPayments } from "@/lib/data/payments";
 import { getAllPurchases } from "@/server/modules/purchases/queries";

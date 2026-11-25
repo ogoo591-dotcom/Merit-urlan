@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/server/auth";
-import { markRead, setNotificationRead } from "@/lib/data/notifications";
+import { markRead, setNotificationRead } from "@/server/modules/notifications/service";
 
 export async function toggleNotificationRead(formData: FormData) {
   await requireAdmin();

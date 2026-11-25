@@ -2,7 +2,7 @@ import "server-only";
 
 import { formatPrice } from "@/lib/format";
 import { readDb, updateDb, type DbPayment } from "@/server/mock/db";
-import { notifyAdmin, notifyCustomer } from "@/lib/notify";
+import { notifyAdmin, notifyCustomer } from "@/server/modules/notifications/service";
 import { paymentCodePattern } from "@/lib/payments";
 
 // Дансаар шилжүүлсэн төлбөр (урсгалын тайлбар: lib/payments.ts). Одоогоор mock сан, дараа нь Supabase-ийн payments хүснэгт.

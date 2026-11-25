@@ -3,12 +3,10 @@
 import { auth } from "@clerk/nextjs/server";
 
 import { getCourse } from "@/server/modules/courses/queries";
-import { countUnread, markRead } from "@/lib/data/notifications";
+import { notifyAdmin } from "@/server/modules/notifications/service";
 import { createOrder, validateCart } from "@/lib/data/orders";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
 import { hasAccess } from "@/server/modules/purchases/queries";
-import { notifyAdmin } from "@/lib/notify";
-import { getAdminUser } from "@/server/auth";
 import type { CartInput, Order } from "@/lib/orders";
 
 // Client компонентууд lib/data-г шууд импортлохгүй (сервер талын сан) — эдгээр server action-оор дамжина.
@@ -150,17 +148,4 @@ export async function placeOrder(input: {
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Захиалга үүсгэхэд алдаа гарлаа." };
   }
-}
-
-// Header: админ эсэх + уншаагүй мэдэгдлийн тоо (админ бол админы мэдэгдлийг ч оруулна).
-export async function getViewerStatus(): Promise<{ isAdmin: boolean; unread: number }> {
-  const { userId } = await auth();
-  if (!userId) return { isAdmin: false, unread: 0 };
-  const isAdmin = Boolean(await getAdminUser());
-  return { isAdmin, unread: await countUnread({ userId, admin: isAdmin }) };
-}
-
-export async function markMyNotificationsRead() {
-  const { userId } = await auth();
-  if (userId) await markRead({ userId });
 }
