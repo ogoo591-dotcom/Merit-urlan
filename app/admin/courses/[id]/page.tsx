@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { deleteCourseAction } from "@/server/modules/courses/admin-actions";
-import { ConfirmButton } from "@/components/admin/confirm-button";
-import { CourseForm } from "@/components/admin/course-form";
-import { PageHeader } from "@/components/admin/ui";
+import { ConfirmButton } from "@/components/ui/confirm-button";
+import { CourseForm } from "@/features/admin/components/course-form";
+import { PageHeader } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getCourseForAdmin } from "@/server/modules/courses/queries";
 

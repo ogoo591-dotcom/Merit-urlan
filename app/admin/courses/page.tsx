@@ -2,7 +2,7 @@ import { Pencil, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Notice, PageHeader, primaryButton } from "@/components/admin/ui";
+import { Notice, PageHeader, primaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getCourses } from "@/server/modules/courses/queries";
 import { getAllPurchases } from "@/server/modules/purchases/queries";

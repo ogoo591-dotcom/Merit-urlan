@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { AdminNav } from "@/components/admin/admin-nav";
+import { AdminNav } from "@/features/admin/components/admin-nav";
 import { getAdminUser } from "@/server/auth";
 import { countUnread } from "@/server/modules/notifications/queries";
 import { countPendingPayments } from "@/server/modules/payments/queries";

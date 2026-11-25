@@ -1,11 +1,11 @@
-import { AboutSection } from "@/components/about-section";
-import { FaqSection } from "@/components/faq-section";
-import { GallerySection } from "@/components/gallery-section";
-import { HomeHero } from "@/components/home-hero";
-import { ServicesSection } from "@/components/services-section";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { WhySection } from "@/components/why-section";
+import { AboutSection } from "@/features/home/components/about-section";
+import { FaqSection } from "@/features/home/components/faq-section";
+import { GallerySection } from "@/features/home/components/gallery-section";
+import { HomeHero } from "@/features/home/components/home-hero";
+import { ServicesSection } from "@/features/home/components/services-section";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { WhySection } from "@/features/home/components/why-section";
 import { getPatterns } from "@/server/modules/patterns/queries";
 
 export default async function HomePage() {

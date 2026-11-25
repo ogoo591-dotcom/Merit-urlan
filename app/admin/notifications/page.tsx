@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { markAllAdminNotificationsRead, toggleNotificationRead } from "@/server/modules/notifications/admin-actions";
-import { PageHeader, secondaryButton } from "@/components/admin/ui";
+import { PageHeader, secondaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getAdminNotifications } from "@/server/modules/notifications/queries";
 import { formatDateTime } from "@/lib/format";

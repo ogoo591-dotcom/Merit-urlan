@@ -1,4 +1,4 @@
-import { SignInScreen } from "@/components/auth/sign-in-screen";
+import { SignInScreen } from "@/features/auth/components/sign-in-screen";
 import { safeRedirect } from "@/lib/redirect";
 
 type SignInPageProps = {

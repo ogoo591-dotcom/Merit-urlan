@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { markMyNotificationsRead } from "@/server/modules/notifications/actions";
-import { MarkReadOnView } from "@/components/mark-read-on-view";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { MarkReadOnView } from "@/features/notifications/components/mark-read-on-view";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { getCustomerNotifications } from "@/server/modules/notifications/queries";
 import { formatDateTime } from "@/lib/format";
 

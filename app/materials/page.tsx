@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { CatalogView, type CatalogSearchParams } from "@/components/store/catalog-view";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { CatalogView, type CatalogSearchParams } from "@/features/catalog/components/catalog-view";
 
 export const metadata: Metadata = { title: "Материал | Merit Urlan" };
 

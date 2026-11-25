@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { changeOrderStatus, changeReadyDate } from "@/server/modules/orders/admin-actions";
-import { SubmitButton } from "@/components/admin/submit-button";
-import { PageHeader, StatusPill, cardClass, inputClass, primaryButton } from "@/components/admin/ui";
+import { SubmitButton } from "@/components/ui/submit-button";
+import { PageHeader, StatusPill, cardClass, inputClass, primaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getOrder } from "@/server/modules/orders/queries";
 import { formatDateTime, formatPrice, formatReadyDate } from "@/lib/format";

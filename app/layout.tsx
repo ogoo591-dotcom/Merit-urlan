@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { AuthModalProvider } from "@/components/auth/auth-modal-provider";
-import { CartProvider } from "@/components/cart-provider";
-import { DeliveryAddressProvider } from "@/components/delivery-address-provider";
-import { SavedProvider } from "@/components/saved-provider";
+import { AppProviders } from "@/components/providers/app-providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,13 +17,7 @@ export default function RootLayout({
     <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-in">
       <html lang="mn" className="h-full scroll-smooth antialiased">
       <body className="flex min-h-full flex-col">
-        <AuthModalProvider>
-          <DeliveryAddressProvider>
-            <CartProvider>
-              <SavedProvider>{children}</SavedProvider>
-            </CartProvider>
-          </DeliveryAddressProvider>
-        </AuthModalProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
       </html>
     </ClerkProvider>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { CourseForm } from "@/components/admin/course-form";
-import { PageHeader } from "@/components/admin/ui";
+import { CourseForm } from "@/features/admin/components/course-form";
+import { PageHeader } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 
 export default async function NewCoursePage() {

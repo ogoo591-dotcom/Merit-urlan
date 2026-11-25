@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
-import { StoryTimeline } from "@/components/about/story-timeline";
-import { AboutSection } from "@/components/about-section";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { WhySection } from "@/components/why-section";
+import { StoryTimeline } from "@/features/about/components/story-timeline";
+import { AboutSection } from "@/features/home/components/about-section";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { WhySection } from "@/features/home/components/why-section";
 
 export const metadata: Metadata = {
   title: "Бидний тухай | Merit Urlan",

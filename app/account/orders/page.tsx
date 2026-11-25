@@ -1,10 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 
-import { OrdersList } from "@/components/account/orders-list";
-import { PendingPayments, PurchasedCourses, PurchasedPatterns } from "@/components/account/purchased-items";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { OrdersList } from "@/features/account/components/orders-list";
+import { PendingPayments, PurchasedCourses, PurchasedPatterns } from "@/features/account/components/purchased-items";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { getCourse } from "@/server/modules/courses/queries";
 import type { CourseDetail } from "@/types/courses";
 import { getOrdersByUser } from "@/server/modules/orders/queries";

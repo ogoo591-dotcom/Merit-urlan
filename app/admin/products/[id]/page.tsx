@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { deleteProductAction } from "@/server/modules/catalog/admin-actions";
-import { ConfirmButton } from "@/components/admin/confirm-button";
-import { ProductForm } from "@/components/admin/product-form";
-import { PageHeader } from "@/components/admin/ui";
+import { ConfirmButton } from "@/components/ui/confirm-button";
+import { ProductForm } from "@/features/admin/components/product-form";
+import { PageHeader } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getProduct, getProducts } from "@/server/modules/catalog/queries";
 

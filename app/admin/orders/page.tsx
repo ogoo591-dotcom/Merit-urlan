@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { PageHeader, StatusPill } from "@/components/admin/ui";
+import { PageHeader, StatusPill } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getAllOrders } from "@/server/modules/orders/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";

@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { approvePaymentAction, rejectPaymentAction } from "@/server/modules/payments/admin-actions";
-import { ConfirmButton } from "@/components/admin/confirm-button";
-import { PageHeader, StatusPill } from "@/components/admin/ui";
+import { ConfirmButton } from "@/components/ui/confirm-button";
+import { PageHeader, StatusPill } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getPayments } from "@/server/modules/payments/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";

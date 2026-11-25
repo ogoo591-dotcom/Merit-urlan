@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { ProductForm } from "@/components/admin/product-form";
-import { PageHeader } from "@/components/admin/ui";
+import { ProductForm } from "@/features/admin/components/product-form";
+import { PageHeader } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
 import { getProducts } from "@/server/modules/catalog/queries";
 

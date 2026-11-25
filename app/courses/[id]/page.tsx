@@ -4,10 +4,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { CourseCartActions, CourseGallery, ShareButton } from "@/components/courses/course-buy";
-import { CourseProgressBar } from "@/components/courses/course-progress";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { CourseCartActions, CourseGallery, ShareButton } from "@/features/courses/components/course-buy";
+import { CourseProgressBar } from "@/features/courses/components/course-progress";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { formatCoursePrice } from "@/types/courses";
 import { getCourse } from "@/server/modules/courses/queries";
 import { hasPendingPayment } from "@/server/modules/payments/queries";
