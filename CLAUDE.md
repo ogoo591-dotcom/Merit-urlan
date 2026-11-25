@@ -13,12 +13,42 @@ Merit урлан — гар урлалын (crochet, amigurumi) бизнес. 5 
 4. Сургалт — видео сургалтууд (жишээ: түлхүүрийн оосор хийх 5 хичээлтэй сургалт). 1-р хичээл үнэгүй, бусад нь худалдаж авсны дараа нээгдэнэ
 5. Схем заавар — орчуулсан схемүүд (PDF). Худалдаж авсны дараа татаж авна
 
+━━━ ТӨСЛИЙН БҮТЭЦ ━━━
+```
+app/                 ЗӨВХӨН route (page, layout, route.ts). Бизнес логик, actions.ts энд байхгүй.
+server/              BACKEND бүхэлдээ (файл бүр "server-only"; actions.ts нь "use server")
+  modules/<модуль>/  catalog, courses, patterns, orders, payments, purchases, notifications, feedback
+    queries.ts         унших (RSC page шууд дуудна)
+    service.ts         бичих, бизнес логик
+    actions.ts         хэрэглэгчийн server action
+    admin-actions.ts   админы server action — эхний мөр нь requireAdmin()
+    schema.ts          Drizzle хүснэгт (DB үе шатанд нэмнэ)
+  db/                client.ts, schema.ts (модулиудын schema-г нэгтгэнэ)
+  payment-provider/  mock | qpay (QPay v2 invoice хэлбэртэй)
+  storage/           images.ts (Cloudinary/mock), pattern-files.ts (PDF, private)
+  mock/              .mock-db/db.json сан — DB руу шилжсэний дараа устгана
+  auth.ts, admin-access.ts, env.ts, listing.ts
+types/<модуль>.ts    client + server-ийн дундын төрөл, label, жижиг pure функц. server/-ээс юу ч import хийхгүй.
+features/<хэсэг>/    FRONTEND: components/*.tsx + хэсгийн туслах .ts (home, about, catalog, courses, patterns,
+                     cart, checkout, saved, account, notifications, feedback, auth, admin)
+components/          дундын UI: ui/ (суурь элемент, shadcn энд), common/, layout/ (header, footer, drawer), providers/
+hooks/               дундын client hook
+lib/                 client + server дундын туслахууд: format, redirect, site-config, navigation, content/, progress, local-store
+db/migrations/       drizzle-kit-ийн гаралт
+```
+Хилийн дүрэм:
+- app/ нь server/modules/*-ийн queries, actions-ийг дуудна; DB/mock-д шууд хандахгүй.
+- Client компонент server/-ээс зөвхөн actions.ts, admin-actions.ts-ийг import хийнэ; төрлийг types/-ээс авна.
+- Модуль хооронд зөвхөн service/queries-ийг дуудна (actions-ийг биш). Хамаарал: payments → orders, purchases, notifications.
+- features/* бие биенийхээ компонентыг хэрэглэж болно, гэхдээ тойрог үүсгэхгүй.
+- components/ui, components/common нь features/-ээс import хийхгүй. components/layout, components/providers (app shell) хийж болно.
+
 MOCK ГОРИМ (одоогийн шат):
-- Бүх өгөгдлийг lib/data/ доторх функцуудаар дамжуулж ав (getProducts(), getCourses(), createOrder() г.м.). Одоогоор эдгээр функц lib/mock/ доторх mock өгөгдлийг буцаана. Дараа нь зөвхөн эдгээр функцын дотор талыг Supabase руу солиход бүх сайт ажилладаг байх ёстой.
-- Төлбөр: ДАНСААР ШИЛЖҮҮЛЭХ + АДМИН БАТАЛГААЖУУЛАХ (QPay merchant гэрээ хийгдэх хүртэл). Урсгалын тайлбар: lib/payments.ts.
+- Бүх өгөгдлийг server/modules/<модуль>/ доторх функцуудаар (queries.ts, service.ts) дамжуулж ав (getProducts(), getCourses(), createOrder() г.м.). Одоогоор эдгээр функц server/mock/ (.mock-db/db.json) өгөгдлийг ашиглана. Дараа нь зөвхөн эдгээр функцын дотор талыг Supabase руу солиход бүх сайт ажилладаг байх ёстой.
+- Төлбөр: ДАНСААР ШИЛЖҮҮЛЭХ + АДМИН БАТАЛГААЖУУЛАХ (QPay merchant гэрээ хийгдэх хүртэл). Урсгалын тайлбар: types/payments.ts.
   Бараа/материал (сагс → checkout), сургалт, схем бүгд нэг урсгалтай:
-  1) "Төлөх" → components/store/bank-transfer-dialog.tsx: данс (lib/site-config.ts → BANK), дүн, гүйлгээний утга MU-XXXXXX.
-  2) "Төлбөр шилжүүлсэн" → хүлээгдэж буй төлбөр (lib/data/payments.ts → createPayment) + админд мэдэгдэл. Барааны захиалга үүсч үлдэгдэл нөөцлөгдөнө (payment.status "pending").
+  1) "Төлөх" → features/checkout/components/bank-transfer-dialog.tsx: данс (lib/site-config.ts → BANK), дүн, гүйлгээний утга MU-XXXXXX.
+  2) "Төлбөр шилжүүлсэн" → хүлээгдэж буй төлбөр (server/modules/payments/service.ts → createPayment) + админд мэдэгдэл. Барааны захиалга үүсч үлдэгдэл нөөцлөгдөнө (payment.status "pending").
   3) Админ /admin/payments-д банкны хуулгатай тулгаад "Баталгаажуулах" → захиалга төлөгдсөн, сургалт/схем нээгдэнэ, хэрэглэгчид мэдэгдэл.
      "Татгалзах" → захиалгын үлдэгдэл буцна, хэрэглэгчид мэдэгдэл.
   QPay холбоход 2-р алхмыг QPay invoice + callback-аар сольж, approvePayment()-ийг callback-аас дуудна.
@@ -32,7 +62,7 @@ MOCK ГОРИМ (одоогийн шат):
 Merit урлан даалин урлаж зардаг, мөн даалин хийх сургалт заадаг. Үүнийг сайтад нэм. Эхлээд CLAUDE.md файлд энэ мэдээллийг нэм.
 
 БҮТЭЭГДЭХҮҮН — "Даалин" ангилал:
-1. lib/mock/products.ts-д type: "product", ангилал: "Даалин" гэсэн 4–6 mock бараа нэм (зургийн линкийг дараа нь би Cloudinary-аас оруулна, одоохондоо placeholder).
+1. server/mock/products.ts-д type: "product", ангилал: "Даалин" гэсэн 4–6 mock бараа нэм (зургийн линкийг дараа нь би Cloudinary-аас оруулна, одоохондоо placeholder).
 2. Даалин бэлэн байгаа эсвэл захиалгаар хийгддэг байж болно. Захиалгаар хийх үед хэрэглэгч дараах зүйлсийг сонгож болдог байх:
    - Даавууны өнгө (сонголтоор)
    - Хээ угалзны загвар (зурагтай сонголт)
@@ -43,7 +73,7 @@ Merit урлан даалин урлаж зардаг, мөн даалин хи�
 3. Даалин бэлэг болгоход тохиромжтой тул бүтээгдэхүүний хуудсанд "Бэлгийн боодолтой" сонголт нэм (+X₮).
 
 СУРГАЛТ — "Даалин урлал":
-1. lib/mock/courses.ts-д "Даалин урлах анхан шат" сургалтыг нэм: 5–6 хичээл (жишээ нь: 1. Даалингийн түүх ба материал — үнэгүй, 2. Хэв гаргах ба эсгэх, 3. Хээ угалз хатгах, 4. Оёх, угсрах, 5. Чимэглэл ба өнгөлгөө).
+1. server/mock/courses.ts-д "Даалин урлах анхан шат" сургалтыг нэм: 5–6 хичээл (жишээ нь: 1. Даалингийн түүх ба материал — үнэгүй, 2. Хэв гаргах ба эсгэх, 3. Хээ угалз хатгах, 4. Оёх, угсрах, 5. Чимэглэл ба өнгөлгөө).
 2. Сургалтын хуудсанд "Шаардлагатай материал" хэсэг нэм. Тэнд Материал хэсгийн бараануудтай холбоос байх ба "Бүх материалыг сагсанд нэмэх" товч байна.
 3. Сургалтын ангилал: Crochet / Amigurumi / Даалин. Сургалтын жагсаалтын хуудсанд ангиллаар шүүх боломж нэм.
 
@@ -63,7 +93,7 @@ Drawer-ийн карт: гарчиг дээр дарахад тухайн анг
    • Сүлжмэл бүтээгдэхүүн (suljmel) — дэд: Тоглоом (togloom), Бусад (busad)
    • Бэлгийн багц (belgiin-bagts)
    • Зүү ороосон бүтээл (zuu-oroosen) — дэд: Хавтага (khavtaga), Даалин (daalin), Бүс (bus)
-   • Захиалгаар хийлгэх — хуудас биш: "Чат руу шилжих үү?" цонх (components/messenger-confirm-dialog.tsx) → "Тийм" бол Messenger шинэ таб.
+   • Захиалгаар хийлгэх — хуудас биш: "Чат руу шилжих үү?" цонх (components/common/messenger-confirm-dialog.tsx) → "Тийм" бол Messenger шинэ таб.
 2. Материал (/materials)
    • Нэхмэлийн утас (utas) — drawer-т "Турк утас", "Хятад утас" (→ ?category=utas&origin=...).
      Брэнд/төрөл нь yarnGroups массивт (материалын хуудасны зүүн самбарт дэд ангилал болж харагдана):
@@ -71,9 +101,9 @@ Drawer-ийн карт: гарчиг дээр дарахад тухайн анг
        Турк утас: Alize, Wolans
    • Туслах материал (tuslah) — дэд: Дэгээ зүү, Дүүргэгч, Сүлжмэлийн зүү, Нүд хамар, Товч, Синель утас, Цүнхний материал, Хэрэгсэл.
      Drawer-т эхний 2-ыг харуулж, үлдсэнийг "+N" (catalogCard-ийн limit) болгоно.
-3. Сургалт (/courses) — ангилалгүй, түвшингүй (анхан/дунд/ахисан гэж ангилахгүй). 3 сургалтын багц (lib/mock/courses.ts):
+3. Сургалт (/courses) — ангилалгүй, түвшингүй (анхан/дунд/ахисан гэж ангилахгүй). 3 сургалтын багц (server/mock/courses.ts):
    Хүүхдийн багц (kids-set), Шинэ жилийн багц (new-year-set), Ороолт малгайны багц (scarf-hat-set). Drawer-т бүх сургалт жагсаалтаар (нүүр зураг, нэр, хичээлийн тоо, үнэ, "1-р хичээл үнэгүй"),
-   өгөгдлийг app/actions.ts → getDrawerCourses() server action-оор уншина. /courses хуудасны зүүн самбарт "Ангиллууд" нь 3 багцын нэр (?package=<id>), түвшний шүүлтүүргүй.
+   өгөгдлийг server/modules/courses/actions.ts → getDrawerCourses() server action-оор уншина. /courses хуудасны зүүн самбарт "Ангиллууд" нь 3 багцын нэр (?package=<id>), түвшний шүүлтүүргүй.
 4. Схем заавар
    • Үнэгүй схем (/patterns?access=free, price = 0) — зурагтай grid; дарахад орчуулсан схем шууд нээгдэнэ (/patterns/[id]/view).
    • Төлбөртэй схем (/patterns?access=paid) — зурагтай grid; дарахад дэлгэрэнгүй → mock QPay → төлсний дараа /patterns/[id]/view автоматаар нээгдэнэ,
