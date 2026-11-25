@@ -3,29 +3,9 @@ import "server-only";
 // Схем зааврын mock өгөгдөл. filePath нь private/ хавтас доторх бүтэн схем (зураг эсвэл PDF) — зөвхөн сервер уншина.
 // coverImage нь нийтэд нээлттэй тул зөвхөн бүтээлийн зураг байна, заавар агуулахгүй. Үнэ түр утга.
 
-export type PatternType = "toy" | "clothes" | "home" | "accessory";
-export type PatternLevel = "beginner" | "intermediate" | "advanced";
+import type { Pattern } from "@/types/patterns";
 
-export type MockPattern = {
-  id: string;
-  name: string;
-  description: string;
-  // 0 бол үнэгүй: нэвтрэлт, төлбөргүйгээр шууд үзэж, татна.
-  price: number;
-  coverImage: string;
-  type: PatternType;
-  level: PatternLevel;
-  // materialId байвал "Материал" хэсгийн бараа руу холбоно.
-  materials: Array<{ name: string; materialId?: string }>;
-  size: string;
-  sourceLanguage: string;
-  // Схемийн эх зохиогч.
-  credit?: string;
-  createdAt: string;
-  filePath: string;
-};
-
-export const mockPatterns: MockPattern[] = [
+export const mockPatterns: Pattern[] = [
   {
     id: "little-frog",
     name: "Бяцхан мэлхий",

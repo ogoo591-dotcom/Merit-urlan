@@ -9,7 +9,8 @@ import { purchasePattern } from "@/app/patterns/actions";
 import { PurchaseButton } from "@/components/purchase-button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { formatPatternPrice, getPattern } from "@/lib/data/patterns";
+import { formatPatternPrice } from "@/types/patterns";
+import { getPattern } from "@/server/modules/patterns/queries";
 import { hasPendingPayment } from "@/lib/data/payments";
 import { hasPatternAccess } from "@/server/modules/purchases/queries";
 

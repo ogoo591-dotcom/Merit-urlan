@@ -7,7 +7,7 @@ import type { CourseDetail } from "@/types/courses";
 import type { Payment } from "@/lib/data/payments";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { paymentStatusLabel, paymentStatusTone } from "@/lib/payments";
-import type { PatternDetail } from "@/lib/data/patterns";
+import type { PatternDetail } from "@/types/patterns";
 
 const sectionTitle = "text-[16px] font-semibold text-[#2f2420]";
 

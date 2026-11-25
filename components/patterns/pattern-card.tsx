@@ -2,7 +2,7 @@ import { BadgeCheck, Gift, Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { formatPatternPrice, type PatternSummary } from "@/lib/data/patterns";
+import { formatPatternPrice, type PatternSummary } from "@/types/patterns";
 
 export function PatternCard({ pattern, purchased }: { pattern: PatternSummary; purchased: boolean }) {
   const open = pattern.isFree || purchased;

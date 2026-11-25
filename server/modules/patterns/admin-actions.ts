@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/server/auth";
-import { deletePattern, getPatternForAdmin, savePattern } from "@/lib/data/patterns";
+import { deletePattern, savePattern } from "@/server/modules/patterns/service";
+import { getPatternForAdmin } from "@/server/modules/patterns/queries";
 import { saveImageUpload } from "@/server/storage/images";
 import { savePatternFile } from "@/server/storage/pattern-files";
-import type { PatternLevel, PatternType } from "@/server/mock/patterns";
+import type { PatternLevel, PatternType } from "@/types/patterns";
 
 export type FormState = { error?: string };
 

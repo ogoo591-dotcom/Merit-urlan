@@ -6,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getPattern } from "@/lib/data/patterns";
+import { getPattern } from "@/server/modules/patterns/queries";
 import { hasPatternAccess } from "@/server/modules/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };

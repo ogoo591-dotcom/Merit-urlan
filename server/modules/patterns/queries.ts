@@ -1,52 +1,14 @@
 import "server-only";
 
+import { readDb } from "@/server/mock/db";
 import { buildListing, type ListingFilters } from "@/server/listing";
 import { getProduct } from "@/server/modules/catalog/queries";
-import { readDb, updateDb, type DbPattern } from "@/server/mock/db";
-import type { PatternLevel, PatternType } from "@/server/mock/patterns";
+import { patternLevelLabels, patternTypeLabels, type Pattern, type PatternDetail, type PatternSummary } from "@/types/patterns";
 
 // Схем зааврын өгөгдөл. Client руу дамжих зүйлд filePath байхгүй;
-// Бүтэн схемийг зөвхөн /api/patterns/[id]/download эрх шалгасны дараа lib/data/pattern-files.ts уншина.
+// Бүтэн схемийг зөвхөн /api/patterns/[id]/download эрх шалгасны дараа server/storage/pattern-files.ts уншина.
 
-export type { PatternLevel, PatternType } from "@/server/mock/patterns";
-
-export type PatternMaterial = { name: string; href?: string; category?: string };
-
-export type PatternSummary = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  isFree: boolean;
-  // Нийтэд нээлттэй бүтээлийн зураг. Бүтэн схем биш.
-  cover: { src: string };
-  fileKind: "image" | "pdf";
-  credit?: string;
-  type: PatternType;
-  typeLabel: string;
-  level: PatternLevel;
-  levelLabel: string;
-  size: string;
-  sourceLanguage: string;
-  createdAt: string;
-};
-
-export type PatternDetail = PatternSummary & { materials: PatternMaterial[] };
-
-export const patternTypeLabels: Record<PatternType, string> = {
-  toy: "Тоглоом",
-  clothes: "Хувцас",
-  home: "Гэр ахуй",
-  accessory: "Аксессуар",
-};
-
-export const patternLevelLabels: Record<PatternLevel, string> = {
-  beginner: "Анхан шат",
-  intermediate: "Дунд шат",
-  advanced: "Ахисан шат",
-};
-
-function toSummary(pattern: DbPattern): PatternSummary {
+function toSummary(pattern: Pattern): PatternSummary {
   return {
     id: pattern.id,
     name: pattern.name,
@@ -97,28 +59,6 @@ export async function getPattern(id: string): Promise<PatternDetail | null> {
   return { ...toSummary(pattern), materials };
 }
 
-export function formatPatternPrice(value: number) {
-  return value === 0 ? "Үнэгүй" : `${value.toLocaleString("en-US")}₮`;
-}
-
-// ---- Админ ----
-
-export async function getPatternForAdmin(id: string): Promise<DbPattern | null> {
+export async function getPatternForAdmin(id: string): Promise<Pattern | null> {
   return (await readDb()).patterns.find((item) => item.id === id) ?? null;
-}
-
-export async function savePattern(pattern: DbPattern, originalId?: string) {
-  await updateDb((db) => {
-    const index = db.patterns.findIndex((item) => item.id === (originalId ?? pattern.id));
-    const clash = db.patterns.some((item, itemIndex) => item.id === pattern.id && itemIndex !== index);
-    if (clash) throw new Error("Энэ ID-тай схем аль хэдийн байна.");
-    if (index === -1) db.patterns.push(pattern);
-    else db.patterns[index] = pattern;
-  });
-}
-
-export async function deletePattern(id: string) {
-  await updateDb((db) => {
-    db.patterns = db.patterns.filter((item) => item.id !== id);
-  });
 }

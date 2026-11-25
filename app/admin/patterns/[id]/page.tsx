@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { deletePatternAction } from "@/app/admin/patterns/actions";
+import { deletePatternAction } from "@/server/modules/patterns/admin-actions";
 import { ConfirmButton } from "@/components/admin/confirm-button";
 import { PatternForm } from "@/components/admin/pattern-form";
 import { PageHeader } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
-import { getPatternForAdmin } from "@/lib/data/patterns";
+import { getPatternForAdmin } from "@/server/modules/patterns/queries";
 import { getProducts } from "@/server/modules/catalog/queries";
 
 export default async function EditPatternPage({ params }: { params: Promise<{ id: string }> }) {

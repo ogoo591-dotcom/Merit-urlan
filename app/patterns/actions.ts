@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import type { PurchaseResult } from "@/components/purchase-button";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
-import { getPattern } from "@/lib/data/patterns";
+import { getPattern } from "@/server/modules/patterns/queries";
 import { hasPatternAccess } from "@/server/modules/purchases/queries";
 
 // "Төлбөр шилжүүлсэн" дарахад: хүлээгдэж буй төлбөр үүсгэж админд мэдэгдэнэ.
