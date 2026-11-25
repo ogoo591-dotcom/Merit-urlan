@@ -2,8 +2,6 @@
 
 import { notifyAdmin } from "@/server/modules/notifications/service";
 
-// Client компонентууд lib/data-г шууд импортлохгүй (сервер талын сан) — эдгээр server action-оор дамжина.
-
 export type FeedbackState = {
   sent?: boolean;
   error?: string;
