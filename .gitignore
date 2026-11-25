@@ -49,3 +49,4 @@ raw-images/
 
 # Mock өгөгдлийн сан, upload хийсэн файлууд (локал хөгжүүлэлт)
 .mock-db/
+bun.lock
