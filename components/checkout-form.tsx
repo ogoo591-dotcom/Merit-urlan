@@ -30,7 +30,7 @@ const cardClass = "rounded-[24px] border border-[#eadfd5] bg-white";
 const required = <span className="text-[#a24456]">*</span>;
 
 // Захиалгын урсгал: сагснаас сонгох → 1. Мэдээлэл → 2. Дансаар шилжүүлэх → "Төлбөр шилжүүлсэн" →
-// админ баталгаажуулмагц захиалга төлөгдөж, сургалт нээгдэнэ (lib/payments.ts).
+// админ баталгаажуулмагц захиалга төлөгдөж, сургалт нээгдэнэ (types/payments.ts).
 // Зөвхөн сонгосон мөрүүд худалдан авагдана; бусад нь сагсандаа үлдэнэ.
 export function CheckoutForm({ defaults }: Props) {
   const router = useRouter();

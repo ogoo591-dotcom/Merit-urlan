@@ -2,7 +2,7 @@ import "server-only";
 
 import type { FacetOption } from "@/types/catalog";
 
-// Сургалт, схемийн жагсаалтын дундын шүүлт. Бараа, материал нь getCatalog() (lib/data/products.ts)-ийг ашиглана.
+// Сургалт, схемийн жагсаалтын дундын шүүлт. Бараа, материал нь getCatalog() (server/modules/catalog/queries.ts)-ийг ашиглана.
 
 export type ListingFilters = {
   category?: string;

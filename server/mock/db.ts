@@ -16,7 +16,7 @@ import type { Payment } from "@/types/payments";
 import type { Purchase } from "@/types/purchases";
 
 // Сервер талын mock өгөгдлийн сан: .mock-db/db.json файл. Админ, захиалагч бүгд нэг өгөгдлийг харна.
-// Анх уншихад lib/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд lib/data/* функцууд энэ файлын оронд Supabase-ийг дуудна.
+// Анх уншихад server/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд server/modules/* функцууд энэ файлын оронд Supabase-ийг дуудна.
 // Анхаар: Vercel production дээр файл бичих боломжгүй — энэ нь зөвхөн локал хөгжүүлэлтэд зориулагдсан.
 
 

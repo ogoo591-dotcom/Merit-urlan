@@ -10,7 +10,7 @@ import { BankTransferDialog } from "@/components/store/bank-transfer-dialog";
 import { newPaymentCode, type PaymentInvoice, type PurchaseResult } from "@/types/payments";
 
 // Сургалт, схем худалдаж авах товч: (нэвтрэх) → дансаар шилжүүлэх цонх → "Төлбөр шилжүүлсэн" →
-// `action` хүлээгдэж буй төлбөр үүсгэж, админ баталгаажуулмагц нээгдэнэ (lib/payments.ts).
+// `action` хүлээгдэж буй төлбөр үүсгэж, админ баталгаажуулмагц нээгдэнэ (types/payments.ts).
 export function PurchaseButton({
   action,
   itemId,

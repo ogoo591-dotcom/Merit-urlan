@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/format";
 import type { PaymentInvoice } from "@/types/payments";
 import { BANK } from "@/lib/site-config";
 
-// Дансаар шилжүүлэх цонх (урсгал: lib/payments.ts).
+// Дансаар шилжүүлэх цонх (урсгал: types/payments.ts).
 // 1-р алхам: данс, дүн, гүйлгээний утга → "Төлбөр шилжүүлсэн". 2-р алхам (done): "Шалгагдаж байна".
 export function BankTransferDialog({
   invoice,
