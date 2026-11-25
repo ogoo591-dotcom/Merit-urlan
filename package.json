@@ -8,24 +8,33 @@
     "pages:build": "npx @cloudflare/next-on-pages",
     "start": "next start",
     "lint": "eslint",
-    "compress": "node scripts/compress.mjs"
+    "compress": "node scripts/compress.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:check": "tsx scripts/db-check.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.2.7",
     "@supabase/supabase-js": "^2.118.0",
+    "drizzle-orm": "^0.45.4",
     "lucide-react": "^1.64.0",
     "next": "^15.5.28",
+    "postgres": "^4.1.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
