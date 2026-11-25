@@ -1,7 +1,7 @@
 import "server-only";
 
 import { buildListing, type ListingFilters } from "@/server/listing";
-import { hasAccess } from "@/lib/data/purchases";
+import { hasAccess } from "@/server/modules/purchases/queries";
 import { readDb, updateDb, type DbCourse } from "@/server/mock/db";
 import type { CourseLevel } from "@/server/mock/courses";
 

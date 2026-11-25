@@ -9,7 +9,7 @@ import { getCourse, type CourseDetail } from "@/lib/data/courses";
 import { getOrdersByUser } from "@/lib/data/orders";
 import { getPaymentsByUser } from "@/lib/data/payments";
 import { getPattern, type PatternDetail } from "@/lib/data/patterns";
-import { getPurchasedCourseIds, getPurchasedPatternIds } from "@/lib/data/purchases";
+import { getPurchasedCourseIds, getPurchasedPatternIds } from "@/server/modules/purchases/queries";
 
 export const metadata: Metadata = { title: "Миний захиалгууд | Merit Urlan" };
 

@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import type { PurchaseResult } from "@/components/purchase-button";
 import { getCourse } from "@/lib/data/courses";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
-import { hasAccess } from "@/lib/data/purchases";
+import { hasAccess } from "@/server/modules/purchases/queries";
 
 // "Төлбөр шилжүүлсэн" дарахад: хүлээгдэж буй төлбөр үүсгэж админд мэдэгдэнэ.
 // Админ баталгаажуулмагц сургалт нээгдэнэ (lib/data/payments.ts → approvePayment).

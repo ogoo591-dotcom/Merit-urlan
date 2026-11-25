@@ -9,6 +9,7 @@ import { mockPatterns, type MockPattern } from "@/server/mock/patterns";
 import { mockCatalogVersion, mockProducts } from "@/server/mock/products";
 import type { StoreProduct } from "@/types/catalog";
 import type { Order } from "@/lib/orders";
+import type { Purchase } from "@/types/purchases";
 
 // Сервер талын mock өгөгдлийн сан: .mock-db/db.json файл. Админ, захиалагч бүгд нэг өгөгдлийг харна.
 // Анх уншихад lib/mock/*-ийн өгөгдлөөр үүснэ. Supabase руу шилжихэд lib/data/* функцууд энэ файлын оронд Supabase-ийг дуудна.
@@ -25,16 +26,6 @@ export type DbNotification = {
   href?: string;
   createdAt: string;
   read: boolean;
-};
-
-export type DbPurchase = {
-  id: string;
-  kind: "course" | "pattern";
-  itemId: string;
-  userId: string;
-  price: number;
-  transactionId: string;
-  createdAt: string;
 };
 
 // Дансаар шилжүүлсэн төлбөр (lib/payments.ts). Админ баталгаажуулсны дараа захиалга төлөгдөж, сургалт/схем нээгдэнэ.
@@ -61,7 +52,7 @@ export type Db = {
   notifications: DbNotification[];
   courses: DbCourse[];
   patterns: DbPattern[];
-  purchases: DbPurchase[];
+  purchases: Purchase[];
   payments: DbPayment[];
   catalogVersion?: number;
 };

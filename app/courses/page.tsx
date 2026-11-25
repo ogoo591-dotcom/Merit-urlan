@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import type { CatalogSearchParams } from "@/components/store/catalog-params";
 import { ListingView, parseListingParams } from "@/components/store/listing-view";
 import { getCourseCatalog } from "@/lib/data/courses";
-import { getPurchasedCourseIds } from "@/lib/data/purchases";
+import { getPurchasedCourseIds } from "@/server/modules/purchases/queries";
 
 export const metadata: Metadata = { title: "Сургалт | Merit Urlan" };
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Notice, PageHeader, primaryButton } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
 import { getCourses } from "@/lib/data/courses";
-import { getAllPurchases } from "@/lib/data/purchases";
+import { getAllPurchases } from "@/server/modules/purchases/queries";
 import { formatPrice } from "@/lib/format";
 
 export default async function AdminCoursesPage({ searchParams }: { searchParams: Promise<{ saved?: string; deleted?: string }> }) {

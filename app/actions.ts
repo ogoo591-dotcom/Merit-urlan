@@ -6,7 +6,7 @@ import { getCourse, getCourses } from "@/lib/data/courses";
 import { countUnread, markRead } from "@/lib/data/notifications";
 import { createOrder, validateCart } from "@/lib/data/orders";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
-import { hasAccess } from "@/lib/data/purchases";
+import { hasAccess } from "@/server/modules/purchases/queries";
 import { notifyAdmin } from "@/lib/notify";
 import { getAdminUser } from "@/server/auth";
 import type { CartInput, Order } from "@/lib/orders";

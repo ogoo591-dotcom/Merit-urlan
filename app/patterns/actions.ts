@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs/server";
 import type { PurchaseResult } from "@/components/purchase-button";
 import { createPayment, hasPendingPayment, isValidPaymentCode } from "@/lib/data/payments";
 import { getPattern } from "@/lib/data/patterns";
-import { hasPatternAccess } from "@/lib/data/purchases";
+import { hasPatternAccess } from "@/server/modules/purchases/queries";
 
 // "Төлбөр шилжүүлсэн" дарахад: хүлээгдэж буй төлбөр үүсгэж админд мэдэгдэнэ.
 // Админ баталгаажуулмагц схем нээгдэнэ (lib/data/payments.ts → approvePayment).

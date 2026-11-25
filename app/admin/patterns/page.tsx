@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Notice, PageHeader, primaryButton } from "@/components/admin/ui";
 import { requireAdmin } from "@/server/auth";
 import { getPatterns } from "@/lib/data/patterns";
-import { getAllPurchases } from "@/lib/data/purchases";
+import { getAllPurchases } from "@/server/modules/purchases/queries";
 import { formatPrice } from "@/lib/format";
 
 export default async function AdminPatternsPage({ searchParams }: { searchParams: Promise<{ saved?: string; deleted?: string }> }) {

@@ -6,7 +6,7 @@ import { requireAdmin } from "@/server/auth";
 import { getAdminNotifications } from "@/lib/data/notifications";
 import { getAllOrders } from "@/lib/data/orders";
 import { countPendingPayments } from "@/lib/data/payments";
-import { getAllPurchases } from "@/lib/data/purchases";
+import { getAllPurchases } from "@/server/modules/purchases/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { orderStatusLabel, orderStatusTone } from "@/lib/orders";
 

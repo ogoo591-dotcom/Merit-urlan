@@ -11,7 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { formatPatternPrice, getPattern } from "@/lib/data/patterns";
 import { hasPendingPayment } from "@/lib/data/payments";
-import { hasPatternAccess } from "@/lib/data/purchases";
+import { hasPatternAccess } from "@/server/modules/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

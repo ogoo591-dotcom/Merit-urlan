@@ -6,7 +6,7 @@ import { LearnView } from "@/components/courses/learn-view";
 import { SiteHeader } from "@/components/site-header";
 import { getCourse, getLessonVideo } from "@/lib/data/courses";
 import { hasPendingPayment } from "@/lib/data/payments";
-import { hasAccess } from "@/lib/data/purchases";
+import { hasAccess } from "@/server/modules/purchases/queries";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ lesson?: string }> };
 
