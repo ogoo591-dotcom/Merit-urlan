@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 
-import { getAdminUser } from "@/server/auth";
+import { isAdmin as viewerIsAdmin } from "@/server/auth";
 import { countUnread } from "@/server/services/notifications/queries";
 import { markRead } from "@/server/services/notifications/service";
 
@@ -10,7 +10,7 @@ import { markRead } from "@/server/services/notifications/service";
 export async function getViewerStatus(): Promise<{ isAdmin: boolean; unread: number }> {
   const { userId } = await auth();
   if (!userId) return { isAdmin: false, unread: 0 };
-  const isAdmin = Boolean(await getAdminUser());
+  const isAdmin = await viewerIsAdmin();
   return { isAdmin, unread: await countUnread({ userId, admin: isAdmin }) };
 }
 

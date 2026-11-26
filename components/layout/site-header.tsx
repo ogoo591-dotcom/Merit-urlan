@@ -112,7 +112,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isSignedIn } = useUser();
-  // Админ эсэх (publicMetadata эсвэл ADMIN_EMAILS) болон уншаагүй мэдэгдлийн тоог серверээс авна.
+  // Админ эсэх (session token-ий role) болон уншаагүй мэдэгдлийн тоог серверээс авна.
   const [viewer, setViewer] = useState({ isAdmin: false, unread: 0 });
   const isAdmin = isSignedIn ? viewer.isAdmin : false;
   const unread = isSignedIn ? viewer.unread : 0;

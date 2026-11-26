@@ -1,27 +1,9 @@
 // Админ эсэхийг шалгах дүрэм (middleware болон серверт хамт ашиглана).
-// 1) Clerk Dashboard → Users → Metadata → Public: {"role": "admin"}
-// 2) эсвэл .env.local: ADMIN_EMAILS=a@gmail.com,b@gmail.com
+// Clerk Dashboard → Users → Metadata → Public: {"role": "admin"}. Session token-д {"metadata": "{{user.public_metadata}}"}
+// нэмсэн тул Clerk API дуудалгүй token-оос уншина (эрх өөрчлөгдсөнөөс ~1 минутын дотор шинэчлэгдэнэ).
 
-type AdminCandidate = {
-  publicMetadata?: Record<string, unknown> | null;
-  emailAddresses?: Array<{ emailAddress: string; verification?: { status?: string | null } | null }>;
-};
-
-export function adminEmails() {
-  return (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-}
-
-export function isAdminUser(user: AdminCandidate | null | undefined) {
-  if (!user) return false;
-  if (user.publicMetadata?.role === "admin") return true;
-  const allowed = adminEmails();
-  // Зөвхөн баталгаажсан имэйлээр (хүн өөр хүний имэйлийг баталгаажуулалгүй нэмээд админ болохоос сэргийлнэ).
-  return (user.emailAddresses ?? []).some(
-    (email) => email.verification?.status === "verified" && allowed.includes(email.emailAddress.toLowerCase()),
-  );
+export function isAdminClaims(claims: CustomJwtSessionClaims | null | undefined) {
+  return claims?.metadata?.role === "admin";
 }
 
 // ТҮР: локал dev-д админ шалгалтыг алгасна (.env.local: ADMIN_AUTH_BYPASS=true). Production build-д хэзээ ч ажиллахгүй.
