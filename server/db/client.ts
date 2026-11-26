@@ -15,9 +15,10 @@ export type DbExecutor = Db | Tx;
 const globalForDb = globalThis as unknown as { meritDb?: Db };
 
 // Supabase transaction pooler (6543) prepared statement дэмждэггүй тул prepare: false.
+// Pipelining (нэг холболтоор зэрэг олон query) нь pooler-ийг гацаадаг тул max_pipeline: 1.
 export function getDb(): Db {
   if (globalForDb.meritDb) return globalForDb.meritDb;
-  const client = postgres(serverEnv("db").DATABASE_URL, { prepare: false, max: 5, idle_timeout: 20 });
+  const client = postgres(serverEnv("db").DATABASE_URL, { prepare: false, max: 5, idle_timeout: 20, max_pipeline: 1 });
   const db = drizzle({ client, schema, casing: "snake_case" });
   globalForDb.meritDb = db;
   return db;
