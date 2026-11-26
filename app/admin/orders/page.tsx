@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { PageHeader, StatusPill } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getAllOrders } from "@/server/modules/orders/queries";
+import { getAllOrders } from "@/server/services/orders/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { orderStatusLabel, orderStatuses, orderStatusTone, type OrderStatus } from "@/types/orders";
 import { paymentStatusTone } from "@/types/payments";

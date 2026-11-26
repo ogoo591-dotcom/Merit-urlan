@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ProductForm } from "@/features/admin/components/product-form";
 import { PageHeader } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getProducts } from "@/server/modules/catalog/queries";
+import { getProducts } from "@/server/services/catalog/queries";
 
 export default async function NewProductPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   await requireAdmin();

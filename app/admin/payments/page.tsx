@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-import { approvePaymentAction, rejectPaymentAction } from "@/server/modules/payments/admin-actions";
+import { approvePaymentAction, rejectPaymentAction } from "@/server/services/payments/admin-actions";
 import { ConfirmButton } from "@/components/ui/confirm-button";
 import { PageHeader, StatusPill } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getPayments } from "@/server/modules/payments/queries";
+import { getPayments } from "@/server/services/payments/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { paymentStatusLabel, paymentStatusTone, type PaymentStatus } from "@/types/payments";
 import { BANK } from "@/lib/site-config";

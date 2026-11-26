@@ -6,7 +6,7 @@ import { list, price, single, type CatalogSearchParams } from "@/features/catalo
 import { CatalogSidebar } from "@/features/catalog/components/catalog-sidebar";
 import { ProductCard } from "@/features/catalog/components/product-card";
 import { storeMeta } from "@/features/catalog/store-paths";
-import { getCatalog } from "@/server/modules/catalog/queries";
+import { getCatalog } from "@/server/services/catalog/queries";
 import { productColors, type Availability, type ColorKey, type Origin, type ProductSort, type ProductType } from "@/types/catalog";
 import { formatPrice } from "@/lib/format";
 import { categoryOrder, categorySlug, resolveCatalogParams, subOrder, subSlug } from "@/lib/navigation";

@@ -5,14 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { purchasePattern } from "@/server/modules/payments/actions";
+import { purchasePattern } from "@/server/services/payments/actions";
 import { PurchaseButton } from "@/features/checkout/components/purchase-button";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { formatPatternPrice } from "@/types/patterns";
-import { getPattern } from "@/server/modules/patterns/queries";
-import { hasPendingPayment } from "@/server/modules/payments/queries";
-import { hasPatternAccess } from "@/server/modules/purchases/queries";
+import { getPattern } from "@/server/services/patterns/queries";
+import { hasPendingPayment } from "@/server/services/payments/queries";
+import { hasPatternAccess } from "@/server/services/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

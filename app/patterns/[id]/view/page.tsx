@@ -6,8 +6,8 @@ import { notFound, redirect } from "next/navigation";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { getPattern } from "@/server/modules/patterns/queries";
-import { hasPatternAccess } from "@/server/modules/purchases/queries";
+import { getPattern } from "@/server/services/patterns/queries";
+import { hasPatternAccess } from "@/server/services/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

@@ -9,9 +9,9 @@ import { CourseProgressBar } from "@/features/courses/components/course-progress
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { formatCoursePrice } from "@/types/courses";
-import { getCourse } from "@/server/modules/courses/queries";
-import { hasPendingPayment } from "@/server/modules/payments/queries";
-import { hasAccess } from "@/server/modules/purchases/queries";
+import { getCourse } from "@/server/services/courses/queries";
+import { hasPendingPayment } from "@/server/services/payments/queries";
+import { hasAccess } from "@/server/services/purchases/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

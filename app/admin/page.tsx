@@ -13,10 +13,10 @@ import {
   cardClass,
 } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getAdminNotifications } from "@/server/modules/notifications/queries";
-import { getAllOrders } from "@/server/modules/orders/queries";
-import { countPendingPayments } from "@/server/modules/payments/queries";
-import { getAllPurchases } from "@/server/modules/purchases/queries";
+import { getAdminNotifications } from "@/server/services/notifications/queries";
+import { getAllOrders } from "@/server/services/orders/queries";
+import { countPendingPayments } from "@/server/services/payments/queries";
+import { getAllPurchases } from "@/server/services/purchases/queries";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import { orderStatusLabel, orderStatusTone } from "@/types/orders";
 

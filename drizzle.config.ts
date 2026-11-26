@@ -9,9 +9,10 @@ try {
 
 export default defineConfig({
   dialect: "postgresql",
-  schema: "./server/db/schema.ts",
+  schema: "./server/db/schema/index.ts",
   out: "./db/migrations",
   dbCredentials: { url: process.env.DIRECT_URL ?? "" },
+  casing: "snake_case",
   strict: true,
   verbose: true,
 });

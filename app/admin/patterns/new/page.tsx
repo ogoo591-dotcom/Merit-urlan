@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PatternForm } from "@/features/admin/components/pattern-form";
 import { PageHeader } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getProducts } from "@/server/modules/catalog/queries";
+import { getProducts } from "@/server/services/catalog/queries";
 
 export default async function NewPatternPage() {
   await requireAdmin();

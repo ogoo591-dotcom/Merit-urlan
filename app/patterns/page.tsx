@@ -6,8 +6,8 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import type { CatalogSearchParams } from "@/features/catalog/catalog-params";
 import { ListingView, parseListingParams } from "@/features/catalog/components/listing-view";
-import { getPatternCatalog } from "@/server/modules/patterns/queries";
-import { getPurchasedPatternIds } from "@/server/modules/purchases/queries";
+import { getPatternCatalog } from "@/server/services/patterns/queries";
+import { getPurchasedPatternIds } from "@/server/services/purchases/queries";
 
 export const metadata: Metadata = { title: "Схем заавар | Merit Urlan" };
 
