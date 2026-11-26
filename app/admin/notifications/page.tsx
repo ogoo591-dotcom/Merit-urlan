@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-import { markAllAdminNotificationsRead, toggleNotificationRead } from "@/server/modules/notifications/admin-actions";
+import { markAllAdminNotificationsRead, toggleNotificationRead } from "@/server/services/notifications/admin-actions";
 import { PageHeader, secondaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getAdminNotifications } from "@/server/modules/notifications/queries";
+import { getAdminNotifications } from "@/server/services/notifications/queries";
 import { formatDateTime } from "@/lib/format";
 
 export default async function AdminNotificationsPage({ searchParams }: { searchParams: Promise<{ filter?: string }> }) {

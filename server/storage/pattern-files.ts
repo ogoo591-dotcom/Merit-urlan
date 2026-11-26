@@ -3,7 +3,8 @@ import "server-only";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { mockDbDir, readDb } from "@/server/mock/db";
+import { mockDbDir } from "@/server/mock/db";
+import { findPattern } from "@/server/repository/pattern/pattern";
 
 // Бүтэн схем (зураг, PDF) нь нийтэд нээлттэй биш тул .mock-db/files дотор үлдэнэ (дараа нь Supabase private bucket + signed URL).
 const filesDir = path.join(mockDbDir, "files");
@@ -19,7 +20,7 @@ const contentTypes: Record<string, string> = {
 // Бүтэн схемийг (зураг, PDF) private/ хавтаснаас унших (Node.js runtime шаардлагатай — edge дээр fs байхгүй).
 // Зөвхөн эрх шалгасны дараа дуудна. Дараа нь Supabase Storage-ийн private bucket + signed URL руу солино.
 export async function readPatternFile(id: string): Promise<{ data: Buffer; fileName: string; extension: string; contentType: string } | null> {
-  const pattern = (await readDb()).patterns.find((item) => item.id === id);
+  const pattern = await findPattern(id);
   if (!pattern) return null;
   // filePath нь өгөгдлөөс ирдэг (хэрэглэгчийн оролт биш), гэхдээ private/ эсвэл .mock-db/files/ (админы upload)-аас гадагш гарахгүйг баталгаажуулна.
   const allowedRoots = [path.join(process.cwd(), "private"), path.join(mockDbDir, "files")];

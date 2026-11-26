@@ -4,7 +4,8 @@ import { FileCheck } from "lucide-react";
 import Image from "next/image";
 import { useActionState } from "react";
 
-import { savePatternAction, type FormState } from "@/server/modules/patterns/admin-actions";
+import { savePatternAction } from "@/server/services/patterns/admin-actions";
+import type { FormState } from "@/types/forms";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton } from "@/features/admin/components/ui";
 import type { Pattern } from "@/types/patterns";

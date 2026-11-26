@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 
 import { AdminNav } from "@/features/admin/components/admin-nav";
 import { getAdminUser } from "@/server/auth";
-import { countUnread } from "@/server/modules/notifications/queries";
-import { countPendingPayments } from "@/server/modules/payments/queries";
+import { countUnread } from "@/server/services/notifications/queries";
+import { countPendingPayments } from "@/server/services/payments/queries";
 
 export const metadata: Metadata = { title: "Админ | Merit Urlan" };
 

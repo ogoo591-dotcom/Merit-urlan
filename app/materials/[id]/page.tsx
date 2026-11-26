@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ProductDetailView } from "@/features/catalog/components/product-detail";
-import { getProduct } from "@/server/modules/catalog/queries";
+import { getProduct } from "@/server/services/catalog/queries";
 
 type Props = { params: Promise<{ id: string }> };
 

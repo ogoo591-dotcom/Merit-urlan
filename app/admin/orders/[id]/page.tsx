@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { changeOrderStatus, changeReadyDate } from "@/server/modules/orders/admin-actions";
+import { changeOrderStatus, changeReadyDate } from "@/server/services/orders/admin-actions";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { PageHeader, StatusPill, cardClass, inputClass, primaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getOrder } from "@/server/modules/orders/queries";
+import { getOrder } from "@/server/services/orders/queries";
 import { formatDateTime, formatPrice, formatReadyDate } from "@/lib/format";
 import { formatOrderAddress, orderStatusLabel, orderStatuses, orderStatusTone } from "@/types/orders";
 

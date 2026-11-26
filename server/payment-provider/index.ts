@@ -8,5 +8,5 @@ import type { PaymentProvider } from "@/server/payment-provider/types";
 export type * from "@/server/payment-provider/types";
 
 export function getPaymentProvider(): PaymentProvider {
-  return serverEnv().PAYMENT_PROVIDER === "qpay" ? qpayProvider : mockProvider;
+  return serverEnv("payment").PAYMENT_PROVIDER === "qpay" ? qpayProvider : mockProvider;
 }

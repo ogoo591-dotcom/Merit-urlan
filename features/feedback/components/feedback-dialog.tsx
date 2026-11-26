@@ -3,7 +3,7 @@
 import { ArrowUpRight, CheckCircle2, Clock, Landmark, MapPin, MessageCircle, MessageSquareText, Phone, Send, X } from "lucide-react";
 import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 
-import { sendFeedback, type FeedbackState } from "@/server/modules/feedback/actions";
+import { sendFeedback, type FeedbackState } from "@/server/services/feedback/actions";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { ADDRESS, BANK, MESSENGER_URL, PHONE } from "@/lib/site-config";
 

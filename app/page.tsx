@@ -6,7 +6,7 @@ import { ServicesSection } from "@/features/home/components/services-section";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { WhySection } from "@/features/home/components/why-section";
-import { getPatterns } from "@/server/modules/patterns/queries";
+import { getPatterns } from "@/server/services/patterns/queries";
 
 export default async function HomePage() {
   const [latestPattern] = await getPatterns({ sort: "new" });

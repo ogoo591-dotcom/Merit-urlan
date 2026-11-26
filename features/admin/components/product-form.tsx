@@ -4,7 +4,8 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 
-import { saveProductAction, type FormState } from "@/server/modules/catalog/admin-actions";
+import { saveProductAction } from "@/server/services/catalog/admin-actions";
+import type { FormState } from "@/types/forms";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton } from "@/features/admin/components/ui";
 import { productColors, type ColorKey, type ProductType, type StoreProduct } from "@/types/catalog";

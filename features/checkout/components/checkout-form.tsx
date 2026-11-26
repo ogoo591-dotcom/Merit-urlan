@@ -10,7 +10,7 @@ import { AddressFields, readAddressFields } from "@/features/checkout/components
 import { CartLineRow, SelectAllRow } from "@/features/cart/components/cart-lines";
 import { useCart } from "@/features/cart/components/cart-provider";
 import { formatAddress, useDeliveryAddress } from "@/features/checkout/components/delivery-address-provider";
-import { checkCart, placeOrder } from "@/server/modules/orders/actions";
+import { checkCart, placeOrder } from "@/server/services/orders/actions";
 import { BankTransferDialog } from "@/features/checkout/components/bank-transfer-dialog";
 import { useData } from "@/hooks/use-data";
 import { formatPrice } from "@/lib/format";

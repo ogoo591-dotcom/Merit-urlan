@@ -18,15 +18,19 @@ Merit урлан — гар урлалын (crochet, amigurumi) бизнес. 5 
 app/                 ЗӨВХӨН route (page, layout, route.ts). Бизнес логик, actions.ts энд байхгүй.
   (auth)/            sign-in, sign-up, sso-callback (route group — URL өөрчлөгдөхгүй)
 server/              BACKEND бүхэлдээ (файл бүр "server-only"; actions.ts нь "use server")
-  modules/<модуль>/  catalog, courses, patterns, orders, payments, purchases, notifications, feedback
-    queries.ts         унших (RSC page шууд дуудна)
-    service.ts         бичих, бизнес логик
-    actions.ts         хэрэглэгчийн server action
+  services/<модуль>/ catalog, courses, patterns, orders, payments, purchases, notifications, feedback — ЗӨВХӨН бизнес логик, SQL байхгүй
+    queries.ts         repository-оос уншаад types/-ийн хэлбэр рүү хөрвүүлнэ (RSC page шууд дуудна)
+    service.ts         бизнесийн дүрэм + transaction (repository дуудна)
+    actions.ts         хэрэглэгчийн server action (оролт шалгах → service)
     admin-actions.ts   админы server action — эхний мөр нь requireAdmin()
-    schema.ts          Drizzle хүснэгт (DB үе шатанд нэмнэ)
-  db/                client.ts, schema.ts (модулиудын schema-г нэгтгэнэ)
+  repository/<сэдэв>/ DB-ийн бүх query. Нэг файл = нэг хүснэгт, нэр нь prefix-гүй kebab (md_product_image → catalog/product-image.ts).
+                       Нарийн query: <хүснэгт>-<зорилго>.ts (catalog/product-search.ts); олширвол хавтас (catalog/product/).
+                       Олон сэдэв хамарсан query → report/. Бизнесийн шийдвэр гаргахгүй; функц бүр tx-ийг заавал биш авна.
+  db/                client.ts (getDb, Tx), columns.ts (нийтлэг багана)
+    schema/            Drizzle хүснэгт сэдвээр: user, catalog, course, pattern, order, finance, access, notification
+                       (index.ts нэгтгэнэ). Prefix: md_ үндсэн, fin_ санхүү, rl_ олон-олон холбоо.
   payment-provider/  mock | qpay (QPay v2 invoice хэлбэртэй)
-  storage/           images.ts (Cloudinary/mock), pattern-files.ts (PDF, private)
+  storage/           Supabase Storage: images.ts (media bucket, public), pattern-files.ts (private bucket). Видео → Bunny Stream
   mock/              .mock-db/db.json сан — DB руу шилжсэний дараа устгана
   auth.ts, admin-access.ts, env.ts, listing.ts
 types/<модуль>.ts    client + server-ийн дундын төрөл, label, жижиг pure функц. server/-ээс юу ч import хийхгүй.
@@ -35,21 +39,25 @@ features/<хэсэг>/    FRONTEND: components/*.tsx + хэсгийн тусла
 components/          дундын UI: ui/ (суурь элемент, shadcn энд), common/, layout/ (header, footer, drawer), providers/
 hooks/               дундын client hook
 lib/                 client + server дундын туслахууд: format, redirect, site-config, navigation, content/, progress, local-store
-db/migrations/       drizzle-kit-ийн гаралт
+db/migrations/       drizzle-kit-ийн гаралт (db:generate → db:migrate). Storage bucket-ийн SQL ч энд (custom migration)
+scripts/             db-check.ts, db-seed.ts (mock → DB)
 ```
 Хилийн дүрэм:
-- app/ нь server/modules/*-ийн queries, actions-ийг дуудна; DB/mock-д шууд хандахгүй.
+- app/ нь server/services/*-ийн queries, actions-ийг дуудна; DB/mock-д шууд хандахгүй.
 - Client компонент server/-ээс зөвхөн actions.ts, admin-actions.ts-ийг import хийнэ; төрлийг types/-ээс авна.
+- getDb() болон server/db/schema-г ЗӨВХӨН server/repository/* import хийнэ. services/* DB-д зөвхөн repository-оор хандана
+  (өөр сэдвийн repository-г шууд дуудаж болно); app/, features/ repository-д хандахгүй.
+- Олон хүснэгт өөрчлөх үйлдэл (төлбөр баталгаажуулах г.м.) service дотор нэг db.transaction-д, repository-д tx дамжуулна.
 - Модуль хооронд зөвхөн service/queries-ийг дуудна (actions-ийг биш). Хамаарал: payments → orders, purchases, notifications.
 - features/* бие биенийхээ компонентыг хэрэглэж болно, гэхдээ тойрог үүсгэхгүй.
 - components/ui, components/common нь features/-ээс import хийхгүй. components/layout, components/providers (app shell) хийж болно.
 
 MOCK ГОРИМ (одоогийн шат):
-- Бүх өгөгдлийг server/modules/<модуль>/ доторх функцуудаар (queries.ts, service.ts) дамжуулж ав (getProducts(), getCourses(), createOrder() г.м.). Одоогоор эдгээр функц server/mock/ (.mock-db/db.json) өгөгдлийг ашиглана. Дараа нь зөвхөн эдгээр функцын дотор талыг Supabase руу солиход бүх сайт ажилладаг байх ёстой.
+- Бүх өгөгдлийг server/services/<модуль>/ доторх функцуудаар (queries.ts, service.ts) дамжуулж ав (getProducts(), getCourses(), createOrder() г.м.). Одоогоор эдгээр функц server/mock/ (.mock-db/db.json) өгөгдлийг ашиглана. Дараа нь зөвхөн эдгээр функцын дотор талыг Supabase руу солиход бүх сайт ажилладаг байх ёстой.
 - Төлбөр: ДАНСААР ШИЛЖҮҮЛЭХ + АДМИН БАТАЛГААЖУУЛАХ (QPay merchant гэрээ хийгдэх хүртэл). Урсгалын тайлбар: types/payments.ts.
   Бараа/материал (сагс → checkout), сургалт, схем бүгд нэг урсгалтай:
   1) "Төлөх" → features/checkout/components/bank-transfer-dialog.tsx: данс (lib/site-config.ts → BANK), дүн, гүйлгээний утга MU-XXXXXX.
-  2) "Төлбөр шилжүүлсэн" → хүлээгдэж буй төлбөр (server/modules/payments/service.ts → createPayment) + админд мэдэгдэл. Барааны захиалга үүсч үлдэгдэл нөөцлөгдөнө (payment.status "pending").
+  2) "Төлбөр шилжүүлсэн" → хүлээгдэж буй төлбөр (server/services/payments/service.ts → createPayment) + админд мэдэгдэл. Барааны захиалга үүсч үлдэгдэл нөөцлөгдөнө (payment.status "pending").
   3) Админ /admin/payments-д банкны хуулгатай тулгаад "Баталгаажуулах" → захиалга төлөгдсөн, сургалт/схем нээгдэнэ, хэрэглэгчид мэдэгдэл.
      "Татгалзах" → захиалгын үлдэгдэл буцна, хэрэглэгчид мэдэгдэл.
   QPay холбоход 2-р алхмыг QPay invoice + callback-аар сольж, approvePayment()-ийг callback-аас дуудна.
@@ -104,7 +112,7 @@ Drawer-ийн карт: гарчиг дээр дарахад тухайн анг
      Drawer-т эхний 2-ыг харуулж, үлдсэнийг "+N" (catalogCard-ийн limit) болгоно.
 3. Сургалт (/courses) — ангилалгүй, түвшингүй (анхан/дунд/ахисан гэж ангилахгүй). 3 сургалтын багц (server/mock/courses.ts):
    Хүүхдийн багц (kids-set), Шинэ жилийн багц (new-year-set), Ороолт малгайны багц (scarf-hat-set). Drawer-т бүх сургалт жагсаалтаар (нүүр зураг, нэр, хичээлийн тоо, үнэ, "1-р хичээл үнэгүй"),
-   өгөгдлийг server/modules/courses/actions.ts → getDrawerCourses() server action-оор уншина. /courses хуудасны зүүн самбарт "Ангиллууд" нь 3 багцын нэр (?package=<id>), түвшний шүүлтүүргүй.
+   өгөгдлийг server/services/courses/actions.ts → getDrawerCourses() server action-оор уншина. /courses хуудасны зүүн самбарт "Ангиллууд" нь 3 багцын нэр (?package=<id>), түвшний шүүлтүүргүй.
 4. Схем заавар
    • Үнэгүй схем (/patterns?access=free, price = 0) — зурагтай grid; дарахад орчуулсан схем шууд нээгдэнэ (/patterns/[id]/view).
    • Төлбөртэй схем (/patterns?access=paid) — зурагтай grid; дарахад дэлгэрэнгүй → mock QPay → төлсний дараа /patterns/[id]/view автоматаар нээгдэнэ,

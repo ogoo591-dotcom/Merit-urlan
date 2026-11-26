@@ -2,11 +2,11 @@ import { Pencil, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { updateStockAction } from "@/server/modules/catalog/admin-actions";
+import { updateStockAction } from "@/server/services/catalog/admin-actions";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Notice, PageHeader, StatusPill, primaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getProducts } from "@/server/modules/catalog/queries";
+import { getProducts } from "@/server/services/catalog/queries";
 import type { ProductType } from "@/types/catalog";
 import { formatPrice } from "@/lib/format";
 

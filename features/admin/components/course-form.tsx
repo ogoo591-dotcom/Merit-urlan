@@ -4,7 +4,8 @@ import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useActionState, useState } from "react";
 
-import { saveCourseAction, type FormState } from "@/server/modules/courses/admin-actions";
+import { saveCourseAction } from "@/server/services/courses/admin-actions";
+import type { FormState } from "@/types/forms";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Notice, cardClass, hintClass, inputClass, labelClass, primaryButton, secondaryButton } from "@/features/admin/components/ui";
 import type { Course } from "@/types/courses";

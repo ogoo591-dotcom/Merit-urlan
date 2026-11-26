@@ -5,13 +5,13 @@ import { OrdersList } from "@/features/account/components/orders-list";
 import { PendingPayments, PurchasedCourses, PurchasedPatterns } from "@/features/account/components/purchased-items";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { getCourse } from "@/server/modules/courses/queries";
+import { getCourse } from "@/server/services/courses/queries";
 import type { CourseDetail } from "@/types/courses";
-import { getOrdersByUser } from "@/server/modules/orders/queries";
-import { getPaymentsByUser } from "@/server/modules/payments/queries";
-import { getPattern } from "@/server/modules/patterns/queries";
+import { getOrdersByUser } from "@/server/services/orders/queries";
+import { getPaymentsByUser } from "@/server/services/payments/queries";
+import { getPattern } from "@/server/services/patterns/queries";
 import type { PatternDetail } from "@/types/patterns";
-import { getPurchasedCourseIds, getPurchasedPatternIds } from "@/server/modules/purchases/queries";
+import { getPurchasedCourseIds, getPurchasedPatternIds } from "@/server/services/purchases/queries";
 
 export const metadata: Metadata = { title: "Миний захиалгууд | Merit Urlan" };
 

@@ -4,8 +4,8 @@ import Link from "next/link";
 
 import { Notice, PageHeader, primaryButton } from "@/features/admin/components/ui";
 import { requireAdmin } from "@/server/auth";
-import { getCourses } from "@/server/modules/courses/queries";
-import { getAllPurchases } from "@/server/modules/purchases/queries";
+import { getCourses } from "@/server/services/courses/queries";
+import { getAllPurchases } from "@/server/services/purchases/queries";
 import { formatPrice } from "@/lib/format";
 
 export default async function AdminCoursesPage({ searchParams }: { searchParams: Promise<{ saved?: string; deleted?: string }> }) {
