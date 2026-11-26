@@ -1,18 +1,23 @@
 import { sql } from "drizzle-orm";
-import { boolean, index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
-import { timestamps } from "../columns";
+import { timestamps, visibility } from "../columns";
 
 // Clerk-ийн хэрэглэгчийн хуулбар (webhook + захиалга/төлбөр үүсгэхэд upsert). Нэвтрэлт, админ эрх Clerk-д үлдэнэ.
-export const mdUser = pgTable("md_user", {
-  id: text().primaryKey(),
-  email: text().unique(),
-  name: text(),
-  phone: text(),
-  imageUrl: text(),
-  deletedAt: timestamp({ withTimezone: true }),
-  ...timestamps,
-}).enableRLS();
+// is_active = false: админ хаасан (Clerk ban-тай хамт) — захиалга, төлбөр хийхийг хориглоно. Webhook хөндөхгүй.
+// deleted_at: Clerk-ээс устсан. Имэйл зөвхөн устаагүй хэрэглэгчдийн дунд давтагдахгүй (ижил gmail-ээр дахин бүртгүүлж болно).
+export const mdUser = pgTable(
+  "md_user",
+  {
+    id: text().primaryKey(),
+    email: text().notNull(),
+    name: text(),
+    imageUrl: text().notNull().default(""),
+    ...visibility,
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("md_user_email_active_uq").on(t.email).where(sql`${t.deletedAt} is null`)],
+).enableRLS();
 
 // Хэрэглэгчийн өөрөө бөглөдөг профайл (Clerk webhook хөндөхгүй). Анхны захиалга эсвэл /account/profile-д бөглөнө.
 export const mdPerson = pgTable("md_person", {

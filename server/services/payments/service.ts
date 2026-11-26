@@ -10,7 +10,7 @@ import { transaction, type DbExecutor } from "@/server/repository/transaction";
 import { notifyAdmin, notifyCustomer } from "@/server/services/notifications/service";
 import { createOrder } from "@/server/services/orders/service";
 import { grantAccess } from "@/server/services/purchases/service";
-import { syncUser } from "@/server/services/users/service";
+import { ensureActiveUser } from "@/server/services/users/service";
 import { paymentCodePattern, type Payment } from "@/types/payments";
 import type { CartInput, Order } from "@/types/orders";
 
@@ -69,7 +69,7 @@ const notifyNewPayment = (payment: paymentRepo.PaymentRow) =>
 
 // Сургалт/схем дангаар нь авах: хүлээгдэж буй төлбөр үүсгэж админд мэдэгдэнэ.
 export async function createPayment(input: PaymentInput) {
-  await syncUser(input.userId);
+  await ensureActiveUser(input.userId);
   const payment = await transaction((tx) => recordPayment(input, tx));
   await notifyNewPayment(payment);
   return payment;
@@ -85,7 +85,7 @@ export async function submitCheckout(input: {
   cart: CartInput;
   courses: Array<Item & { title: string }>;
 }) {
-  await syncUser(input.userId);
+  await ensureActiveUser(input.userId);
   const { order, payment } = await transaction(async (tx) => {
     const created = input.cart.length
       ? await createOrder({ userId: input.userId, customer: input.customer, address: input.address, note: input.note, cart: input.cart }, tx)
