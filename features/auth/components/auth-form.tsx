@@ -2,9 +2,8 @@
 
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { useSignIn, useSignUp } from "@clerk/nextjs/legacy";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-type Method = "phone" | "email";
 type Flow = "signIn" | "signUp";
 
 type AuthFormProps = {
@@ -17,8 +16,14 @@ type AuthFormProps = {
 
 const codeLength = 6;
 const resendSeconds = 60;
-const phonePattern = /^[0-9]{8}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Facebook, Messenger, Instagram зэргийн дотоод браузерт Google OAuth-ийг хаадаг (disallowed_useragent).
+const inAppBrowserPattern = /FBAN|FBAV|FB_IAB|FBIOS|Messenger|Instagram|Line\/|KAKAOTALK|TikTok/i;
+
+const noopSubscribe = () => () => {};
+function useInAppBrowser() {
+  return useSyncExternalStore(noopSubscribe, () => inAppBrowserPattern.test(navigator.userAgent), () => false);
+}
 
 function readError(error: unknown) {
   if (isClerkAPIResponseError(error)) {
@@ -32,9 +37,9 @@ function readError(error: unknown) {
         return "Хэт олон оролдлого хийлээ. Түр хүлээгээд дахин оролдоно уу.";
       case "form_param_format_invalid":
       case "form_identifier_invalid":
-        return "Утасны дугаар эсвэл имэйл буруу форматтай байна.";
+        return "Имэйл буруу форматтай байна.";
       case "strategy_for_user_invalid":
-        return "Энэ аргаар нэвтрэх боломжгүй. Нөгөө аргыг сонгоно уу.";
+        return "Энэ имэйл Google-ээр бүртгэгдсэн байна. «Google-р нэвтрэх»-ийг сонгоно уу.";
       default:
         return first?.longMessage ?? first?.message ?? "Алдаа гарлаа. Дахин оролдоно уу.";
     }
@@ -46,18 +51,6 @@ function CloseIcon() {
   return (
     <svg aria-hidden="true" className="h-6 w-6" viewBox="0 0 24 24" fill="none">
       <path d="M5 5l14 14M19 5 5 19" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function FacebookIcon() {
-  return (
-    <svg aria-hidden="true" className="h-6 w-6" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="12" fill="#1877F2" />
-      <path
-        d="M15.1 12.9l.4-2.8h-2.7V8.3c0-.8.4-1.5 1.6-1.5h1.2V4.4s-1.1-.2-2.2-.2c-2.2 0-3.7 1.4-3.7 3.8v2.1H7.3v2.8h2.4V20h3.1v-7.1h2.3z"
-        fill="#fff"
-      />
     </svg>
   );
 }
@@ -86,12 +79,12 @@ function Divider() {
 const outlineButtonClass =
   "flex w-full items-center rounded-[14px] border border-[#eadfd5] bg-white px-6 py-4 text-[14px] text-[#4a3b35] transition hover:border-[#6e4f45] disabled:opacity-50";
 
+// Үндсэн арга Google; имэйлээр код авах нь нөөц (дотоод браузер, Gmail-гүй хэрэглэгч).
 export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormProps) {
   const { isLoaded: signInLoaded, signIn, setActive } = useSignIn();
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
+  const inAppBrowser = useInAppBrowser();
 
-  const [method, setMethod] = useState<Method>("phone");
-  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [step, setStep] = useState<"identify" | "verify">("identify");
   const [flow, setFlow] = useState<Flow>("signIn");
@@ -102,8 +95,8 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
   const codeRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const ready = signInLoaded && signUpLoaded;
-  const identifierValid = method === "phone" ? phonePattern.test(phone) : emailPattern.test(email.trim());
-  const displayIdentifier = method === "phone" ? phone : email.trim();
+  const emailAddress = email.trim();
+  const emailValid = emailPattern.test(emailAddress);
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -117,38 +110,24 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
 
   // Бүртгэлтэй бол нэвтрэх код, бүртгэлгүй бол шинээр бүртгэх код илгээнэ.
   async function sendCode() {
-    if (!ready || !identifierValid) return;
+    if (!ready || !emailValid) return;
     setBusy(true);
     setError(null);
 
-    const phoneNumber = `+976${phone}`;
-    const emailAddress = email.trim();
-
     try {
       try {
-        const attempt = await signIn.create({ identifier: method === "phone" ? phoneNumber : emailAddress });
-        if (method === "phone") {
-          const factor = attempt.supportedFirstFactors?.find((item) => item.strategy === "phone_code");
-          if (!factor || factor.strategy !== "phone_code") throw new Error("NO_FACTOR");
-          await attempt.prepareFirstFactor({ strategy: "phone_code", phoneNumberId: factor.phoneNumberId });
-        } else {
-          const factor = attempt.supportedFirstFactors?.find((item) => item.strategy === "email_code");
-          if (!factor || factor.strategy !== "email_code") throw new Error("NO_FACTOR");
-          await attempt.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
-        }
+        const attempt = await signIn.create({ identifier: emailAddress });
+        const factor = attempt.supportedFirstFactors?.find((item) => item.strategy === "email_code");
+        if (!factor || factor.strategy !== "email_code") throw new Error("NO_FACTOR");
+        await attempt.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
         setFlow("signIn");
       } catch (signInError) {
         const notFound =
           isClerkAPIResponseError(signInError) && signInError.errors[0]?.code === "form_identifier_not_found";
         if (!notFound) throw signInError;
 
-        if (method === "phone") {
-          await signUp.create({ phoneNumber });
-          await signUp.preparePhoneNumberVerification({ strategy: "phone_code" });
-        } else {
-          await signUp.create({ emailAddress });
-          await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-        }
+        await signUp.create({ emailAddress });
+        await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
         setFlow("signUp");
       }
 
@@ -158,7 +137,7 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
     } catch (sendError) {
       setError(
         sendError instanceof Error && sendError.message === "NO_FACTOR"
-          ? "Энэ аргаар код илгээх боломжгүй байна. Нөгөө аргыг сонгоно уу."
+          ? "Энэ имэйлээр код илгээх боломжгүй байна. «Google-р нэвтрэх»-ийг сонгоно уу."
           : readError(sendError),
       );
     } finally {
@@ -173,17 +152,11 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
 
     try {
       if (flow === "signIn") {
-        const result = await signIn.attemptFirstFactor({
-          strategy: method === "phone" ? "phone_code" : "email_code",
-          code: value,
-        });
+        const result = await signIn.attemptFirstFactor({ strategy: "email_code", code: value });
         if (result.status !== "complete") throw new Error(`SIGN_IN_${result.status}`);
         await setActive({ session: result.createdSessionId });
       } else {
-        const result =
-          method === "phone"
-            ? await signUp.attemptPhoneNumberVerification({ code: value })
-            : await signUp.attemptEmailAddressVerification({ code: value });
+        const result = await signUp.attemptEmailAddressVerification({ code: value });
         if (result.status !== "complete") throw new Error(`SIGN_UP_${result.status}`);
         await setActive({ session: result.createdSessionId });
       }
@@ -191,7 +164,7 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
     } catch (verifyError) {
       setError(
         verifyError instanceof Error && verifyError.message.startsWith("SIGN_")
-          ? "Нэмэлт мэдээлэл шаардлагатай байна. Clerk тохиргоонд зөвхөн утас/имэйл шаарддаг эсэхийг шалгана уу."
+          ? "Нэмэлт мэдээлэл шаардлагатай байна. Clerk тохиргоонд зөвхөн имэйл шаарддаг эсэхийг шалгана уу."
           : readError(verifyError),
       );
       setCode(Array(codeLength).fill(""));
@@ -205,7 +178,7 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
     const digits = raw.replace(/\D/g, "");
     const next = [...code];
 
-    // Мессежээс бүтэн кодыг хуулж буулгасан тохиолдол.
+    // Имэйлээс бүтэн кодыг хуулж буулгасан тохиолдол.
     if (digits.length > 1) {
       digits.slice(0, codeLength - index).split("").forEach((digit, offset) => (next[index + offset] = digit));
     } else {
@@ -219,13 +192,14 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
     if (filled.length === codeLength) void verify(filled);
   }
 
-  async function continueWithOAuth(strategy: "oauth_google" | "oauth_facebook") {
+  // Шинэ хэрэглэгч бол /sso-callback дээр Clerk өөрөө бүртгэл рүү шилжүүлнэ.
+  async function continueWithGoogle() {
     if (!ready) return;
     setBusy(true);
     setError(null);
     try {
       await signIn.authenticateWithRedirect({
-        strategy,
+        strategy: "oauth_google",
         redirectUrl: "/sso-callback",
         redirectUrlComplete: redirectTo,
       });
@@ -248,8 +222,7 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
         </div>
 
         <p className="mt-6 text-[15px] leading-[1.8] text-[#4a3b35]">
-          Таны <strong className="text-[#2f2420]">{displayIdentifier}</strong>{" "}
-          {method === "phone" ? "дугаарт" : "хаягт"} илгээсэн 6 оронтой баталгаажуулах кодыг оруулна уу.
+          Таны <strong className="text-[#2f2420]">{emailAddress}</strong> хаягт илгээсэн 6 оронтой баталгаажуулах кодыг оруулна уу.
         </p>
 
         <div className="mt-8 grid grid-cols-6 gap-3">
@@ -293,7 +266,7 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
           }}
           className="mt-4 w-full text-center text-[13px] text-[#8a7b73] hover:text-[#4a3b35]"
         >
-          ← {method === "phone" ? "Дугаар" : "Имэйл"} солих
+          ← Имэйл солих
         </button>
       </div>
     );
@@ -314,6 +287,26 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
         Та нэвтрээд дуртай бүтээлээ хадгалж, захиалга өгөөрэй!
       </p>
 
+      <button
+        type="button"
+        disabled={busy || !ready || inAppBrowser}
+        onClick={continueWithGoogle}
+        className={`${outlineButtonClass} mt-6`}
+      >
+        <GoogleIcon />
+        <span className="flex-1 text-center">Google-р нэвтрэх</span>
+      </button>
+      {inAppBrowser ? (
+        <p className="mt-3 rounded-[12px] bg-[#fdf0dc] px-4 py-3 text-[12px] leading-[1.7] text-[#9a6412]">
+          Facebook, Messenger доторх хөтөчөөс Google-р нэвтрэх боломжгүй. Баруун дээд буланд «…» → «Хөтөчид нээх»-ийг дарах
+          эсвэл доор имэйлээрээ нэвтэрнэ үү.
+        </p>
+      ) : null}
+
+      <div className="mt-6">
+        <Divider />
+      </div>
+
       <form
         className="mt-6"
         onSubmit={(event) => {
@@ -321,48 +314,18 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
           void sendCode();
         }}
       >
-        <div className="mb-3 flex items-center justify-between">
-          <label htmlFor="auth-identifier" className="text-[14px] text-[#2f2420]">
-            {method === "phone" ? "Утас" : "Имэйл"}
-          </label>
-          <button
-            type="button"
-            onClick={() => {
-              setMethod(method === "phone" ? "email" : "phone");
-              setError(null);
-            }}
-            className="text-[13px] font-medium text-[#6e4f45] underline-offset-4 hover:underline"
-          >
-            {method === "phone" ? "Имэйлээр нэвтрэх" : "Утсаар нэвтрэх"}
-          </button>
-        </div>
-
-        <div className="flex overflow-hidden rounded-[14px] border border-[#eadfd5] bg-white focus-within:border-[#2f2420] focus-within:ring-1 focus-within:ring-[#2f2420]">
-          {method === "phone" ? (
-            <span className="flex items-center border-r border-[#eadfd5] px-5 text-[16px] text-[#8a7b73]">+976</span>
-          ) : null}
-          {method === "phone" ? (
-            <input
-              id="auth-identifier"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 8))}
-              inputMode="numeric"
-              autoComplete="tel-national"
-              placeholder="Энд оруулна уу"
-              className="min-w-0 flex-1 px-5 py-4 text-[16px] text-[#2f2420] outline-none placeholder:text-[#b3a69e]"
-            />
-          ) : (
-            <input
-              id="auth-identifier"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              placeholder="name@example.com"
-              className="min-w-0 flex-1 px-5 py-4 text-[16px] text-[#2f2420] outline-none placeholder:text-[#b3a69e]"
-            />
-          )}
-        </div>
+        <label htmlFor="auth-email" className="mb-3 block text-[14px] text-[#2f2420]">
+          Имэйлээр код авах
+        </label>
+        <input
+          id="auth-email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
+          placeholder="name@example.com"
+          className="w-full rounded-[14px] border border-[#eadfd5] bg-white px-5 py-4 text-[16px] text-[#2f2420] outline-none placeholder:text-[#b3a69e] focus:border-[#2f2420] focus:ring-1 focus:ring-[#2f2420]"
+        />
 
         {error ? <p className="mt-3 text-[13px] text-[#b04a4a]">{error}</p> : null}
 
@@ -371,27 +334,12 @@ export function AuthForm({ onSuccess, onGuest, onClose, redirectTo }: AuthFormPr
 
         <button
           type="submit"
-          disabled={!ready || !identifierValid || busy}
+          disabled={!ready || !emailValid || busy}
           className="mt-3 w-full rounded-[14px] bg-[#2f2420] px-6 py-4 text-[16px] font-medium text-white transition hover:bg-[#6e4f45] disabled:cursor-not-allowed disabled:bg-[#c9bfb8]"
         >
-          {busy ? "Илгээж байна…" : "Үргэлжлүүлэх"}
+          {busy ? "Илгээж байна…" : "Код авах"}
         </button>
       </form>
-
-      <div className="mt-6">
-        <Divider />
-      </div>
-
-      <div className="mt-6 space-y-3">
-        <button type="button" disabled={busy} onClick={() => continueWithOAuth("oauth_facebook")} className={outlineButtonClass}>
-          <FacebookIcon />
-          <span className="flex-1 text-center">Facebook-р нэвтрэх</span>
-        </button>
-        <button type="button" disabled={busy} onClick={() => continueWithOAuth("oauth_google")} className={outlineButtonClass}>
-          <GoogleIcon />
-          <span className="flex-1 text-center">Google-р нэвтрэх</span>
-        </button>
-      </div>
 
       <p className="mt-6 text-[12px] leading-[1.8] text-[#8a7b73]">
         Нэвтэрснээр та манай <span className="underline">Үйлчилгээний нөхцөл</span>,{" "}
